@@ -10,6 +10,7 @@ import { onMounted, onUnmounted, computed } from 'vue'
 import { useDesktop } from '~/composables/useDesktop'
 import { useWindowManager } from '~/composables/useWindowManager'
 import DesktopIcon from './DesktopIcon.vue'
+import Trash from './Trash.vue'
 import Window from '~/components/window/Window.vue'
 
 const {
@@ -113,11 +114,10 @@ onUnmounted(() => {
     @contextmenu="handleContextMenu"
   >
     <!-- Desktop Icons -->
-    <DesktopIcon
-      v-for="icon in icons"
-      :key="icon.id"
-      :icon="icon"
-    />
+    <template v-for="icon in icons" :key="icon.id">
+      <Trash v-if="icon.type === 'trash'" :icon="icon" />
+      <DesktopIcon v-else :icon="icon" />
+    </template>
 
     <!-- Windows -->
     <Window

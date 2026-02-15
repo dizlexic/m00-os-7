@@ -6,6 +6,7 @@
  */
 
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import Clock from '~/components/system/Clock.vue'
 
 interface MenuItem {
   id: string
@@ -34,7 +35,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 // State
 const activeMenuId = ref<string | null>(null)
-const currentTime = ref('')
 
 // Menus configuration
 const appleMenuItems: MenuItem[] = [
@@ -104,16 +104,6 @@ const menus = computed<Menu[]>(() => [
   { id: 'special', label: 'Special', items: specialMenuItems }
 ])
 
-// Time formatting
-function updateTime(): void {
-  const now = new Date()
-  const hours = now.getHours()
-  const minutes = now.getMinutes().toString().padStart(2, '0')
-  const ampm = hours >= 12 ? 'PM' : 'AM'
-  const displayHours = hours % 12 || 12
-  currentTime.value = `${displayHours}:${minutes} ${ampm}`
-}
-
 // Menu handlers
 function handleMenuClick(menuId: string): void {
   if (activeMenuId.value === menuId) {
@@ -154,18 +144,11 @@ function handleShutdown(): void {
 }
 
 // Lifecycle
-let timeInterval: ReturnType<typeof setInterval> | null = null
-
 onMounted(() => {
-  updateTime()
-  timeInterval = setInterval(updateTime, 1000)
   document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
-  if (timeInterval) {
-    clearInterval(timeInterval)
-  }
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
@@ -245,9 +228,7 @@ onUnmounted(() => {
     <div class="menu-bar__spacer" />
 
     <!-- Clock -->
-    <div class="menu-bar__clock">
-      {{ currentTime }}
-    </div>
+    <Clock />
   </div>
 </template>
 
@@ -302,13 +283,6 @@ onUnmounted(() => {
 
 .menu-bar__spacer {
   flex: 1;
-}
-
-.menu-bar__clock {
-  padding: 0 var(--spacing-md);
-  height: 100%;
-  display: flex;
-  align-items: center;
 }
 
 .menu-bar__dropdown {

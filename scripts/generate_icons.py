@@ -377,6 +377,115 @@ def generate_sad_mac():
 
 
 # ============================================
+# Alert Dialog Icons
+# ============================================
+
+def generate_alert_stop_icon():
+    """Generate Stop alert icon (red octagon with hand)."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Red octagon shape
+    octagon_points = [
+        (10, 2),
+        (22, 2),
+        (30, 10),
+        (30, 22),
+        (22, 30),
+        (10, 30),
+        (2, 22),
+        (2, 10)
+    ]
+    draw.polygon(octagon_points, fill=COLORS['red'], outline=COLORS['black'])
+
+    # Inner highlight
+    inner_octagon = [
+        (12, 5),
+        (20, 5),
+        (27, 12),
+        (27, 20),
+        (20, 27),
+        (12, 27),
+        (5, 20),
+        (5, 12)
+    ]
+    draw.polygon(inner_octagon, outline=COLORS['white'])
+
+    # Hand symbol (simplified stop hand)
+    # Palm
+    draw.rectangle([12, 10, 20, 22], fill=COLORS['white'], outline=COLORS['black'])
+    # Fingers
+    draw.rectangle([12, 6, 14, 10], fill=COLORS['white'], outline=COLORS['black'])
+    draw.rectangle([15, 5, 17, 10], fill=COLORS['white'], outline=COLORS['black'])
+    draw.rectangle([18, 6, 20, 10], fill=COLORS['white'], outline=COLORS['black'])
+    # Thumb
+    draw.rectangle([9, 12, 12, 16], fill=COLORS['white'], outline=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'alert-stop', 'icons/system')
+
+def generate_alert_caution_icon():
+    """Generate Caution alert icon (yellow triangle with exclamation)."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Yellow triangle
+    triangle_points = [
+        (16, 2),
+        (30, 28),
+        (2, 28)
+    ]
+    draw.polygon(triangle_points, fill=COLORS['yellow'], outline=COLORS['black'])
+
+    # Inner border for 3D effect
+    inner_triangle = [
+        (16, 6),
+        (26, 26),
+        (6, 26)
+    ]
+    draw.polygon(inner_triangle, outline=COLORS['folder_dark'])
+
+    # Exclamation mark
+    # Stem
+    draw.rectangle([14, 10, 18, 20], fill=COLORS['black'])
+    # Dot
+    draw.rectangle([14, 23, 18, 27], fill=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'alert-caution', 'icons/system')
+
+def generate_alert_note_icon():
+    """Generate Note alert icon (speech bubble with 'i')."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Speech bubble / rounded rectangle
+    draw.rounded_rectangle([2, 2, 30, 24], radius=4, fill=COLORS['blue'], outline=COLORS['black'])
+
+    # Bubble tail
+    tail_points = [
+        (8, 24),
+        (6, 30),
+        (14, 24)
+    ]
+    draw.polygon(tail_points, fill=COLORS['blue'], outline=COLORS['black'])
+    # Cover the outline inside bubble
+    draw.line([(9, 24), (13, 24)], fill=COLORS['blue'])
+
+    # "i" for information
+    # Dot
+    draw.ellipse([14, 6, 18, 10], fill=COLORS['white'])
+    # Stem
+    draw.rectangle([14, 12, 18, 21], fill=COLORS['white'])
+    # Serifs
+    draw.rectangle([12, 12, 20, 14], fill=COLORS['white'])
+    draw.rectangle([12, 19, 20, 21], fill=COLORS['white'])
+
+    img = add_shadow(img)
+    save_icon(img, 'alert-note', 'icons/system')
+
+
+# ============================================
 # Main Generation Functions
 # ============================================
 
@@ -393,6 +502,9 @@ def generate_system_icons():
     generate_application_icon()
     generate_happy_mac()
     generate_sad_mac()
+    generate_alert_stop_icon()
+    generate_alert_caution_icon()
+    generate_alert_note_icon()
     print('System icons complete!')
 
 def generate_app_icons():

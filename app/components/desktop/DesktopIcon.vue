@@ -11,6 +11,7 @@ import type { DesktopIcon } from '~/types/desktop'
 import type { WindowType } from '~/types/window'
 import { useDesktop } from '~/composables/useDesktop'
 import { useWindowManager } from '~/composables/useWindowManager'
+import { useTrash } from '~/composables/useTrash'
 
 interface Props {
   icon: DesktopIcon
@@ -18,16 +19,26 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const emit = defineEmits<{
+  (e: 'contextmenu', event: MouseEvent): void
+}>()
+
 const {
   selectIcon,
   toggleSelection,
   moveIcon,
+  getIconById,
   startRenaming,
   finishRenaming,
-  cancelRenaming
+  cancelRenaming,
+  isDragging: globalIsDragging,
+  dropTargetId,
+  setDragging,
+  setDropTarget
 } = useDesktop()
 
 const { openWindow } = useWindowManager()
+const { moveToTrash } = useTrash()
 
 // Local state
 const isDragging = ref(false)
@@ -67,6 +78,7 @@ function handleMouseDown(event: MouseEvent): void {
 
   // Start drag tracking
   isDragging.value = true
+  setDragging(true)
 
   // Add global mouse event listeners
   window.addEventListener('mousemove', handleGlobalMouseMove)
@@ -85,9 +97,35 @@ function handleGlobalMouseMove(event: MouseEvent): void {
 }
 
 function handleGlobalMouseUp(): void {
-  isDragging.value = false
+  if (isDragging.value) {
+    isDragging.value = false
+    setDragging(false)
+
+    // Handle drop if we have a target
+    if (dropTargetId.value && dropTargetId.value !== props.icon.id) {
+      const targetIcon = getIconById(dropTargetId.value)
+      if (targetIcon?.type === 'trash') {
+        moveToTrash(props.icon.id)
+      }
+      // Reset drop target
+      setDropTarget(null)
+    }
+  }
+
   window.removeEventListener('mousemove', handleGlobalMouseMove)
   window.removeEventListener('mouseup', handleGlobalMouseUp)
+}
+
+function handleMouseEnter(): void {
+  if (globalIsDragging.value && !props.icon.isSelected) {
+    setDropTarget(props.icon.id)
+  }
+}
+
+function handleMouseLeave(): void {
+  if (dropTargetId.value === props.icon.id) {
+    setDropTarget(null)
+  }
 }
 
 function handleClick(event: MouseEvent): void {
@@ -187,7 +225,7 @@ function handleContextMenu(event: MouseEvent): void {
     selectIcon(props.icon.id)
   }
 
-  // TODO: Show icon-specific context menu
+  emit('contextmenu', event)
 }
 </script>
 
@@ -196,10 +234,13 @@ function handleContextMenu(event: MouseEvent): void {
     class="desktop-icon"
     :class="{
       'desktop-icon--selected': icon.isSelected,
-      'desktop-icon--dragging': isDragging
+      'desktop-icon--dragging': isDragging,
+      'desktop-icon--drop-target': dropTargetId === icon.id
     }"
     :style="iconStyle"
     @mousedown="handleMouseDown"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
     @click="handleClick"
     @contextmenu="handleContextMenu"
   >
@@ -270,8 +311,9 @@ function handleContextMenu(event: MouseEvent): void {
   image-rendering: crisp-edges;
 }
 
-.desktop-icon--selected .desktop-icon__image {
-  /* Invert colors for selected icon */
+.desktop-icon--selected .desktop-icon__image,
+.desktop-icon--drop-target .desktop-icon__image {
+  /* Invert colors for selected or drop target icon */
   filter: invert(1);
 }
 

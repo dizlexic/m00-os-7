@@ -49,6 +49,10 @@ const contextMenu = ref<ContextMenuState>({
   items: []
 })
 
+// Drag and drop state
+const isDragging = ref<boolean>(false)
+const dropTargetId = ref<string | null>(null)
+
 /**
  * useDesktop composable
  */
@@ -232,6 +236,15 @@ export function useDesktop() {
     showGrid.value = !showGrid.value
   }
 
+  // Drag and drop
+  function setDragging(dragging: boolean): void {
+    isDragging.value = dragging
+  }
+
+  function setDropTarget(id: string | null): void {
+    dropTargetId.value = id
+  }
+
   // Icon renaming
   function startRenaming(id: string): void {
     // First deselect all and stop any other renaming
@@ -329,6 +342,8 @@ export function useDesktop() {
     showGrid: readonly(showGrid),
     marquee: readonly(marquee),
     contextMenu: readonly(contextMenu),
+    isDragging: readonly(isDragging),
+    dropTargetId: readonly(dropTargetId),
 
     // Computed
     selectedIcons,
@@ -362,6 +377,10 @@ export function useDesktop() {
     setBackgroundPattern,
     setGridSize,
     toggleGrid,
+
+    // Drag and drop
+    setDragging,
+    setDropTarget,
 
     // Renaming
     startRenaming,

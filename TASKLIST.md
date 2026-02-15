@@ -70,7 +70,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Generate hard drive icon
 - [x] `P1` Generate application icons (generic)
 - [ ] `P1` Generate system preference icons
-- [ ] `P2` Generate alert/warning icons
+- [x] `P2` Generate alert/warning icons
 
 ### 2.3 Application Icons
 - [x] `P1` Generate Calculator icon
@@ -131,7 +131,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Implement multi-select with Shift/Cmd
 - [x] `P1` Add icon rename functionality (click on label)
 - [ ] `P2` Implement icon sorting options
-- [ ] `P2` Add drag-to-trash functionality
+- [x] `P2` Add drag-to-trash functionality
 
 ### 3.3 Menu Bar
 - [x] `P0` Create MenuBar.vue component
@@ -154,11 +154,11 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P2` Add Shut Down option
 
 ### 3.5 Trash
-- [~] `P0` Create Trash.vue component
+- [x] `P0` Create Trash.vue component
 - [x] `P0` Implement empty/full state icons
-- [ ] `P0` Accept dropped items
-- [ ] `P1` Implement "Empty Trash" functionality
-- [ ] `P1` Add confirmation dialog for emptying
+- [x] `P0` Accept dropped items
+- [x] `P1` Implement "Empty Trash" functionality
+- [x] `P1` Add confirmation dialog for emptying
 - [ ] `P2` Show trash contents on double-click
 - [ ] `P2` Implement "Put Away" to restore items
 
@@ -255,21 +255,21 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Implement user data export/import
 
 ### 5.4 Alert Dialogs
-- [ ] `P0` Create AlertDialog.vue component
-- [ ] `P0` Implement modal overlay
-- [ ] `P0` Add icon display (stop, caution, note)
-- [ ] `P0` Display message text
-- [ ] `P0` Add configurable buttons
-- [ ] `P1` Implement keyboard shortcuts (Enter, Escape)
+- [x] `P0` Create AlertDialog.vue component
+- [x] `P0` Implement modal overlay
+- [x] `P0` Add icon display (stop, caution, note)
+- [x] `P0` Display message text
+- [x] `P0` Add configurable buttons
+- [x] `P1` Implement keyboard shortcuts (Enter, Escape)
 - [ ] `P1` Add input field variant (prompt)
 - [ ] `P2` Implement dialog stacking
 - [ ] `P2` Add dialog animations
 
 ### 5.5 Clock Component
-- [ ] `P0` Create Clock.vue component
-- [ ] `P0` Display current time in menu bar
-- [ ] `P0` Update time every minute
-- [ ] `P1` Add click to show date
+- [x] `P0` Create Clock.vue component
+- [x] `P0` Display current time in menu bar
+- [x] `P0` Update time every minute
+- [x] `P1` Add click to show date
 - [ ] `P1` Implement 12/24 hour format toggle
 - [ ] `P1` Add timezone support
 - [ ] `P2` Show day of week option

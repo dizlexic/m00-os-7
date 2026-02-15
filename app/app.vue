@@ -7,6 +7,10 @@
  */
 import Desktop from "~/components/desktop/Desktop.vue";
 import MenuBar from "~/components/desktop/MenuBar.vue";
+import AlertDialog from "~/components/system/AlertDialog.vue";
+import { useAlert } from "~/composables/useAlert";
+
+const { alertState, hideAlert } = useAlert();
 </script>
 
 <template>
@@ -18,6 +22,16 @@ import MenuBar from "~/components/desktop/MenuBar.vue";
 
     <!-- Desktop Environment -->
     <Desktop />
+
+    <!-- System Alerts -->
+    <AlertDialog
+      v-if="alertState.isVisible"
+      :message="alertState.message"
+      :title="alertState.title"
+      :type="alertState.type"
+      :buttons="alertState.buttons"
+      @close="hideAlert"
+    />
   </div>
 </template>
 
