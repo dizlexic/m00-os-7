@@ -271,7 +271,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Update time every minute
 - [x] `P1` Add click to show date
 - [x] `P1` Implement 12/24 hour format toggle
-- [ ] `P1` Add timezone support
+- [x] `P1` Add timezone support
 - [ ] `P2` Show day of week option
 - [ ] `P2` Add alarm functionality
 
@@ -349,7 +349,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 
 ### 7.3 Date & Time Panel
 - [x] `P0` Create DateTimeSettings.vue component
-- [ ] `P0` Implement timezone selection
+- [x] `P0` Implement timezone selection
 - [x] `P0` Add date format options
 - [x] `P0` Add time format (12/24 hour)
 - [x] `P1` Implement clock display options
