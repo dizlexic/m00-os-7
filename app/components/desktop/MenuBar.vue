@@ -49,17 +49,18 @@ const appleMenuItems: MenuItem[] = [
   {
     id: 'control-panels',
     label: 'Control Panels',
+    action: () => handleControlPanels(),
     submenu: [
-      { id: 'cp-apple-menu', label: 'Apple Menu Options' },
-      { id: 'cp-color', label: 'Color' },
-      { id: 'cp-date-time', label: 'Date & Time' },
-      { id: 'cp-desktop-patterns', label: 'Desktop Patterns' },
-      { id: 'cp-extensions', label: 'Extensions Manager' },
-      { id: 'cp-memory', label: 'Memory' },
-      { id: 'cp-monitors', label: 'Monitors' },
-      { id: 'cp-mouse', label: 'Mouse' },
-      { id: 'cp-sound', label: 'Sound' },
-      { id: 'cp-startup-disk', label: 'Startup Disk' }
+      { id: 'cp-apple-menu', label: 'Apple Menu Options', action: () => handleControlPanel('Apple Menu Options', 'apple-menu-settings') },
+      { id: 'cp-color', label: 'Color', action: () => handleControlPanel('Color', 'color-settings') },
+      { id: 'cp-date-time', label: 'Date & Time', action: () => handleControlPanel('Date & Time', 'date-time-settings') },
+      { id: 'cp-desktop-patterns', label: 'Desktop Patterns', action: () => handleControlPanel('Desktop Patterns', 'desktop-patterns-settings') },
+      { id: 'cp-extensions', label: 'Extensions Manager', action: () => handleControlPanel('Extensions Manager', 'extensions-settings') },
+      { id: 'cp-memory', label: 'Memory', action: () => handleControlPanel('Memory', 'memory-settings') },
+      { id: 'cp-monitors', label: 'Monitors', action: () => handleControlPanel('Monitors', 'monitors-settings') },
+      { id: 'cp-mouse', label: 'Mouse', action: () => handleControlPanel('Mouse', 'mouse-settings') },
+      { id: 'cp-sound', label: 'Sound', action: () => handleControlPanel('Sound', 'sound-settings') },
+      { id: 'cp-startup-disk', label: 'Startup Disk', action: () => handleControlPanel('Startup Disk', 'startup-disk-settings') }
     ]
   },
   { id: 'sep2', label: '', isSeparator: true },
@@ -184,6 +185,28 @@ function handleNewFolder(): void {
 
 function handleEmptyTrash(): void {
   emptyTrash()
+}
+
+function handleControlPanels(): void {
+  openWindow({
+    type: 'control-panels',
+    title: 'Control Panels',
+    icon: '/assets/icons/system/preferences.png',
+    width: 400,
+    height: 300
+  })
+}
+
+function handleControlPanel(title: string, type: string): void {
+  openWindow({
+    type,
+    title,
+    icon: '/assets/icons/system/preferences.png',
+    width: 400,
+    height: 300,
+    resizable: false,
+    maximizable: false
+  })
 }
 
 function handleGetInfo(): void {

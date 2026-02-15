@@ -61,15 +61,25 @@ function selectItem(id: string) {
 
 function handleDoubleClick(item: FileNode) {
   if (item.type === 'folder') {
-    // Open new Finder window for this folder
-    openWindow({
-      type: 'finder',
-      title: item.name,
-      icon: '/assets/icons/system/folder-closed.png', // Fallback icon
-      data: {
-        folderId: item.id
-      }
-    })
+    if (item.name === 'Control Panels' && item.isSystem) {
+      openWindow({
+        type: 'control-panels',
+        title: 'Control Panels',
+        icon: '/assets/icons/system/preferences.png',
+        width: 400,
+        height: 300
+      })
+    } else {
+      // Open new Finder window for this folder
+      openWindow({
+        type: 'finder',
+        title: item.name,
+        icon: '/assets/icons/system/folder-closed.png', // Fallback icon
+        data: {
+          folderId: item.id
+        }
+      })
+    }
   } else if (item.type === 'application') {
     if (item.name === 'SimpleText') {
       openWindow({
