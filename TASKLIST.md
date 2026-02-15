@@ -234,9 +234,9 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 
 ### 5.2 Login Screen
 - [x] `P0` Create LoginScreen.vue component
-- [ ] `P0` Display user selection list
+- [x] `P0` Display user selection list
 - [x] `P0` Implement password input field
-- [ ] `P0` Add "Guest" login option
+- [x] `P0` Add "Guest" login option
 - [x] `P0` Handle login authentication
 - [ ] `P1` Show user icons/avatars
 - [ ] `P1` Add "Cancel" to return to user list
@@ -320,9 +320,9 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P2` Add custom file type icons
 
 ### 6.4 Filesystem Persistence
-- [ ] `P0` Save filesystem to database
-- [ ] `P0` Load filesystem on login
-- [ ] `P1` Implement per-user filesystem
+- [x] `P0` Save filesystem to database
+- [x] `P0` Load filesystem on login
+- [x] `P1` Implement per-user filesystem
 - [ ] `P1` Add filesystem change tracking
 - [ ] `P2` Implement filesystem backup
 - [ ] `P3` Add filesystem import/export
@@ -381,11 +381,11 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Add color calibration (mock)
 
 ### 7.7 Settings Persistence
-- [ ] `P0` Create useSettings.ts composable
-- [ ] `P0` Implement settings state management
-- [ ] `P0` Save settings to database
-- [ ] `P0` Load settings on login
-- [ ] `P1` Implement settings reset to defaults
+- [x] `P0` Create useSettings.ts composable
+- [x] `P0` Implement settings state management
+- [x] `P0` Save settings to database
+- [x] `P0` Load settings on login
+- [x] `P1` Implement settings reset to defaults
 - [ ] `P2` Add settings export/import
 
 ---
