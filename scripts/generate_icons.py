@@ -735,6 +735,27 @@ def generate_app_icons():
     generate_solitaire_icon()
     print('Application icons complete!')
 
+def generate_progress_bar_elements():
+    """Generate progress bar related graphics."""
+    print('Generating progress bar elements...')
+
+    # Progress bar track
+    img, draw = create_icon(size=(32, 12))
+    draw.rectangle([0, 0, 31, 11], fill=COLORS['white'], outline=COLORS['black'])
+    save_icon(img, 'progress-track', 'icons/ui')
+
+    # Progress bar fill (dithered)
+    img, draw = create_icon(size=(32, 12))
+    for y in range(12):
+        for x in range(32):
+            if (x + y) % 2 == 0:
+                draw.point((x, y), fill=COLORS['black'])
+            else:
+                draw.point((x, y), fill=COLORS['gray_dark'])
+    save_icon(img, 'progress-fill', 'icons/ui')
+
+    print('Progress bar elements complete!')
+
 def generate_ui_icons():
     """Generate all UI element icons."""
     print('Generating UI icons...')
@@ -749,6 +770,7 @@ def generate_ui_icons():
     generate_radio_buttons()
     generate_cursors()
     generate_menu_bar_elements()
+    generate_progress_bar_elements()
     print('UI icons complete!')
 
 def generate_small_system_icons():
