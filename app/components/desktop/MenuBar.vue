@@ -176,8 +176,16 @@ function handleClickOutside(): void {
 }
 
 function handleAbout(): void {
-  console.warn('About This Macintosh')
-  // TODO: Open About dialog
+  openWindow({
+    type: 'about',
+    title: 'About This Macintosh',
+    icon: '/assets/icons/system/finder.png',
+    width: 380,
+    height: 220,
+    resizable: false,
+    maximizable: false
+  })
+}
 }
 
 function handleShutdown(): void {

@@ -1,6 +1,6 @@
 /**
  * Window Type Definitions
- * 
+ *
  * Types for the window management system including window state,
  * configuration, and events.
  */
@@ -11,7 +11,7 @@ import type { Position, Size } from './desktop'
 export type WindowState = 'normal' | 'minimized' | 'maximized' | 'collapsed'
 
 /** Window type for different applications */
-export type WindowType = 
+export type WindowType =
   | 'finder'
   | 'simpletext'
   | 'calculator'
@@ -31,6 +31,7 @@ export type WindowType =
   | 'startup-disk-settings'
   | 'get-info'
   | 'about'
+  | 'article'
   | 'alert'
   | 'generic'
 
@@ -147,7 +148,7 @@ export interface WindowResizeState {
 }
 
 /** Resize direction */
-export type ResizeDirection = 
+export type ResizeDirection =
   | 'n' | 's' | 'e' | 'w'
   | 'ne' | 'nw' | 'se' | 'sw'
 
@@ -164,6 +165,7 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   'date-time-settings': { width: 400, height: 400 },
   'get-info': { width: 300, height: 400 },
   about: { width: 400, height: 250 },
+  article: { width: 600, height: 500 },
   alert: { width: 350, height: 150 },
   generic: { width: 400, height: 300 }
 }

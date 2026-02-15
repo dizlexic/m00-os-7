@@ -21,6 +21,7 @@ import ControlPanels from '~/components/apps/ControlPanels.vue'
 import GeneralSettings from '~/components/apps/GeneralSettings.vue'
 import SoundSettings from '~/components/apps/SoundSettings.vue'
 import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
+import AboutMac from '~/components/apps/AboutMac.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import ContextMenu from './ContextMenu.vue'
 import type { MenuItem } from '~/types/menu'
@@ -238,6 +239,9 @@ onUnmounted(() => {
         v-else-if="win.type === 'date-time-settings'"
       />
 
+      <AboutMac
+        v-else-if="win.type === 'about'"
+      />
       <!-- Window content will be rendered based on window type -->
       <div v-else class="window-placeholder">
         <p>{{ win.title }}</p>
