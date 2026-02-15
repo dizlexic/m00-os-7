@@ -32,6 +32,23 @@ const isComplete = ref(false)
 // Progress update interval
 let progressInterval: ReturnType<typeof setInterval> | null = null
 
+// Extensions simulation
+const extensions = [
+  '/assets/icons/system/preferences.png',
+  '/assets/icons/system/sound.png',
+  '/assets/icons/system/network.png',
+  '/assets/icons/system/memory.png',
+  '/assets/icons/apps/calculator.png',
+  '/assets/icons/apps/notepad.png',
+  '/assets/icons/system/help.png'
+]
+
+const visibleExtensions = computed(() => {
+  // Show extensions as progress increases
+  const count = Math.floor((progress.value / 100) * (extensions.length + 2))
+  return extensions.slice(0, Math.min(count, extensions.length))
+})
+
 // Computed style for progress indicator
 const progressStyle = computed(() => ({
   width: `${progress.value}%`
@@ -114,6 +131,18 @@ onUnmounted(() => {
           :style="progressStyle"
         />
       </div>
+
+      <!-- Extensions Row -->
+      <div class="boot-screen__extensions">
+        <transition-group name="fade">
+          <img
+            v-for="(ext, index) in visibleExtensions"
+            :key="index"
+            :src="ext"
+            class="boot-screen__extension-icon"
+          />
+        </transition-group>
+      </div>
     </div>
   </div>
 </template>
@@ -129,7 +158,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--z-boot-screen, 10000);
+  z-index: var(--z-boot, 9999);
 }
 
 .boot-screen__content {
@@ -167,5 +196,30 @@ onUnmounted(() => {
   height: 100%;
   background-color: var(--color-black, #000000);
   transition: width 50ms linear;
+}
+
+.boot-screen__extensions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 200px;
+  min-height: 32px;
+  gap: 2px;
+}
+
+.boot-screen__extension-icon {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
