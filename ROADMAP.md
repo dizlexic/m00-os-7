@@ -148,7 +148,7 @@ Implement the essential applications: Finder, SimpleText, Calculator, and Contro
 - [x] Add icon view and list view
 - [x] Implement navigation (back, forward, up)
 - [ ] Add file operations (copy, move, delete)
-- [ ] Implement "Get Info" dialog
+- [x] Implement "Get Info" dialog
 - [x] Add "New Folder" functionality
 - [x] Integrate with menu bar
 
@@ -162,11 +162,11 @@ Implement the essential applications: Finder, SimpleText, Calculator, and Contro
 - [ ] Add font selection
 
 #### 3.4 Calculator Application
-- [ ] Create Calculator component
-- [ ] Implement number display
-- [ ] Add basic operations (+, -, ×, ÷)
-- [ ] Implement memory functions
-- [ ] Add keyboard input support
+- [x] Create Calculator component
+- [x] Implement number display
+- [x] Add basic operations (+, -, ×, ÷)
+- [x] Implement memory functions
+- [x] Add keyboard input support
 
 #### 3.5 Control Panels
 - [ ] Create Control Panels window

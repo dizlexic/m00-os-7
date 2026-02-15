@@ -245,7 +245,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Support keyboard navigation
 
 ### 5.3 User Management
-- [ ] `P0` Create user registration flow
+- [x] `P0` Create user registration flow
 - [x] `P0` Implement user data storage
 - [x] `P0` Create user settings storage
 - [ ] `P1` Implement user profile editing
@@ -406,15 +406,16 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ### 8.2 Finder Navigation
 - [x] `P0` Implement double-click to open folder
 - [x] `P0` Implement double-click to open file
-- [ ] `P0` Add breadcrumb path navigation
+- [x] `P0` Add breadcrumb path navigation
 - [ ] `P1` Implement keyboard navigation (arrows)
 - [ ] `P1` Add "Go to Folder" dialog
 - [ ] `P2` Implement folder history
 - [ ] `P2` Add bookmarks/favorites
+- [ ] `P2` Implement folder tree view
 
 ### 8.3 Finder Operations
 - [x] `P0` Implement file/folder selection
-- [ ] `P0` Add "Get Info" dialog
+- [x] `P0` Add "Get Info" dialog
 - [ ] `P1` Implement copy/paste operations
 - [ ] `P1` Implement move operations
 - [x] `P1` Add "New Folder" creation
@@ -451,13 +452,13 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Add spell check (mock)
 
 ### 9.2 Calculator
-- [ ] `P0` Create Calculator.vue component
-- [ ] `P0` Implement number display
-- [ ] `P0` Add number buttons (0-9)
-- [ ] `P0` Implement basic operations (+, -, ×, ÷)
-- [ ] `P0` Add equals and clear buttons
-- [ ] `P1` Implement decimal point
-- [ ] `P1` Add percentage calculation
+- [x] `P0` Create Calculator.vue component
+- [x] `P0` Implement number display
+- [x] `P0` Add number buttons (0-9)
+- [x] `P0` Implement basic operations (+, -, ×, ÷)
+- [x] `P0` Add equals and clear buttons
+- [x] `P1` Implement decimal point
+- [x] `P1` Add percentage calculation
 - [ ] `P1` Implement memory functions (M+, M-, MR, MC)
 - [ ] `P2` Add square root function
 - [ ] `P2` Implement keyboard input
@@ -651,7 +652,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P1` Test filesystem composable
 - [ ] `P1` Test settings composable
 - [ ] `P2` Test user authentication
-- [ ] `P2` Test calculator logic
+- [x] `P2` Test calculator logic
 - [ ] `P2` Test game logic (Tetris, Solitaire)
 
 ### 15.2 Component Tests
