@@ -149,7 +149,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Create Apple Menu integration in MenuBar
 - [x] `P0` Add "About This Macintosh" item
 - [x] `P1` Add Control Panels submenu
-- [ ] `P1` Add recent applications list
+- [x] `P1` Add recent applications list
+- [x] `P2` Add recent documents list
 - [ ] `P2` Add Chooser item (printer selection mock)
 - [x] `P2` Add Shut Down option
 
