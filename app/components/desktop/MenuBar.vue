@@ -11,8 +11,8 @@ import MenuDropdown from '~/components/desktop/MenuDropdown.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
 
-const { createFolder, getRoot, getNodeByPath, emptyTrash } = useFileSystem()
-const { activeWindow } = useWindowManager()
+const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode } = useFileSystem()
+const { activeWindow, openWindow } = useWindowManager()
 
 interface MenuItem {
   id: string
@@ -75,7 +75,7 @@ const fileMenuItems: MenuItem[] = [
   { id: 'sep1', label: '', isSeparator: true },
   { id: 'close', label: 'Close Window', shortcut: '⌘W' },
   { id: 'sep2', label: '', isSeparator: true },
-  { id: 'get-info', label: 'Get Info', shortcut: '⌘I' },
+  { id: 'get-info', label: 'Get Info', shortcut: '⌘I', action: () => handleGetInfo() },
   { id: 'sep3', label: '', isSeparator: true },
   { id: 'duplicate', label: 'Duplicate', shortcut: '⌘D', disabled: true },
   { id: 'make-alias', label: 'Make Alias', shortcut: '⌘M', disabled: true },
@@ -184,6 +184,35 @@ function handleNewFolder(): void {
 
 function handleEmptyTrash(): void {
   emptyTrash()
+}
+
+function handleGetInfo(): void {
+  if (activeWindow.value) {
+    let nodeId: string | null = null
+
+    if (activeWindow.value.type === 'finder') {
+      const data = activeWindow.value.data as any
+      nodeId = data?.selectedItemId || data?.folderId
+    } else if (activeWindow.value.type === 'simpletext') {
+      nodeId = (activeWindow.value.data as any)?.fileId
+    }
+
+    if (nodeId) {
+      const node = getNode(nodeId)
+      if (node) {
+        openWindow({
+          type: 'get-info',
+          title: `Info: ${node.name}`,
+          icon: '/assets/icons/system/document.png',
+          data: { nodeId: node.id },
+          width: 300,
+          height: 400,
+          resizable: false,
+          maximizable: false
+        })
+      }
+    }
+  }
 }
 
 // Lifecycle

@@ -17,6 +17,7 @@ export type WindowType =
   | 'calculator'
   | 'notepad'
   | 'control-panel'
+  | 'get-info'
   | 'about'
   | 'alert'
   | 'generic'
@@ -145,6 +146,7 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   calculator: { width: 180, height: 240 },
   notepad: { width: 300, height: 400 },
   'control-panel': { width: 400, height: 300 },
+  'get-info': { width: 300, height: 400 },
   about: { width: 400, height: 250 },
   alert: { width: 350, height: 150 },
   generic: { width: 400, height: 300 }
