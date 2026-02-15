@@ -422,4 +422,72 @@ describe('AlertDialog.vue', () => {
       expect(dialog.attributes('tabindex')).toBe('-1')
     })
   })
+
+  describe('prompt variant', () => {
+    it('should render an input field when showInput is true', () => {
+      wrapper = mount(AlertDialog, {
+        props: {
+          message: 'Enter your name:',
+          showInput: true
+        }
+      })
+      expect(wrapper.find('.alert-dialog__input').exists()).toBe(true)
+    })
+
+    it('should pre-fill input with defaultValue prop', () => {
+      wrapper = mount(AlertDialog, {
+        props: {
+          message: 'Enter your name:',
+          showInput: true,
+          defaultValue: 'John Doe'
+        }
+      })
+      const input = wrapper.find('.alert-dialog__input').element as HTMLInputElement
+      expect(input.value).toBe('John Doe')
+    })
+
+    it('should show placeholder text when provided', () => {
+      wrapper = mount(AlertDialog, {
+        props: {
+          message: 'Enter your name:',
+          showInput: true,
+          inputPlaceholder: 'Your name here...'
+        }
+      })
+      const input = wrapper.find('.alert-dialog__input')
+      expect(input.attributes('placeholder')).toBe('Your name here...')
+    })
+
+    it('should emit input value when closed with a button', async () => {
+      wrapper = mount(AlertDialog, {
+        props: {
+          message: 'Enter your name:',
+          showInput: true
+        }
+      })
+      const input = wrapper.find('.alert-dialog__input')
+      await input.setValue('Jane Doe')
+      
+      await wrapper.find('.alert-dialog__button--default').trigger('click')
+      
+      expect(wrapper.emitted('close')).toBeTruthy()
+      expect(wrapper.emitted('close')![0]).toEqual(['ok', 'Jane Doe'])
+    })
+
+    it('should emit empty string if input is cleared', async () => {
+      wrapper = mount(AlertDialog, {
+        props: {
+          message: 'Enter your name:',
+          showInput: true,
+          defaultValue: 'Initial'
+        }
+      })
+      const input = wrapper.find('.alert-dialog__input')
+      await input.setValue('')
+      
+      await wrapper.find('.alert-dialog__button--default').trigger('click')
+      
+      expect(wrapper.emitted('close')![0]).toEqual(['ok', ''])
+    })
+  })
 })

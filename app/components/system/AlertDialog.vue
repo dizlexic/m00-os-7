@@ -32,17 +32,26 @@ interface Props {
   buttons?: AlertButton[]
   /** Whether clicking the overlay dismisses the dialog */
   dismissible?: boolean
+  /** Whether to show an input field (prompt variant) */
+  showInput?: boolean
+  /** Default value for the input field */
+  defaultValue?: string
+  /** Placeholder for the input field */
+  inputPlaceholder?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'note',
   buttons: () => [{ label: 'OK', value: 'ok', isDefault: true }],
-  dismissible: false
+  dismissible: false,
+  showInput: false,
+  defaultValue: '',
+  inputPlaceholder: ''
 })
 
 const emit = defineEmits<{
-  /** Emitted when the dialog is closed, with the button value */
-  close: [value: string]
+  /** Emitted when the dialog is closed, with the button value and optional input value */
+  close: [value: string, inputValue?: string]
 }>()
 
 // Generate unique IDs for accessibility
@@ -59,6 +68,10 @@ const iconPath = computed(() => {
   }
   return icons[props.type]
 })
+
+// Input field state
+const inputValue = ref(props.defaultValue)
+const inputRef = ref<HTMLInputElement | null>(null)
 
 // Alt text for icons
 const iconAlt = computed(() => {
@@ -82,13 +95,21 @@ const cancelButton = computed(() => {
 
 // Handle button click
 function handleButtonClick(value: string): void {
-  emit('close', value)
+  if (props.showInput) {
+    emit('close', value, inputValue.value)
+  } else {
+    emit('close', value)
+  }
 }
 
 // Handle overlay click
 function handleOverlayClick(): void {
   if (props.dismissible) {
-    emit('close', cancelButton.value?.value || 'cancel')
+    if (props.showInput) {
+      emit('close', cancelButton.value?.value || 'cancel', inputValue.value)
+    } else {
+      emit('close', cancelButton.value?.value || 'cancel')
+    }
   }
 }
 
@@ -101,10 +122,18 @@ function handleBoxClick(event: MouseEvent): void {
 function handleKeydown(event: KeyboardEvent): void {
   if (event.key === 'Enter') {
     event.preventDefault()
-    emit('close', defaultButton.value?.value || 'ok')
+    if (props.showInput) {
+      emit('close', defaultButton.value?.value || 'ok', inputValue.value)
+    } else {
+      emit('close', defaultButton.value?.value || 'ok')
+    }
   } else if (event.key === 'Escape') {
     event.preventDefault()
-    emit('close', cancelButton.value?.value || 'ok')
+    if (props.showInput) {
+      emit('close', cancelButton.value?.value || 'ok', inputValue.value)
+    } else {
+      emit('close', cancelButton.value?.value || 'ok')
+    }
   }
 }
 
@@ -112,8 +141,13 @@ function handleKeydown(event: KeyboardEvent): void {
 const dialogRef = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-  // Focus the dialog for keyboard events
-  dialogRef.value?.focus()
+  // Focus the input if it exists, otherwise focus the dialog
+  if (props.showInput && inputRef.value) {
+    inputRef.value.focus()
+    inputRef.value.select()
+  } else {
+    dialogRef.value?.focus()
+  }
 })
 </script>
 
@@ -169,6 +203,18 @@ onMounted(() => {
           >
             {{ message }}
           </p>
+
+          <!-- Input Field (Prompt) -->
+          <div v-if="showInput" class="alert-dialog__input-container">
+            <input
+              ref="inputRef"
+              v-model="inputValue"
+              type="text"
+              class="alert-dialog__input"
+              :placeholder="inputPlaceholder"
+              @click.stop
+            />
+          </div>
         </div>
       </div>
 
@@ -270,5 +316,25 @@ onMounted(() => {
 
 .alert-dialog__button--default {
   /* Default button styling is handled by mac-button--default class */
+}
+
+.alert-dialog__input-container {
+  margin-top: var(--spacing-md, 8px);
+}
+
+.alert-dialog__input {
+  width: 100%;
+  padding: 2px 4px;
+  font-family: var(--font-system, 'Chicago', 'Geneva', sans-serif);
+  font-size: var(--font-size-md, 12px);
+  border: 1px solid var(--color-black, #000000);
+  background-color: var(--color-white, #FFFFFF);
+  color: var(--color-black, #000000);
+  outline: none;
+}
+
+.alert-dialog__input:focus {
+  border-color: var(--color-highlight, #000080);
+  box-shadow: 0 0 0 1px var(--color-highlight, #000080);
 }
 </style>
