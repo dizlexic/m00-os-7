@@ -9,8 +9,13 @@ import Desktop from "~/components/desktop/Desktop.vue";
 import MenuBar from "~/components/desktop/MenuBar.vue";
 import AlertDialog from "~/components/system/AlertDialog.vue";
 import { useAlert } from "~/composables/useAlert";
+import { useFileSystem } from "~/composables/useFileSystem";
 
 const { alertState, hideAlert } = useAlert();
+const { initialize } = useFileSystem();
+
+// Initialize filesystem on app start
+initialize();
 </script>
 
 <template>
