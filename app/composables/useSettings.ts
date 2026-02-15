@@ -9,6 +9,7 @@ export interface Settings {
   timeFormat: '12h' | '24h';
   showSeconds: boolean;
   dateFormat: string;
+  timezone: string;
 }
 
 const defaultSettings: Settings = {
@@ -18,7 +19,8 @@ const defaultSettings: Settings = {
   highlightColor: '#000080',
   timeFormat: '12h',
   showSeconds: false,
-  dateFormat: 'MM/DD/YYYY'
+  dateFormat: 'MM/DD/YYYY',
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
 }
 
 const settings = ref<Settings>({ ...defaultSettings })
