@@ -290,30 +290,30 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 6. Virtual Filesystem
 
 ### 6.1 Filesystem Core
-- [ ] `P0` Create useFileSystem.ts composable
-- [ ] `P0` Define file/folder data structures
-- [ ] `P0` Implement folder hierarchy
-- [ ] `P0` Create root filesystem structure
-- [ ] `P1` Implement file CRUD operations
-- [ ] `P1` Add folder CRUD operations
-- [ ] `P1` Implement path resolution
+- [x] `P0` Create useFileSystem.ts composable
+- [x] `P0` Define file/folder data structures
+- [x] `P0` Implement folder hierarchy
+- [x] `P0` Create root filesystem structure
+- [x] `P1` Implement file CRUD operations
+- [x] `P1` Add folder CRUD operations
+- [x] `P1` Implement path resolution
 - [ ] `P2` Add file metadata (created, modified dates)
 - [ ] `P2` Implement file permissions (read-only)
 
 ### 6.2 Default Filesystem Structure
-- [ ] `P0` Create "Macintosh HD" root
-- [ ] `P0` Create "System Folder" with system files
-- [ ] `P0` Create "Applications" folder
-- [ ] `P0` Create "Documents" folder
-- [ ] `P1` Create "Trash" special folder
-- [ ] `P1` Add sample documents/readme files
+- [x] `P0` Create "Macintosh HD" root
+- [x] `P0` Create "System Folder" with system files
+- [x] `P0` Create "Applications" folder
+- [x] `P0` Create "Documents" folder
+- [x] `P1` Create "Trash" special folder
+- [x] `P1` Add sample documents/readme files
 - [ ] `P2` Create "Preferences" folder
 - [ ] `P2` Add "Extensions" folder (mock)
 
 ### 6.3 File Types
-- [ ] `P0` Implement text file type (.txt)
-- [ ] `P0` Implement folder type
-- [ ] `P0` Implement application type
+- [x] `P0` Implement text file type (.txt)
+- [x] `P0` Implement folder type
+- [x] `P0` Implement application type
 - [ ] `P1` Implement markdown file type (.md)
 - [ ] `P1` Add image file type support
 - [ ] `P2` Implement alias/shortcut type
