@@ -18,7 +18,14 @@ const currentFolder = computed(() => getNode(currentFolderId.value) as FolderNod
 const items = computed(() => getChildren(currentFolderId.value))
 const selectedItemId = ref<string | null>(null)
 
+type ViewMode = 'icon' | 'list'
+const viewMode = ref<ViewMode>('icon')
+
 const isRoot = computed(() => currentFolderId.value === getRoot()?.id)
+
+function toggleViewMode() {
+  viewMode.value = viewMode.value === 'icon' ? 'list' : 'icon'
+}
 
 function goUp() {
   if (isRoot.value) return
@@ -46,8 +53,23 @@ function handleDoubleClick(item: FileNode) {
     })
   } else if (item.type === 'application') {
      // TODO: Implement app launching
+     if (item.name === 'SimpleText') {
+       openWindow({
+         type: 'simpletext',
+         title: 'Untitled',
+         icon: '/assets/icons/apps/simpletext.png'
+       })
+     }
   } else {
-    // TODO: Implement file opening (e.g. SimpleText)
+    // Open file in SimpleText
+    openWindow({
+      type: 'simpletext',
+      title: item.name,
+      icon: '/assets/icons/system/document.png',
+      data: {
+        fileId: item.id
+      }
+    })
   }
 }
 
@@ -72,26 +94,63 @@ function getIcon(item: FileNode) {
       </button>
       <div class="finder__header-info">
         <span class="finder__header-title">{{ currentFolder?.name }}</span>
-        <span class="finder__header-count">{{ items.length }} items</span>
+        <div class="finder__header-actions">
+          <span class="finder__header-count">{{ items.length }} items</span>
+          <button class="finder__view-toggle" @click.stop="toggleViewMode" title="Toggle View Mode">
+            {{ viewMode === 'icon' ? 'List' : 'Icon' }}
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="finder__content">
-      <div
-        v-for="item in items"
-        :key="item.id"
-        class="finder__item"
-        :class="{ 'finder__item--selected': selectedItemId === item.id }"
-        @click.stop="selectItem(item.id)"
-        @dblclick.stop="handleDoubleClick(item)"
-      >
-        <div class="finder__item-icon">
-          <img :src="getIcon(item)" :alt="item.name" draggable="false" />
+    <div
+      class="finder__content"
+      :class="{ 'finder__content--list': viewMode === 'list' }"
+    >
+      <template v-if="viewMode === 'icon'">
+        <div
+          v-for="item in items"
+          :key="item.id"
+          class="finder__item finder__item--icon"
+          :class="{ 'finder__item--selected': selectedItemId === item.id }"
+          @click.stop="selectItem(item.id)"
+          @dblclick.stop="handleDoubleClick(item)"
+        >
+          <div class="finder__item-icon">
+            <img :src="getIcon(item)" :alt="item.name" draggable="false" />
+          </div>
+          <div class="finder__item-label">
+            {{ item.name }}
+          </div>
         </div>
-        <div class="finder__item-label">
-          {{ item.name }}
+      </template>
+
+      <template v-else>
+        <div class="finder__list-header">
+          <div class="finder__list-col finder__list-col--name">Name</div>
+          <div class="finder__list-col finder__list-col--size">Size</div>
+          <div class="finder__list-col finder__list-col--kind">Kind</div>
         </div>
-      </div>
+        <div
+          v-for="item in items"
+          :key="item.id"
+          class="finder__item finder__item--list"
+          :class="{ 'finder__item--selected': selectedItemId === item.id }"
+          @click.stop="selectItem(item.id)"
+          @dblclick.stop="handleDoubleClick(item)"
+        >
+          <div class="finder__list-col finder__list-col--name">
+            <img :src="getIcon(item)" :alt="item.name" class="finder__item-mini-icon" />
+            <span>{{ item.name }}</span>
+          </div>
+          <div class="finder__list-col finder__list-col--size">
+            {{ item.type === 'folder' ? '--' : `${Math.ceil(item.size / 1024)}K` }}
+          </div>
+          <div class="finder__list-col finder__list-col--kind">
+            {{ item.type.charAt(0).toUpperCase() + item.type.slice(1) }}
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
