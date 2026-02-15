@@ -279,6 +279,26 @@ def generate_scrapbook_icon():
     img = add_shadow(img)
     save_icon(img, 'scrapbook', 'icons/apps')
 
+def generate_preferences_icon():
+    """Generate System Preferences icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Control panel / gears
+    # Main body
+    draw.rectangle([4, 4, w - 5, h - 5], fill=COLORS['gray_light'], outline=COLORS['black'])
+
+    # Gear 1
+    draw.ellipse([8, 8, 18, 18], fill=COLORS['gray_medium'], outline=COLORS['black'])
+    draw.ellipse([11, 11, 15, 15], fill=COLORS['gray_light'], outline=COLORS['black'])
+
+    # Gear 2
+    draw.ellipse([16, 16, 24, 24], fill=COLORS['gray_medium'], outline=COLORS['black'])
+    draw.ellipse([19, 19, 21, 21], fill=COLORS['gray_light'], outline=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'preferences', 'icons/system')
+
 def generate_solitaire_icon():
     """Generate Solitaire game icon."""
     img, draw = create_icon()
@@ -702,6 +722,7 @@ def generate_system_icons():
     generate_alert_stop_icon()
     generate_alert_caution_icon()
     generate_alert_note_icon()
+    generate_preferences_icon()
     print('System icons complete!')
 
 def generate_app_icons():
