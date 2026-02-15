@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
@@ -12,7 +12,16 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const { getChildren, getNode, renameNode, deleteNode, getRoot, getPathNodes } = useFileSystem()
+const {
+  getChildren,
+  getNode,
+  renameNode,
+  deleteNode,
+  getRoot,
+  getPathNodes,
+  moveToTrash,
+  createFolder
+} = useFileSystem()
 const { openWindow, updateWindow } = useWindowManager()
 const { addRecentDoc } = useRecentItems()
 
@@ -20,6 +29,9 @@ const currentFolderId = ref(props.folderId)
 const currentFolder = computed(() => getNode(currentFolderId.value) as FolderNode)
 const items = computed(() => getChildren(currentFolderId.value))
 const selectedItemId = ref<string | null>(null)
+const isRenamingId = ref<string | null>(null)
+const editingName = ref('')
+const renameInput = ref<HTMLInputElement | null>(null)
 
 const pathNodes = computed(() => getPathNodes(currentFolderId.value))
 
@@ -59,6 +71,82 @@ function navigateTo(id: string) {
 
 function selectItem(id: string) {
   selectedItemId.value = id
+  // Reset renaming if we select a different item
+  if (isRenamingId.value && isRenamingId.value !== id) {
+    cancelRename()
+  }
+}
+
+function handleLabelClick(item: FileNode) {
+  // If already selected, start renaming after a delay (similar to Mac OS 7)
+  if (selectedItemId.value === item.id && isRenamingId.value !== item.id) {
+    setTimeout(() => {
+      if (selectedItemId.value === item.id) {
+        startRename(item)
+      }
+    }, 500)
+  }
+}
+
+function startRename(item: FileNode) {
+  if (item.isSystem) return // Don't allow renaming system folders
+
+  isRenamingId.value = item.id
+  editingName.value = item.name
+
+  nextTick(() => {
+    const el = Array.isArray(renameInput.value) ? renameInput.value[0] : renameInput.value
+    if (el) {
+      el.focus()
+      el.select()
+    }
+  })
+}
+
+function finishRename() {
+  if (isRenamingId.value && editingName.value.trim()) {
+    renameNode(isRenamingId.value, editingName.value.trim())
+  }
+  isRenamingId.value = null
+}
+
+function cancelRename() {
+  isRenamingId.value = null
+}
+
+function deleteSelectedItem() {
+  if (selectedItemId.value) {
+    const item = getNode(selectedItemId.value)
+    if (item && !item.isSystem) {
+      moveToTrash(selectedItemId.value)
+      selectedItemId.value = null
+    }
+  }
+}
+
+function createNewFolder() {
+  const name = 'untitled folder'
+  let finalName = name
+  let counter = 1
+
+  const existingNames = items.value.map(i => i.name)
+  while (existingNames.includes(finalName)) {
+    finalName = `${name} ${++counter}`
+  }
+
+  const newFolder = createFolder(finalName, currentFolderId.value)
+  selectedItemId.value = newFolder.id
+  startRename(newFolder)
+}
+
+function handleRenameKeyDown(event: KeyboardEvent) {
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    finishRename()
+  } else if (event.key === 'Escape') {
+    event.preventDefault()
+    cancelRename()
+  }
 }
 
 function handleDoubleClick(item: FileNode) {
@@ -146,6 +234,21 @@ function getIcon(item: FileNode) {
       <div class="finder__header-info">
         <span class="finder__header-title">{{ currentFolder?.name }}</span>
         <div class="finder__header-actions">
+          <button
+            class="finder__action-button"
+            title="New Folder"
+            @click.stop="createNewFolder"
+          >
+            <img src="/assets/icons/system/folder.png" alt="+" />
+          </button>
+          <button
+            class="finder__action-button"
+            title="Move to Trash"
+            :disabled="!selectedItemId"
+            @click.stop="deleteSelectedItem"
+          >
+            <img src="/assets/icons/system/trash-empty.png" alt="Del" />
+          </button>
           <span class="finder__header-count">{{ items.length }} items</span>
           <button class="finder__view-toggle" @click.stop="toggleViewMode" title="Toggle View Mode">
             {{ viewMode === 'icon' ? 'List' : 'Icon' }}
@@ -185,8 +288,25 @@ function getIcon(item: FileNode) {
           <div class="finder__item-icon">
             <img :src="getIcon(item)" :alt="item.name" draggable="false" />
           </div>
-          <div class="finder__item-label">
-            {{ item.name }}
+          <div
+            class="finder__item-label"
+            :class="{ 'finder__item-label--selected': selectedItemId === item.id }"
+            @click.stop="handleLabelClick(item)"
+          >
+            <template v-if="isRenamingId === item.id">
+              <input
+                ref="renameInput"
+                v-model="editingName"
+                type="text"
+                class="finder__rename-input"
+                @keydown="handleRenameKeyDown"
+                @blur="finishRename"
+                @click.stop
+              />
+            </template>
+            <template v-else>
+              {{ item.name }}
+            </template>
           </div>
         </div>
       </template>
@@ -207,7 +327,26 @@ function getIcon(item: FileNode) {
         >
           <div class="finder__list-col finder__list-col--name">
             <img :src="getIcon(item)" :alt="item.name" class="finder__item-mini-icon" />
-            <span>{{ item.name }}</span>
+            <span
+              class="finder__item-name"
+              :class="{ 'finder__item-name--selected': selectedItemId === item.id }"
+              @click.stop="handleLabelClick(item)"
+            >
+              <template v-if="isRenamingId === item.id">
+                <input
+                  ref="renameInput"
+                  v-model="editingName"
+                  type="text"
+                  class="finder__rename-input finder__rename-input--list"
+                  @keydown="handleRenameKeyDown"
+                  @blur="finishRename"
+                  @click.stop
+                />
+              </template>
+              <template v-else>
+                {{ item.name }}
+              </template>
+            </span>
           </div>
           <div class="finder__list-col finder__list-col--size">
             {{ item.type === 'folder' ? '--' : `${Math.ceil(item.size / 1024)}K` }}
@@ -288,6 +427,34 @@ function getIcon(item: FileNode) {
   font-size: 10px;
   padding: 0 4px;
   cursor: pointer;
+}
+
+.finder__action-button {
+  width: 18px;
+  height: 18px;
+  padding: 1px;
+  background: none;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.finder__action-button:hover:not(:disabled) {
+  border-color: var(--color-black);
+  background-color: var(--color-gray-light);
+}
+
+.finder__action-button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.finder__action-button img {
+  width: 14px;
+  height: 14px;
+  image-rendering: pixelated;
 }
 
 .finder__view-toggle:active {
@@ -441,5 +608,28 @@ function getIcon(item: FileNode) {
 .finder__item--selected .finder__item-label {
   background-color: var(--color-highlight);
   color: var(--color-highlight-text);
+}
+
+.finder__item-name--selected {
+  background-color: var(--color-highlight);
+  color: var(--color-highlight-text);
+  padding: 0 4px;
+}
+
+.finder__rename-input {
+  width: 100%;
+  font-size: var(--font-size-sm);
+  font-family: var(--font-system);
+  text-align: center;
+  border: 1px solid var(--color-black);
+  background-color: var(--color-white);
+  color: var(--color-black);
+  outline: none;
+  padding: 0;
+}
+
+.finder__rename-input--list {
+  text-align: left;
+  padding: 0 2px;
 }
 </style>

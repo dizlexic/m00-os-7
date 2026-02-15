@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import Finder from '~/components/apps/Finder.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
@@ -25,7 +26,9 @@ const { mockFileSystem } = vi.hoisted(() => ({
       return []
     }),
     renameNode: vi.fn(),
-    deleteNode: vi.fn()
+    deleteNode: vi.fn(),
+    moveToTrash: vi.fn(),
+    createFolder: vi.fn()
   }
 }))
 
@@ -104,5 +107,83 @@ describe('Finder.vue', () => {
     await upButton.trigger('click')
 
     expect(wrapper.find('.finder__header-title').text()).toBe('Macintosh HD')
+  })
+
+  it('allows renaming an item', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(Finder, {
+      props: {
+        folderId: 'root'
+      }
+    })
+
+    const firstItem = wrapper.find('.finder__item--icon')
+    const itemLabel = firstItem.find('.finder__item-label')
+
+    // First click to select
+    await firstItem.trigger('click')
+
+    // Second click on label to start renaming
+    await itemLabel.trigger('click')
+
+    // Fast forward for the renaming delay
+    vi.advanceTimersByTime(600)
+    await nextTick()
+
+    expect(wrapper.find('.finder__rename-input').exists()).toBe(true)
+
+    const input = wrapper.find('.finder__rename-input')
+    await input.setValue('New Name')
+    await input.trigger('keydown', { key: 'Enter' })
+
+    expect(mockFileSystem.renameNode).toHaveBeenCalledWith('folder-1', 'New Name')
+    expect(wrapper.find('.finder__rename-input').exists()).toBe(false)
+    vi.useRealTimers()
+  })
+
+  it('allows creating a new folder', async () => {
+    const mockItems = [
+      { id: 'folder-1', name: 'Documents', type: 'folder', parentId: 'root' },
+      { id: 'file-1', name: 'README.txt', type: 'file', parentId: 'root' }
+    ]
+    mockFileSystem.getChildren.mockImplementation((id) => id === 'root' ? mockItems : [])
+
+    mockFileSystem.createFolder.mockImplementation((name, parentId) => {
+      const newFolder = { id: 'new-folder', name, type: 'folder', parentId }
+      mockItems.push(newFolder)
+      return newFolder
+    })
+
+    const wrapper = mount(Finder, {
+      props: {
+        folderId: 'root'
+      }
+    })
+
+    const newFolderButton = wrapper.find('button[title="New Folder"]')
+    await newFolderButton.trigger('click')
+
+    await nextTick()
+
+    expect(mockFileSystem.createFolder).toHaveBeenCalledWith('untitled folder', 'root')
+    // It should also start renaming the new folder
+    expect(wrapper.find('.finder__rename-input').exists()).toBe(true)
+  })
+
+  it('allows moving an item to trash', async () => {
+    const wrapper = mount(Finder, {
+      props: {
+        folderId: 'root'
+      }
+    })
+
+    // Select item first
+    const firstItem = wrapper.find('.finder__item--icon')
+    await firstItem.trigger('click')
+
+    const deleteButton = wrapper.find('button[title="Move to Trash"]')
+    await deleteButton.trigger('click')
+
+    expect(mockFileSystem.moveToTrash).toHaveBeenCalledWith('folder-1')
   })
 })
