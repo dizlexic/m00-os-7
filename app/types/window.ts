@@ -28,6 +28,7 @@ export type WindowType =
   | 'memory-settings'
   | 'monitors-settings'
   | 'mouse-settings'
+  | 'stc-settings'
   | 'startup-disk-settings'
   | 'get-info'
   | 'about'
@@ -165,6 +166,15 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   'general-settings': { width: 400, height: 350 },
   'sound-settings': { width: 400, height: 350 },
   'date-time-settings': { width: 400, height: 400 },
+  'apple-menu-settings': { width: 400, height: 350 },
+  'color-settings': { width: 400, height: 350 },
+  'desktop-patterns-settings': { width: 400, height: 350 },
+  'extensions-settings': { width: 400, height: 350 },
+  'memory-settings': { width: 400, height: 350 },
+  'monitors-settings': { width: 400, height: 350 },
+  'mouse-settings': { width: 400, height: 350 },
+  'stc-settings': { width: 450, height: 400 },
+  'startup-disk-settings': { width: 400, height: 350 },
   'get-info': { width: 300, height: 400 },
   about: { width: 400, height: 250 },
   article: { width: 600, height: 500 },
