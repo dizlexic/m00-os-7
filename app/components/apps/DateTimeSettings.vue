@@ -12,6 +12,15 @@ const { settings, updateSetting } = useSettings()
 const currentTime = ref(new Date())
 let timer: any
 
+const availableTimezones = computed(() => {
+  try {
+    // @ts-ignore
+    return Intl.supportedValuesOf('timeZone')
+  } catch (e) {
+    return ['UTC']
+  }
+})
+
 onMounted(() => {
   timer = setInterval(() => {
     currentTime.value = new Date()
@@ -23,30 +32,33 @@ onUnmounted(() => {
 })
 
 const formattedTime = computed(() => {
-  const now = currentTime.value
-  let hours = now.getHours()
-  const minutes = now.getMinutes().toString().padStart(2, '0')
-  const seconds = now.getSeconds().toString().padStart(2, '0')
-
-  if (settings.timeFormat === '12h') {
-    const ampm = hours >= 12 ? 'PM' : 'AM'
-    hours = hours % 12 || 12
-    return `${hours}:${minutes}${settings.showSeconds ? ':' + seconds : ''} ${ampm}`
-  } else {
-    const hoursStr = hours.toString().padStart(2, '0')
-    return `${hoursStr}:${minutes}${settings.showSeconds ? ':' + seconds : ''}`
+  try {
+    const options: Intl.DateTimeFormatOptions = {
+      hour: 'numeric',
+      minute: '2-digit',
+      second: settings.showSeconds ? '2-digit' : undefined,
+      hour12: settings.timeFormat === '12h',
+      timeZone: settings.timezone
+    }
+    return new Intl.DateTimeFormat('en-US', options).format(currentTime.value)
+  } catch (e) {
+    return currentTime.value.toLocaleTimeString()
   }
 })
 
 const formattedDate = computed(() => {
-  const now = currentTime.value
-  const options: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  try {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: settings.timezone
+    }
+    return new Intl.DateTimeFormat('en-US', options).format(currentTime.value)
+  } catch (e) {
+    return currentTime.value.toLocaleDateString()
   }
-  return now.toLocaleDateString('en-US', options)
 })
 
 function setTimeFormat(format: '12h' | '24h') {
@@ -111,6 +123,21 @@ function toggleSeconds() {
           <option value="MM/DD/YYYY">12/31/1999</option>
           <option value="DD/MM/YYYY">31/12/1999</option>
           <option value="YYYY-MM-DD">1999-12-31</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="datetime-settings__section">
+      <h3 class="datetime-settings__title">Time Zone</h3>
+      <div class="datetime-settings__options">
+        <select
+          class="mac-input"
+          :value="settings.timezone"
+          @change="(e) => updateSetting('timezone', (e.target as HTMLSelectElement).value)"
+        >
+          <option v-for="tz in availableTimezones" :key="tz" :value="tz">
+            {{ tz }}
+          </option>
         </select>
       </div>
     </div>
