@@ -118,25 +118,67 @@ export const DEFAULT_PATTERNS: DesktopPattern[] = [
   {
     id: 'default',
     name: 'Default',
-    pattern: '#666699',
+    pattern: '#999999',
     isSolid: true
   },
   {
-    id: 'gray',
-    name: 'Gray',
-    pattern: '#808080',
-    isSolid: true
-  },
-  {
-    id: 'stripes',
-    name: 'Stripes',
-    pattern: 'repeating-linear-gradient(0deg, #666699, #666699 2px, #555588 2px, #555588 4px)',
+    id: 'blueprint',
+    name: 'Blueprint',
+    pattern: 'url(/assets/patterns/blueprint.png)',
     isSolid: false
   },
   {
-    id: 'dots',
-    name: 'Dots',
-    pattern: 'radial-gradient(#555588 1px, #666699 1px)',
+    id: 'bricks',
+    name: 'Bricks',
+    pattern: 'url(/assets/patterns/bricks.png)',
+    isSolid: false
+  },
+  {
+    id: 'checkerboard',
+    name: 'Checkerboard',
+    pattern: 'url(/assets/patterns/checkerboard.png)',
+    isSolid: false
+  },
+  {
+    id: 'circuit',
+    name: 'Circuit',
+    pattern: 'url(/assets/patterns/circuit.png)',
+    isSolid: false
+  },
+  {
+    id: 'diagonal',
+    name: 'Diagonal',
+    pattern: 'url(/assets/patterns/diagonal.png)',
+    isSolid: false
+  },
+  {
+    id: 'gray-dither',
+    name: 'Gray Dither',
+    pattern: 'url(/assets/patterns/gray-dither.png)',
+    isSolid: false
+  },
+  {
+    id: 'maze',
+    name: 'Maze',
+    pattern: 'url(/assets/patterns/maze.png)',
+    isSolid: false
+  },
+  {
+    id: 'polka-dots',
+    name: 'Polka Dots',
+    pattern: 'url(/assets/patterns/polka-dots.png)',
+    isSolid: false
+  },
+  {
+    id: 'stripes-vertical',
+    name: 'Stripes',
+    pattern: 'url(/assets/patterns/stripes-vertical.png)',
+    isSolid: false
+  },
+  {
+    id: 'waves',
+    name: 'Waves',
+    pattern: 'url(/assets/patterns/waves.png)',
     isSolid: false
   }
 ]
