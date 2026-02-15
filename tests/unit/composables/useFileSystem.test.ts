@@ -76,6 +76,56 @@ describe('useFileSystem', () => {
     expect(updatedFolder2.childrenIds).toContain(file.id)
   })
 
+  it('should copy a node', () => {
+    const root = fs.getRoot()
+    const folder1 = fs.createFolder('Folder 1', root.id)
+    const folder2 = fs.createFolder('Folder 2', root.id)
+    const file = fs.createFile('File.txt', folder1.id, 'Original Content')
+    
+    const copiedNodeId = fs.copyNode(file.id, folder2.id)
+    
+    expect(copiedNodeId).toBeDefined()
+    expect(copiedNodeId).not.toBe(file.id)
+    
+    const copiedFile = fs.getNode(copiedNodeId!)
+    expect(copiedFile?.name).toBe('File.txt')
+    expect(copiedFile?.parentId).toBe(folder2.id)
+    expect((copiedFile as any).content).toBe('Original Content')
+    
+    const updatedFolder2 = fs.getNode(folder2.id) as any
+    expect(updatedFolder2.childrenIds).toContain(copiedNodeId)
+    
+    // Original file should still exist in original location
+    const originalFile = fs.getNode(file.id)
+    expect(originalFile).toBeDefined()
+    expect(originalFile?.parentId).toBe(folder1.id)
+  })
+
+  it('should copy a folder recursively', () => {
+    const root = fs.getRoot()
+    const sourceFolder = fs.createFolder('Source', root.id)
+    const subFolder = fs.createFolder('Sub', sourceFolder.id)
+    const file = fs.createFile('File.txt', subFolder.id, 'Content')
+    const targetFolder = fs.createFolder('Target', root.id)
+    
+    const copiedFolderId = fs.copyNode(sourceFolder.id, targetFolder.id)
+    
+    expect(copiedFolderId).toBeDefined()
+    const copiedFolder = fs.getNode(copiedFolderId!) as any
+    expect(copiedFolder.name).toBe('Source')
+    expect(copiedFolder.childrenIds.length).toBe(1)
+    
+    const copiedSubFolderId = copiedFolder.childrenIds[0]
+    const copiedSubFolder = fs.getNode(copiedSubFolderId) as any
+    expect(copiedSubFolder.name).toBe('Sub')
+    expect(copiedSubFolder.childrenIds.length).toBe(1)
+    
+    const copiedFileId = copiedSubFolder.childrenIds[0]
+    const copiedFile = fs.getNode(copiedFileId) as any
+    expect(copiedFile.name).toBe('File.txt')
+    expect(copiedFile.content).toBe('Content')
+  })
+
   it('should get node by path', () => {
     const root = fs.getRoot()
     const folder = fs.createFolder('System Folder', root.id)

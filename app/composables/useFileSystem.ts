@@ -360,6 +360,71 @@ export function useFileSystem() {
     }
   }
 
+  const copyNode = (id: string, newParentId: string): string | undefined => {
+    const sourceNode = state.value.nodes[id]
+    if (!sourceNode) return undefined
+
+    // Check if newParentId is a child of id (prevent cycles)
+    let current: string | undefined = newParentId
+    while (current) {
+      if (current === id) return undefined
+      current = state.value.nodes[current]?.parentId
+    }
+
+    const newId = generateId()
+    const now = Date.now()
+
+    // Create copy without isSystem flag
+    const { isSystem, ...rest } = sourceNode
+
+    let newNode: FileNode
+    if (sourceNode.type === 'folder') {
+      const folderNode: FolderNode = {
+        ...(rest as FolderNode),
+        id: newId,
+        parentId: newParentId,
+        childrenIds: [],
+        createdAt: now,
+        modifiedAt: now,
+        isSystem: false
+      }
+      newNode = folderNode
+      state.value.nodes[newId] = newNode
+
+      // Recursively copy children
+      for (const childId of (sourceNode as FolderNode).childrenIds) {
+        copyNode(childId, newId)
+      }
+    } else {
+      newNode = {
+        ...rest,
+        id: newId,
+        parentId: newParentId,
+        createdAt: now,
+        modifiedAt: now,
+        isSystem: false
+      } as FileNode
+      state.value.nodes[newId] = newNode
+    }
+
+    // Add to new parent
+    const newParent = state.value.nodes[newParentId] as FolderNode
+    if (newParent && newParent.type === 'folder') {
+      newParent.childrenIds.push(newId)
+      newParent.modifiedAt = now
+
+      // Sync new parent
+      if (!newParent.isSystem) {
+        syncNode(newParent)
+      }
+    }
+
+    // Sync new node
+    syncNode(newNode)
+
+    return newId
+  }
+
   const moveToTrash = (id: string): void => {
     const trash = getTrash()
     if (trash && trash.id !== id) {
@@ -413,6 +478,7 @@ export function useFileSystem() {
     renameNode,
     updateFileContent,
     moveNode,
+    copyNode,
     getNodeByPath,
     fetchFilesFromServer,
     emptyTrash
