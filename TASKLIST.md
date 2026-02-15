@@ -408,7 +408,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Implement double-click to open folder
 - [x] `P0` Implement double-click to open file
 - [x] `P0` Add breadcrumb path navigation
-- [ ] `P1` Implement keyboard navigation (arrows)
+- [x] `P1` Implement keyboard navigation (arrows)
 - [ ] `P1` Add "Go to Folder" dialog
 - [ ] `P2` Implement folder history
 - [ ] `P2` Add bookmarks/favorites
@@ -417,8 +417,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ### 8.3 Finder Operations
 - [x] `P0` Implement file/folder selection
 - [x] `P0` Add "Get Info" dialog
-- [ ] `P1` Implement copy/paste operations
-- [ ] `P1` Implement move operations
+- [x] `P1` Implement copy/paste operations
+- [x] `P1` Implement move operations
 - [x] `P1` Add "New Folder" creation
 - [x] `P1` Implement rename functionality
 - [x] `P1` Add delete (move to trash)
