@@ -226,6 +226,20 @@ export function useFileSystem() {
     return state.value.nodes[state.value.rootId] as FolderNode
   }
 
+  const getPathNodes = (id: string): FileNode[] => {
+    const path: FileNode[] = []
+    let currentId: string | undefined = id
+
+    while (currentId) {
+      const node = state.value.nodes[currentId]
+      if (!node) break
+      path.unshift(node)
+      currentId = node.parentId
+    }
+
+    return path
+  }
+
   const getNode = (id: string): FileNode | undefined => {
     return state.value.nodes[id]
   }
@@ -366,6 +380,7 @@ export function useFileSystem() {
     state: readonly(state),
     initialize,
     getRoot,
+    getPathNodes,
     getNode,
     getChildren,
     createFile,

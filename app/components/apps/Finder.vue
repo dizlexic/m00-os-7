@@ -1,22 +1,36 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
 import type { FileNode, FolderNode } from '~/types/filesystem'
 
 interface Props {
   folderId: string
+  windowId?: string
 }
 
 const props = defineProps<Props>()
 
-const { getChildren, getNode, renameNode, deleteNode, getRoot } = useFileSystem()
-const { openWindow } = useWindowManager()
+const { getChildren, getNode, renameNode, deleteNode, getRoot, getPathNodes } = useFileSystem()
+const { openWindow, updateWindow } = useWindowManager()
 
 const currentFolderId = ref(props.folderId)
 const currentFolder = computed(() => getNode(currentFolderId.value) as FolderNode)
 const items = computed(() => getChildren(currentFolderId.value))
 const selectedItemId = ref<string | null>(null)
+
+const pathNodes = computed(() => getPathNodes(currentFolderId.value))
+
+watch(selectedItemId, (newId) => {
+  if (props.windowId) {
+    updateWindow(props.windowId, {
+      data: {
+        folderId: currentFolderId.value,
+        selectedItemId: newId
+      }
+    })
+  }
+})
 
 type ViewMode = 'icon' | 'list'
 const viewMode = ref<ViewMode>('icon')
@@ -36,6 +50,11 @@ function goUp() {
   }
 }
 
+function navigateTo(id: string) {
+  currentFolderId.value = id
+  selectedItemId.value = null
+}
+
 function selectItem(id: string) {
   selectedItemId.value = id
 }
@@ -52,14 +71,23 @@ function handleDoubleClick(item: FileNode) {
       }
     })
   } else if (item.type === 'application') {
-     // TODO: Implement app launching
-     if (item.name === 'SimpleText') {
-       openWindow({
-         type: 'simpletext',
-         title: 'Untitled',
-         icon: '/assets/icons/apps/simpletext.png'
-       })
-     }
+    if (item.name === 'SimpleText') {
+      openWindow({
+        type: 'simpletext',
+        title: 'Untitled',
+        icon: '/assets/icons/apps/simpletext.png'
+      })
+    } else if (item.name === 'Calculator') {
+      openWindow({
+        type: 'calculator',
+        title: 'Calculator',
+        icon: '/assets/icons/apps/calculator.png',
+        width: 178,
+        height: 280,
+        resizable: false,
+        maximizable: false
+      })
+    }
   } else {
     // Open file in SimpleText
     openWindow({
@@ -101,6 +129,21 @@ function getIcon(item: FileNode) {
           </button>
         </div>
       </div>
+    </div>
+
+    <div class="finder__path-bar">
+      <template v-for="(node, index) in pathNodes" :key="node.id">
+        <span
+          class="finder__path-part"
+          :class="{ 'finder__path-part--last': index === pathNodes.length - 1 }"
+          @click.stop="navigateTo(node.id)"
+        >
+          {{ node.name }}
+        </span>
+        <span v-if="index < pathNodes.length - 1" class="finder__path-separator">
+          <img src="/assets/icons/ui/scroll-arrow-right.png" alt=">" />
+        </span>
+      </template>
     </div>
 
     <div
@@ -231,6 +274,46 @@ function getIcon(item: FileNode) {
 
 .finder__header-title {
   font-weight: bold;
+}
+
+.finder__path-bar {
+  background-color: var(--color-gray-light);
+  border-bottom: 1px solid var(--color-black);
+  padding: 2px var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.finder__path-part {
+  cursor: pointer;
+}
+
+.finder__path-part:hover {
+  text-decoration: underline;
+}
+
+.finder__path-part--last {
+  font-weight: bold;
+  cursor: default;
+}
+
+.finder__path-part--last:hover {
+  text-decoration: none;
+}
+
+.finder__path-separator {
+  display: flex;
+  align-items: center;
+}
+
+.finder__path-separator img {
+  width: 8px;
+  height: 8px;
 }
 
 .finder__content {
