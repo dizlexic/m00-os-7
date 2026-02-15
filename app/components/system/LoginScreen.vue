@@ -2,9 +2,13 @@
 import { ref, onMounted } from 'vue'
 import { useUser } from '~/composables/useUser'
 import { useAlert } from '~/composables/useAlert'
+import { useFileSystem } from '~/composables/useFileSystem'
+import { useSettings } from '~/composables/useSettings'
 
 const { login, loginAsGuest, register, fetchUsers, users, removeUser } = useUser()
 const { showAlert } = useAlert()
+const { fetchFilesFromServer } = useFileSystem()
+const { fetchSettingsFromServer } = useSettings()
 
 const selectedUser = ref<string | 'guest' | 'new'>('')
 const username = ref('')
@@ -46,6 +50,13 @@ async function handleLogin() {
     if (!success) {
       error.value = 'Invalid password.'
     }
+  }
+
+  if (success) {
+    await Promise.all([
+      fetchFilesFromServer(),
+      fetchSettingsFromServer()
+    ])
   }
 
   isLoading.value = false
