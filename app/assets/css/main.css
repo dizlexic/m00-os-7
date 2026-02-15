@@ -1,0 +1,362 @@
+/**
+ * m00-os-7 Main Stylesheet
+ *
+ * Global styles and CSS variables for the Mac OS 7 web clone.
+ * Follows the Mac OS 7 design principles for visual authenticity.
+ */
+
+/* ============================================
+   CSS Variables - Mac OS 7 Design System
+   ============================================ */
+
+:root {
+  /* Mac OS 7 Color Palette (Classic 16-color) */
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-gray-light: #CCCCCC;
+  --color-gray-medium: #999999;
+  --color-gray-dark: #666666;
+  --color-blue: #000080;
+  --color-cyan: #00FFFF;
+  --color-green: #00FF00;
+  --color-magenta: #FF00FF;
+  --color-red: #FF0000;
+  --color-yellow: #FFFF00;
+
+  /* Semantic Colors */
+  --color-highlight: #000080;
+  --color-highlight-text: #FFFFFF;
+  --color-window-bg: #CCCCCC;
+  --color-desktop-bg: #666699;
+  --color-title-bar-active: #000000;
+  --color-title-bar-inactive: #999999;
+  --color-border: #000000;
+  --color-shadow: #000000;
+
+  /* Spacing Scale */
+  --spacing-xs: 2px;
+  --spacing-sm: 4px;
+  --spacing-md: 8px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+
+  /* Typography */
+  --font-system: 'Chicago', 'Geneva', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-size-xs: 9px;
+  --font-size-sm: 10px;
+  --font-size-md: 12px;
+  --font-size-lg: 14px;
+  --font-size-xl: 18px;
+  --line-height-tight: 1.1;
+  --line-height-normal: 1.3;
+  --line-height-relaxed: 1.5;
+
+  /* Window Dimensions */
+  --window-border-width: 1px;
+  --window-title-height: 20px;
+  --window-min-width: 100px;
+  --window-min-height: 50px;
+  --window-shadow: 1px 1px 0 var(--color-black);
+  --window-border-radius: 0px;
+
+  /* Menu Bar */
+  --menu-bar-height: 20px;
+  --menu-item-padding: 8px 12px;
+
+  /* Icons */
+  --icon-size-sm: 16px;
+  --icon-size-md: 32px;
+  --icon-size-lg: 48px;
+
+  /* Z-Index Scale */
+  --z-desktop: 0;
+  --z-desktop-icons: 10;
+  --z-windows: 100;
+  --z-menu-bar: 1000;
+  --z-dropdown: 1100;
+  --z-modal: 2000;
+  --z-alert: 3000;
+  --z-boot: 9999;
+
+  /* Transitions */
+  --transition-fast: 100ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Scrollbar */
+  --scrollbar-width: 16px;
+  --scrollbar-button-height: 16px;
+}
+
+/* ============================================
+   CSS Reset & Base Styles
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--font-size-md);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+  text-rendering: optimizeSpeed;
+}
+
+body {
+  font-family: var(--font-system), serif;
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-normal);
+  color: var(--color-black);
+  background-color: var(--color-desktop-bg);
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
+
+/* Disable anti-aliasing for pixel-perfect rendering */
+img,
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Remove default button styles */
+button {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Remove default input styles */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Remove default list styles */
+ul,
+ol {
+  list-style: none;
+}
+
+/* Remove default link styles */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============================================
+   Mac OS 7 UI Components Base Styles
+   ============================================ */
+
+/* Classic Mac button style */
+.mac-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-black);
+  border-radius: var(--window-border-radius);
+  box-shadow:
+    inset -1px -1px 0 var(--color-gray-dark),
+    inset 1px 1px 0 var(--color-white);
+  font-family: var(--font-system), serif;
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+.mac-button:active {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  box-shadow: none;
+}
+
+.mac-button--default {
+  border-width: 2px;
+  font-weight: bold;
+}
+
+.mac-button:disabled {
+  color: var(--color-gray-medium);
+  cursor: not-allowed;
+}
+
+/* Classic Mac input field */
+.mac-input {
+  padding: var(--spacing-sm);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-black);
+  box-shadow: inset 1px 1px 0 var(--color-gray-dark);
+  font-family: var(--font-system), serif;
+  font-size: var(--font-size-md);
+}
+
+.mac-input:focus {
+  outline: none;
+  box-shadow:
+    inset 1px 1px 0 var(--color-gray-dark),
+    0 0 0 2px var(--color-highlight);
+}
+
+/* Classic Mac checkbox */
+.mac-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.mac-checkbox__box {
+  width: 12px;
+  height: 12px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-black);
+}
+
+.mac-checkbox__box--checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='%23000' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+}
+
+/* Classic Mac radio button */
+.mac-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.mac-radio__circle {
+  width: 12px;
+  height: 12px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-black);
+  border-radius: 50%;
+}
+
+.mac-radio__circle--selected {
+  background: radial-gradient(circle, var(--color-black) 40%, var(--color-white) 40%);
+}
+
+/* Selection highlight */
+.mac-selected {
+  background-color: var(--color-highlight);
+  color: var(--color-highlight-text);
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* Text selection */
+.selectable {
+  user-select: text;
+  cursor: text;
+}
+
+/* Prevent selection */
+.no-select {
+  user-select: none;
+}
+
+/* Draggable cursor */
+.draggable {
+  cursor: grab;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+/* Hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Flex utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-xs {
+  gap: var(--spacing-xs);
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+/* ============================================
+   Scrollbar Styles (Mac OS 7 style)
+   ============================================ */
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--color-gray-light);
+  border: 1px solid var(--color-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-black);
+  box-shadow:
+    inset -1px -1px 0 var(--color-gray-dark),
+    inset 1px 1px 0 var(--color-white);
+}
+
+::-webkit-scrollbar-button {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-black);
+  height: var(--scrollbar-button-height);
+}
+
+::-webkit-scrollbar-corner {
+  background-color: var(--color-gray-light);
+}

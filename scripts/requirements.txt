@@ -1,0 +1,8 @@
+# m00-os-7 Asset Generation Dependencies
+# Install with: pip install -r requirements.txt
+
+# Image processing
+Pillow>=10.2.0
+
+# Optional: For advanced image manipulation
+# numpy>=1.26.0

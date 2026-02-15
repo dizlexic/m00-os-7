@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+.nuxt/
+.output/
+dist/
+
+# Generated files
+*.min.js
+*.min.css
+
+# Package manager
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# IDE
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+
+# Data directory
+data/
+
+# Public assets (generated)
+public/assets/

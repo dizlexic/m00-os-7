@@ -1,0 +1,71 @@
+# m00-os-7 Docker Compose Configuration
+# Local development environment
+
+services:
+  # Main application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder  # Use builder stage for development
+    container_name: m00-os-7-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+      - NUXT_PUBLIC_APP_NAME=m00-os-7
+      - NUXT_PUBLIC_APP_VERSION=0.1.0
+    volumes:
+      # Mount source code for hot reload
+      - ./app:/app/app:cached
+      - ./public:/app/public:cached
+      - ./content:/app/content:cached
+      - ./server:/app/server:cached
+      # Mount data directory for persistence
+      - ./data:/app/data
+      # Exclude node_modules from mount
+      - /app/node_modules
+      - /app/.nuxt
+    command: npm run dev
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Production-like service (optional, for testing production builds locally)
+  app-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: m00-os-7-prod
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3000
+    volumes:
+      - ./data:/app/data
+    profiles:
+      - production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  data:
+    driver: local
+
+networks:
+  default:
+    name: m00-os-7-network

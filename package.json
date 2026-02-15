@@ -1,0 +1,46 @@
+{
+  "name": "m00-os-7",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed"
+  },
+  "dependencies": {
+    "@nuxt/a11y": "^1.0.0-alpha.1",
+    "@nuxt/content": "^3.11.2",
+    "@nuxt/eslint": "^1.15.1",
+    "@nuxt/image": "^2.0.0",
+    "@nuxt/scripts": "^0.13.2",
+    "@nuxt/ui": "^4.4.0",
+    "better-sqlite3": "^12.6.2",
+    "nuxt": "^4.3.1",
+    "vue": "^3.5.28",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@nuxt/test-utils": "^3.11.0",
+    "@playwright/test": "^1.41.2",
+    "@vitejs/plugin-vue": "^5.0.3",
+    "@vue/test-utils": "^2.4.4",
+    "happy-dom": "^13.3.8",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3",
+    "vitest": "^3.2.0",
+    "vue-tsc": "^2.0.6"
+  }
+}
