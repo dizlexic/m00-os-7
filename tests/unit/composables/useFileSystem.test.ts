@@ -85,8 +85,8 @@ describe('useFileSystem', () => {
     expect(foundNode?.id).toBe(file.id)
   })
 
-  it('should initialize with default structure', () => {
-    fs.initialize()
+  it('should initialize with default structure', async () => {
+    await fs.initialize()
     
     const systemFolder = fs.getNodeByPath('Macintosh HD/System Folder')
     expect(systemFolder).toBeDefined()
