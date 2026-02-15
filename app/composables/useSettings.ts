@@ -5,12 +5,14 @@ export interface Settings {
   desktopPattern: string;
   theme: 'classic' | 'dark' | 'high-contrast';
   soundVolume: number;
+  highlightColor: string;
 }
 
 const defaultSettings: Settings = {
   desktopPattern: 'default',
   theme: 'classic',
-  soundVolume: 75
+  soundVolume: 75,
+  highlightColor: '#000080'
 }
 
 const settings = ref<Settings>({ ...defaultSettings })
