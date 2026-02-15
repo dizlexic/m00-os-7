@@ -6,7 +6,10 @@
  * Following project guidelines for P0 and P1 requirements.
  */
 
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useSettings } from '~/composables/useSettings'
+
+const { settings } = useSettings()
 
 const showDate = ref(false)
 const displayValue = ref('')
@@ -18,22 +21,69 @@ function updateDisplay(): void {
   const now = new Date()
 
   if (showDate.value) {
-    // Date Format: "May 13, 1991"
-    const options: Intl.DateTimeFormatOptions = {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
+    // Date Format: respect settings.dateFormat
+    const now = new Date()
+    const day = now.getDate().toString().padStart(2, '0')
+    const month = (now.getMonth() + 1).toString().padStart(2, '0')
+    const year = now.getFullYear()
+
+    if (settings.dateFormat === 'DD/MM/YYYY') {
+      displayValue.value = `${day}/${month}/${year}`
+    } else if (settings.dateFormat === 'YYYY-MM-DD') {
+      displayValue.value = `${year}-${month}-${day}`
+    } else {
+      displayValue.value = `${month}/${day}/${year}`
     }
-    displayValue.value = now.toLocaleDateString('en-US', options)
   } else {
-    // Time Format: "10:30 AM"
-    const hours = now.getHours()
+    // Time Format: "10:30:00 AM" or "22:30:00"
+    let hours = now.getHours()
     const minutes = now.getMinutes().toString().padStart(2, '0')
-    const ampm = hours >= 12 ? 'PM' : 'AM'
-    const displayHours = hours % 12 || 12
-    displayValue.value = `${displayHours}:${minutes} ${ampm}`
+    const seconds = now.getSeconds().toString().padStart(2, '0')
+    const timeStr = `${minutes}${settings.showSeconds ? ':' + seconds : ''}`
+
+    if (settings.timeFormat === '12h') {
+      const ampm = hours >= 12 ? 'PM' : 'AM'
+      const displayHours = hours % 12 || 12
+      displayValue.value = `${displayHours}:${timeStr} ${ampm}`
+    } else {
+      const displayHours = hours.toString().padStart(2, '0')
+      displayValue.value = `${displayHours}:${timeStr}`
+    }
   }
 }
+
+// Watch for settings changes to update display immediately
+watch(() => [settings.timeFormat, settings.showSeconds, settings.dateFormat], () => {
+  updateDisplay()
+
+  // If showing seconds, we need faster updates
+  if (settings.showSeconds) {
+    startTimer(1000)
+  } else {
+    startTimer(60000)
+  }
+})
+
+let intervalId: ReturnType<typeof setInterval> | null = null
+
+function startTimer(ms: number) {
+  if (intervalId) {
+    clearInterval(intervalId)
+  }
+  intervalId = setInterval(updateDisplay, ms)
+}
+
+onMounted(() => {
+  updateDisplay()
+  // Initial timer based on settings
+  startTimer(settings.showSeconds ? 1000 : 60000)
+})
+
+onUnmounted(() => {
+  if (intervalId) {
+    clearInterval(intervalId)
+  }
+})
 
 /**
  * Toggles between time and date display.
@@ -42,20 +92,6 @@ function toggleDisplay(): void {
   showDate.value = !showDate.value
   updateDisplay()
 }
-
-let intervalId: ReturnType<typeof setInterval> | null = null
-
-onMounted(() => {
-  updateDisplay()
-  // Update every minute as per P0 requirement
-  intervalId = setInterval(updateDisplay, 60000)
-})
-
-onUnmounted(() => {
-  if (intervalId) {
-    clearInterval(intervalId)
-  }
-})
 </script>
 
 <template>
