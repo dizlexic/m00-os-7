@@ -424,6 +424,49 @@ def generate_radio_buttons():
     draw.ellipse([3, 3, 8, 8], fill=COLORS['black'])
     save_icon(img, 'radio-selected', 'icons/ui')
 
+def generate_cursors():
+    """Generate system cursor graphics."""
+    print('Generating cursors...')
+
+    # Arrow cursor (standard)
+    img, draw = create_icon(size=(16, 16))
+    # Standard Mac arrow shape
+    points = [
+        (0, 0),
+        (0, 15),
+        (4, 11),
+        (10, 11)
+    ]
+    draw.polygon(points, fill=COLORS['white'], outline=COLORS['black'])
+    save_icon(img, 'cursor-arrow', 'cursors')
+
+    # Text cursor (I-beam)
+    img, draw = create_icon(size=(16, 16))
+    draw.line([(8, 2), (8, 13)], fill=COLORS['black'])
+    draw.line([(6, 2), (10, 2)], fill=COLORS['black'])
+    draw.line([(6, 13), (10, 13)], fill=COLORS['black'])
+    save_icon(img, 'cursor-text', 'cursors')
+
+    # Wait cursor (Watch)
+    img, draw = create_icon(size=(16, 16))
+    # Watch face
+    draw.ellipse([3, 3, 12, 12], fill=COLORS['white'], outline=COLORS['black'])
+    # Watch hands
+    draw.line([(7.5, 7.5), (7.5, 5)], fill=COLORS['black'])
+    draw.line([(7.5, 7.5), (10, 7.5)], fill=COLORS['black'])
+    # Watch stem
+    draw.rectangle([6, 1, 9, 3], fill=COLORS['gray_medium'], outline=COLORS['black'])
+    save_icon(img, 'cursor-wait', 'cursors')
+
+    # Hand cursor (Pointer)
+    img, draw = create_icon(size=(16, 16))
+    # Simplified hand shape
+    draw.rectangle([4, 6, 12, 14], fill=COLORS['white'], outline=COLORS['black'])
+    draw.rectangle([4, 2, 6, 6], fill=COLORS['white'], outline=COLORS['black']) # Pointer finger
+    save_icon(img, 'cursor-hand', 'cursors')
+
+    print('Cursors complete!')
+
 
 # ============================================
 # Boot/System Icons
@@ -637,6 +680,7 @@ def generate_ui_icons():
     generate_scrollbar_thumb()
     generate_checkboxes()
     generate_radio_buttons()
+    generate_cursors()
     print('UI icons complete!')
 
 def generate_small_system_icons():
