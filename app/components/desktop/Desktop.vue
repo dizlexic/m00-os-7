@@ -21,6 +21,8 @@ import GeneralSettings from '~/components/apps/GeneralSettings.vue'
 import SoundSettings from '~/components/apps/SoundSettings.vue'
 import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
+import ContextMenu from './ContextMenu.vue'
+import type { MenuItem } from '~/types/menu'
 
 const {
   icons,
@@ -31,15 +33,18 @@ const {
   startMarquee,
   updateMarquee,
   endMarquee,
+  showContextMenu,
   hideContextMenu,
-  initializeDesktop
+  initializeDesktop,
+  cleanUpDesktop
 } = useDesktop()
 
 const {
-  windowList
+  windowList,
+  openWindow
 } = useWindowManager()
 
-const { getRoot, getNodeByPath } = useFileSystem()
+const { getRoot, getNodeByPath, createFolder } = useFileSystem()
 
 /**
  * Get folder ID for Finder window
@@ -107,7 +112,49 @@ function handleMouseUp(): void {
 
 function handleContextMenu(event: MouseEvent): void {
   event.preventDefault()
-  // Context menu will be implemented later
+
+  // If clicking on an icon, we might want a different menu later
+  if ((event.target as HTMLElement).closest('.desktop-icon')) return
+
+  const items: MenuItem[] = [
+    {
+      id: 'new-folder',
+      label: 'New Folder',
+      action: () => {
+        createFolder('untitled folder', getRoot().id)
+      }
+    },
+    {
+      id: 'clean-up',
+      label: 'Clean Up Desktop',
+      action: () => {
+        cleanUpDesktop()
+      }
+    },
+    { id: 'sep1', label: '', isSeparator: true },
+    {
+      id: 'desktop-patterns',
+      label: 'Desktop Patterns...',
+      action: () => {
+        openWindow({
+          type: 'general-settings',
+          title: 'General Controls',
+          icon: '/assets/icons/system/preferences.png',
+          width: 400,
+          height: 300
+        })
+      }
+    }
+  ]
+
+  showContextMenu({ x: event.clientX, y: event.clientY }, items)
+}
+
+function handleMenuItemClick(item: MenuItem): void {
+  if (item.action) {
+    item.action()
+  }
+  hideContextMenu()
 }
 
 function handleKeyDown(event: KeyboardEvent): void {
@@ -200,17 +247,14 @@ onUnmounted(() => {
       :style="marqueeStyle"
     />
 
-    <!-- Context Menu (placeholder) -->
-    <div
+    <!-- Context Menu -->
+    <ContextMenu
       v-if="contextMenu.isVisible"
-      class="desktop__context-menu"
-      :style="{
-        left: `${contextMenu.position.x}px`,
-        top: `${contextMenu.position.y}px`
-      }"
-    >
-      <!-- Context menu items will be rendered here -->
-    </div>
+      :items="contextMenu.items"
+      :position="contextMenu.position"
+      @item-click="handleMenuItemClick"
+      @close="hideContextMenu"
+    />
   </div>
 </template>
 
@@ -231,15 +275,6 @@ onUnmounted(() => {
   background-color: rgba(0, 0, 128, 0.1);
   pointer-events: none;
   z-index: var(--z-desktop-icons);
-}
-
-.desktop__context-menu {
-  position: absolute;
-  background-color: var(--color-white);
-  border: 1px solid var(--color-black);
-  box-shadow: 2px 2px 0 var(--color-black);
-  min-width: 150px;
-  z-index: var(--z-dropdown);
 }
 
 .window-placeholder {
