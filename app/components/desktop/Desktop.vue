@@ -15,6 +15,7 @@ import Window from '~/components/window/Window.vue'
 import Finder from '~/components/apps/Finder.vue'
 import SimpleText from '~/components/apps/SimpleText.vue'
 import Calculator from '~/components/apps/Calculator.vue'
+import NotePad from '~/components/apps/NotePad.vue'
 import GetInfo from '~/components/apps/GetInfo.vue'
 import ControlPanels from '~/components/apps/ControlPanels.vue'
 import GeneralSettings from '~/components/apps/GeneralSettings.vue'
@@ -210,6 +211,10 @@ onUnmounted(() => {
 
       <Calculator
         v-else-if="win.type === 'calculator'"
+      />
+
+      <NotePad
+        v-else-if="win.type === 'notepad'"
       />
 
       <GetInfo

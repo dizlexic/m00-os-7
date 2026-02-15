@@ -36,6 +36,19 @@ const appleMenuItems = computed<MenuItem[]>(() => [
   { id: 'about', label: 'About This Macintosh', action: () => handleAbout() },
   { id: 'sep1', label: '', isSeparator: true },
   {
+    id: 'notepad',
+    label: 'Note Pad',
+    action: () => openWindow({
+      type: 'notepad',
+      title: 'Note Pad',
+      icon: '/assets/icons/apps/notepad.png',
+      width: 300,
+      height: 400,
+      resizable: true,
+      maximizable: false
+    })
+  },
+  {
     id: 'control-panels',
     label: 'Control Panels',
     action: () => handleControlPanels(),

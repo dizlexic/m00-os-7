@@ -187,6 +187,16 @@ function handleDoubleClick(item: FileNode) {
         resizable: false,
         maximizable: false
       })
+    } else if (item.name === 'NotePad') {
+      openWindow({
+        type: 'notepad',
+        title: 'Note Pad',
+        icon: '/assets/icons/apps/notepad.png',
+        width: 300,
+        height: 400,
+        resizable: true,
+        maximizable: false
+      })
     }
   } else if (item.type === 'file') {
     // Track recent doc

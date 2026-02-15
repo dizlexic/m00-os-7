@@ -466,12 +466,12 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Add scientific mode
 
 ### 9.3 Note Pad
-- [ ] `P1` Create NotePad.vue component
-- [ ] `P1` Implement multi-page notes
-- [ ] `P1` Add page navigation
-- [ ] `P1` Implement auto-save
-- [ ] `P2` Add page count display
-- [ ] `P2` Implement page deletion
+- [x] `P1` Create NotePad.vue component
+- [x] `P1` Implement multi-page notes
+- [x] `P1` Add page navigation
+- [x] `P1` Implement auto-save
+- [x] `P2` Add page count display
+- [x] `P2` Implement page deletion
 - [ ] `P3` Add note search
 
 ### 9.4 Scrapbook
