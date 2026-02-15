@@ -6,6 +6,7 @@
  */
 
 import { ref, computed, readonly } from 'vue'
+import { useRecentItems } from '~/composables/useRecentItems'
 import type { Position, Size } from '~/types/desktop'
 import type {
   WindowConfig,
@@ -112,7 +113,37 @@ export function useWindowManager() {
     windows.value.set(id, windowInstance)
     activeWindowId.value = id
 
+    // Track recent apps
+    trackRecentApp(config)
+
     return id
+  }
+
+  const { addRecentApp } = useRecentItems()
+
+  function trackRecentApp(config: WindowConfig): void {
+    const trackableApps: WindowType[] = [
+      'simpletext',
+      'calculator',
+      'notepad',
+      'control-panels'
+    ]
+
+    if (trackableApps.includes(config.type)) {
+      const appNames: Record<string, string> = {
+        simpletext: 'SimpleText',
+        calculator: 'Calculator',
+        notepad: 'Note Pad',
+        'control-panels': 'Control Panels'
+      }
+
+      addRecentApp({
+        id: config.type,
+        name: appNames[config.type] || config.title,
+        type: config.type,
+        icon: config.icon
+      })
+    }
   }
 
   function closeWindow(id: string): void {

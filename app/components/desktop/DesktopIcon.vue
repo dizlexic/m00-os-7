@@ -12,6 +12,7 @@ import type { WindowType } from '~/types/window'
 import { useDesktop } from '~/composables/useDesktop'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useTrash } from '~/composables/useTrash'
+import { useRecentItems } from '~/composables/useRecentItems'
 
 interface Props {
   icon: DesktopIcon
@@ -39,6 +40,7 @@ const {
 
 const { openWindow } = useWindowManager()
 const { moveToTrash } = useTrash()
+const { addRecentDoc } = useRecentItems()
 
 // Local state
 const isDragging = ref(false)
@@ -152,6 +154,19 @@ function handleClick(event: MouseEvent): void {
 }
 
 function handleDoubleClick(): void {
+  // Track recent doc if it's a document
+  if (props.icon.type === 'document') {
+    addRecentDoc({
+      id: props.icon.id,
+      name: props.icon.name,
+      type: 'file',
+      icon: props.icon.icon,
+      data: {
+        path: props.icon.path
+      }
+    })
+  }
+
   // Map icon type to window type
   const iconTypeToWindowType: Record<string, WindowType> = {
     'folder': 'finder',

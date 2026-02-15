@@ -10,9 +10,13 @@ import Clock from '~/components/system/Clock.vue'
 import MenuDropdown from '~/components/desktop/MenuDropdown.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
+import { useRecentItems } from '~/composables/useRecentItems'
+import type { WindowType } from '~/types/window'
+import type { RecentItem } from '~/types/recent'
 
 const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode } = useFileSystem()
 const { activeWindow, openWindow } = useWindowManager()
+const { recentApps, recentDocs } = useRecentItems()
 
 interface MenuItem {
   id: string
@@ -43,7 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
 const activeMenuId = ref<string | null>(null)
 
 // Menus configuration
-const appleMenuItems: MenuItem[] = [
+const appleMenuItems = computed<MenuItem[]>(() => [
   { id: 'about', label: 'About This Macintosh', action: () => handleAbout() },
   { id: 'sep1', label: '', isSeparator: true },
   {
@@ -64,11 +68,29 @@ const appleMenuItems: MenuItem[] = [
     ]
   },
   { id: 'sep2', label: '', isSeparator: true },
-  { id: 'recent-apps', label: 'Recent Applications', disabled: true },
-  { id: 'recent-docs', label: 'Recent Documents', disabled: true },
+  {
+    id: 'recent-apps',
+    label: 'Recent Applications',
+    disabled: recentApps.value.length === 0,
+    submenu: recentApps.value.map(app => ({
+      id: `recent-app-${app.id}`,
+      label: app.name,
+      action: () => handleOpenRecentApp(app)
+    }))
+  },
+  {
+    id: 'recent-docs',
+    label: 'Recent Documents',
+    disabled: recentDocs.value.length === 0,
+    submenu: recentDocs.value.map(doc => ({
+      id: `recent-doc-${doc.id}`,
+      label: doc.name,
+      action: () => handleOpenRecentDoc(doc)
+    }))
+  },
   { id: 'sep3', label: '', isSeparator: true },
   { id: 'shutdown', label: 'Shut Down', action: () => handleShutdown() }
-]
+])
 
 const fileMenuItems: MenuItem[] = [
   { id: 'new-folder', label: 'New Folder', shortcut: '⌘N', action: () => handleNewFolder() },
@@ -199,13 +221,31 @@ function handleControlPanels(): void {
 
 function handleControlPanel(title: string, type: string): void {
   openWindow({
-    type,
+    type: type as WindowType,
     title,
     icon: '/assets/icons/system/preferences.png',
     width: 400,
     height: 300,
     resizable: false,
     maximizable: false
+  })
+}
+
+function handleOpenRecentApp(app: RecentItem): void {
+  openWindow({
+    type: app.type as WindowType,
+    title: app.name,
+    icon: app.icon
+  })
+}
+
+function handleOpenRecentDoc(doc: RecentItem): void {
+  // Most docs open in SimpleText in this clone
+  openWindow({
+    type: 'simpletext',
+    title: doc.name,
+    icon: doc.icon,
+    data: doc.data
   })
 }
 

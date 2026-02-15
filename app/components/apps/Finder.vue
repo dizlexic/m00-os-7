@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
+import { useRecentItems } from '~/composables/useRecentItems'
 import type { FileNode, FolderNode } from '~/types/filesystem'
 
 interface Props {
@@ -13,6 +14,7 @@ const props = defineProps<Props>()
 
 const { getChildren, getNode, renameNode, deleteNode, getRoot, getPathNodes } = useFileSystem()
 const { openWindow, updateWindow } = useWindowManager()
+const { addRecentDoc } = useRecentItems()
 
 const currentFolderId = ref(props.folderId)
 const currentFolder = computed(() => getNode(currentFolderId.value) as FolderNode)
@@ -98,7 +100,18 @@ function handleDoubleClick(item: FileNode) {
         maximizable: false
       })
     }
-  } else {
+  } else if (item.type === 'file') {
+    // Track recent doc
+    addRecentDoc({
+      id: item.id,
+      name: item.name,
+      type: 'file',
+      icon: '/assets/icons/system/document.png',
+      data: {
+        fileId: item.id
+      }
+    })
+
     // Open file in SimpleText
     openWindow({
       type: 'simpletext',
