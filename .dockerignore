@@ -1,0 +1,62 @@
+# m00-os-7 Docker Ignore File
+# Excludes files from Docker build context for faster builds and correct native modules
+
+# Dependencies - CRITICAL: exclude to ensure native modules are built for Linux
+node_modules
+
+# Nuxt build outputs - will be regenerated during Docker build
+.nuxt
+.output
+dist
+
+# Development and IDE files
+.git
+.gitignore
+.vscode
+.idea
+*.swp
+*.swo
+
+# Environment files (secrets should be passed via environment variables)
+.env
+.env.*
+!.env.example
+
+# Test files and reports
+tests
+test-results
+playwright-report
+coverage
+*.test.ts
+*.spec.ts
+vitest.config.ts
+playwright.config.ts
+
+# Documentation (not needed in production image)
+docs
+*.md
+!README.md
+
+# Docker files (prevent recursive issues)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Digital Ocean configuration
+.do
+
+# macOS files
+.DS_Store
+*.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Python virtual environment (for asset generation scripts)
+venv
+__pycache__
+*.pyc
+
+# Data directory (should be mounted as volume)
+data
