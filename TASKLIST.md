@@ -227,7 +227,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Display "Happy Mac" icon
 - [x] `P0` Show "Welcome to Macintosh" message
 - [x] `P0` Implement loading progress bar
-- [ ] `P1` Add extension loading simulation
+- [x] `P1` Add extension loading simulation
 - [ ] `P1` Show startup items loading
 - [ ] `P2` Add boot chime sound effect
 - [ ] `P2` Implement "Sad Mac" error screen
@@ -483,11 +483,11 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Implement item reordering
 
 ### 9.5 About This Macintosh
-- [ ] `P0` Create AboutMac.vue component
-- [ ] `P0` Display system name and version
-- [ ] `P0` Show memory usage (mock)
-- [ ] `P1` Display application memory bars
-- [ ] `P1` Add system information
+- [x] `P0` Create AboutMac.vue component
+- [x] `P0` Display system name and version
+- [x] `P0` Show memory usage (mock)
+- [x] `P1` Display application memory bars
+- [x] `P1` Add system information
 - [ ] `P2` Show uptime
 - [ ] `P2` Add credits/acknowledgments
 
@@ -606,20 +606,20 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 13. Content Management
 
 ### 13.1 Article System
-- [ ] `P1` Set up @nuxt/content for articles
-- [ ] `P1` Create article markdown structure
-- [ ] `P1` Implement article listing
-- [ ] `P1` Add article viewer integration with SimpleText
+- [x] `P1` Set up @nuxt/content for articles
+- [x] `P1` Create article markdown structure
+- [x] `P1` Implement article listing
+- [x] `P1` Add article viewer integration with SimpleText
 - [ ] `P2` Implement article categories
 - [ ] `P2` Add article search
 - [ ] `P3` Implement article comments (mock)
 
 ### 13.2 Help System
-- [ ] `P1` Create help documentation structure
-- [ ] `P1` Implement help viewer
+- [x] `P1` Create help documentation structure
+- [x] `P1` Implement help viewer
 - [ ] `P2` Add contextual help (per application)
 - [ ] `P2` Implement help search
-- [ ] `P3` Add help index
+- [x] `P3` Add help index
 
 ---
 
@@ -730,7 +730,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 
 ### 18.1 Authentication Security
 - [x] `P0` Implement secure password hashing
-- [ ] `P0` Add CSRF protection
+- [x] `P0` Add CSRF protection
 - [x] `P1` Implement session management
 - [ ] `P1` Add rate limiting for login attempts
 - [ ] `P2` Implement account lockout
