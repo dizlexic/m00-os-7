@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 /**
  * Root Application Component
  *
@@ -14,15 +14,27 @@ import LoginScreen from "~/components/system/LoginScreen.vue";
 import { useAlert } from "~/composables/useAlert";
 import { useFileSystem } from "~/composables/useFileSystem";
 import { useUser } from "~/composables/useUser";
+import { useSettings } from "~/composables/useSettings";
 
 const { alertState, hideAlert } = useAlert();
-const { initialize } = useFileSystem();
-const { isAuthenticated } = useUser();
+const { initialize, fetchFilesFromServer } = useFileSystem();
+const { isAuthenticated, init } = useUser();
+const { fetchSettingsFromServer } = useSettings();
 
 const isBooting = ref(true);
 
-// Initialize filesystem on app start
-initialize();
+// Initialize on app start
+onMounted(async () => {
+  const loggedIn = await init();
+  await initialize();
+
+  if (loggedIn) {
+    await Promise.all([
+      fetchFilesFromServer(),
+      fetchSettingsFromServer()
+    ]);
+  }
+});
 
 function onBootComplete() {
   isBooting.value = false;
