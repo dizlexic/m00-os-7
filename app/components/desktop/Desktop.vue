@@ -24,6 +24,7 @@ import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
 import AboutMac from '~/components/apps/AboutMac.vue'
 import ArticleViewer from '~/components/apps/ArticleViewer.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
+import { useClipboard } from '~/composables/useClipboard'
 import ContextMenu from './ContextMenu.vue'
 import type { MenuItem } from '~/types/menu'
 
@@ -44,10 +45,12 @@ const {
 
 const {
   windowList,
+  activeWindow,
   openWindow
 } = useWindowManager()
 
-const { getRoot, getNodeByPath, createFolder } = useFileSystem()
+const { getRoot, getNodeByPath, createFolder, moveToTrash } = useFileSystem()
+const { clipboard, copy, cut, paste } = useClipboard()
 
 /**
  * Get folder ID for Finder window
@@ -128,13 +131,21 @@ function handleContextMenu(event: MouseEvent): void {
       }
     },
     {
+      id: 'paste',
+      label: 'Paste',
+      disabled: !clipboard.value,
+      action: () => {
+        paste(getRoot().id)
+      }
+    },
+    { id: 'sep1', label: '', isSeparator: true },
+    {
       id: 'clean-up',
       label: 'Clean Up Desktop',
       action: () => {
         cleanUpDesktop()
       }
     },
-    { id: 'sep1', label: '', isSeparator: true },
     {
       id: 'desktop-patterns',
       label: 'Desktop Patterns...',
@@ -146,6 +157,53 @@ function handleContextMenu(event: MouseEvent): void {
           width: 400,
           height: 300
         })
+      }
+    }
+  ]
+
+  showContextMenu({ x: event.clientX, y: event.clientY }, items)
+}
+
+function handleIconContextMenu(event: MouseEvent, icon: any): void {
+  const items: MenuItem[] = [
+    {
+      id: 'cut',
+      label: 'Cut',
+      disabled: icon.isSystem,
+      action: () => {
+        cut([icon.id])
+      }
+    },
+    {
+      id: 'copy',
+      label: 'Copy',
+      action: () => {
+        copy([icon.id])
+      }
+    },
+    { id: 'sep1', label: '', isSeparator: true },
+    {
+      id: 'get-info',
+      label: 'Get Info',
+      action: () => {
+        openWindow({
+          type: 'get-info',
+          title: `Info: ${icon.name}`,
+          icon: icon.icon,
+          data: { nodeId: icon.id },
+          width: 300,
+          height: 400,
+          resizable: false,
+          maximizable: false
+        })
+      }
+    },
+    {
+      id: 'move-to-trash',
+      label: 'Move to Trash',
+      disabled: icon.isSystem || icon.type === 'trash' || icon.type === 'hard-drive',
+      action: () => {
+        moveToTrash(icon.id)
       }
     }
   ]
@@ -191,7 +249,7 @@ onUnmounted(() => {
     <!-- Desktop Icons -->
     <template v-for="icon in icons" :key="icon.id">
       <Trash v-if="icon.type === 'trash'" :icon="icon" />
-      <DesktopIcon v-else :icon="icon" />
+      <DesktopIcon v-else :icon="icon" @contextmenu="handleIconContextMenu($event, icon)" />
     </template>
 
     <Window
