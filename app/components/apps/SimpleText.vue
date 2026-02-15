@@ -19,7 +19,7 @@ const isDirty = ref(false)
 function loadFile() {
   if (props.fileId) {
     const file = getNode(props.fileId)
-    if (file && file.type === 'file') {
+    if (file && (file.type === 'file' || file.type === 'markdown')) {
       content.value = file.content || ''
       fileName.value = file.name
       isDirty.value = false

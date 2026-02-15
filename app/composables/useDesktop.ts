@@ -289,7 +289,7 @@ export function useDesktop() {
 
     // Arrange in grid from top-right
     const startX = window.innerWidth - gridSize.value - 20
-    const startY = 40 // Below menu bar
+    const startY = 20 // Near top menu bar
     let currentX = startX
     let currentY = startY
 
@@ -338,14 +338,14 @@ export function useDesktop() {
         name: 'Macintosh HD',
         type: 'hard-drive',
         icon: '/assets/icons/system/hard-drive.png',
-        position: { x: window.innerWidth - 100, y: 40 },
+        position: { x: window.innerWidth - 100, y: 20 },
         path: 'Macintosh HD'
       },
       {
         name: 'Readme',
         type: 'document',
         icon: '/assets/icons/system/document.png',
-        position: { x: window.innerWidth - 100, y: 120 },
+        position: { x: window.innerWidth - 100, y: 100 },
         path: 'articles/welcome',
         opensWith: 'article'
       },

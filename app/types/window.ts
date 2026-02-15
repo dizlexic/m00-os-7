@@ -197,8 +197,8 @@ export const CASCADE_OFFSET: Position = {
 
 /** Initial window position */
 export const INITIAL_WINDOW_POSITION: Position = {
-  x: 100,
-  y: 60
+  x: 40,
+  y: 20
 }
 
 /** Maximum number of windows */

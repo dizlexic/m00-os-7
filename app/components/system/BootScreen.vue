@@ -35,9 +35,9 @@ let progressInterval: ReturnType<typeof setInterval> | null = null
 // Extensions simulation
 const extensions = [
   '/assets/icons/system/preferences.png',
-  '/assets/icons/system/sound.png',
-  '/assets/icons/system/network.png',
-  '/assets/icons/system/memory.png',
+  '/assets/icons/system/finder.png',
+  '/assets/icons/system/hard-drive.png',
+  '/assets/icons/system/application.png',
   '/assets/icons/apps/calculator.png',
   '/assets/icons/apps/notepad.png',
   '/assets/icons/system/help.png'

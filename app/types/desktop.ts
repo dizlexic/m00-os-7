@@ -26,6 +26,8 @@ export type IconType =
   | 'trash'
   | 'hard-drive'
   | 'alias'
+  | 'markdown'
+  | 'image'
 
 /** Desktop icon state */
 export interface DesktopIcon {
