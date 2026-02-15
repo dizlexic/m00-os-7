@@ -16,6 +16,8 @@ import Finder from '~/components/apps/Finder.vue'
 import SimpleText from '~/components/apps/SimpleText.vue'
 import Calculator from '~/components/apps/Calculator.vue'
 import GetInfo from '~/components/apps/GetInfo.vue'
+import ControlPanels from '~/components/apps/ControlPanels.vue'
+import GeneralSettings from '~/components/apps/GeneralSettings.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 
 const {
@@ -164,6 +166,14 @@ onUnmounted(() => {
       <GetInfo
         v-else-if="win.type === 'get-info'"
         :node-id="(win.data as any)?.nodeId"
+      />
+
+      <ControlPanels
+        v-else-if="win.type === 'control-panels'"
+      />
+
+      <GeneralSettings
+        v-else-if="win.type === 'general-settings'"
       />
 
       <!-- Window content will be rendered based on window type -->
