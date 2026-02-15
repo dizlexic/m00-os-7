@@ -10,7 +10,8 @@ import { computed } from 'vue'
 import type { DesktopIcon as IDesktopIcon } from '~/types/desktop'
 import { useTrash } from '~/composables/useTrash'
 import { useDesktop } from '~/composables/useDesktop'
-import { useAlert } from '~/composables/useAlert'
+import { useWindowManager } from '~/composables/useWindowManager'
+import { useFileSystem } from '~/composables/useFileSystem'
 import DesktopIcon from './DesktopIcon.vue'
 
 interface Props {
@@ -21,7 +22,8 @@ const props = defineProps<Props>()
 
 const { isEmpty, trashIcon, moveToTrash, emptyTrash, items } = useTrash()
 const { showContextMenu } = useDesktop()
-const { showAlert } = useAlert()
+const { openWindow, windowList, bringToFront } = useWindowManager()
+const { getTrash } = useFileSystem()
 
 // Override the icon if needed, though useTrash should have updated it in the store
 const displayIcon = computed(() => {
@@ -29,6 +31,30 @@ const displayIcon = computed(() => {
   // But we can be extra sure here
   return props.icon.icon
 })
+
+function handleOpenTrash() {
+  const trashFolder = getTrash()
+  if (!trashFolder) return
+
+  // Check if already open
+  const existing = windowList.value.find(w => w.type === 'finder' && w.data?.path === 'Macintosh HD/Trash')
+  if (existing) {
+    bringToFront(existing.id)
+    return
+  }
+
+  openWindow({
+    type: 'finder',
+    title: 'Trash',
+    icon: '/assets/icons/system/trash-empty-16.png',
+    data: {
+      folderId: trashFolder.id,
+      path: 'Macintosh HD/Trash'
+    },
+    width: 400,
+    height: 300
+  })
+}
 
 // Handle dropped items
 function handleDrop(event: DragEvent) {
@@ -52,37 +78,16 @@ function handleContextMenu(event: MouseEvent) {
       {
         id: 'open-trash',
         label: 'Open',
-        action: () => { /* Open trash window */ }
+        action: () => handleOpenTrash()
       },
       {
         id: 'empty-trash',
         label: 'Empty Trash...',
-        action: () => confirmEmptyTrash(),
+        action: () => emptyTrash(),
         disabled: isEmpty.value
       }
     ]
   )
-}
-
-function confirmEmptyTrash() {
-  if (isEmpty.value) return
-
-  const itemCount = items.value.length
-  const message = `The Trash contains ${itemCount} item${itemCount === 1 ? '' : 's'}. It will be permanently deleted.`
-
-  showAlert({
-    message,
-    type: 'caution',
-    buttons: [
-      { label: 'Cancel', value: 'cancel' },
-      { label: 'OK', value: 'ok', isDefault: true }
-    ],
-    onClose: (value) => {
-      if (value === 'ok') {
-        emptyTrash()
-      }
-    }
-  })
 }
 </script>
 
