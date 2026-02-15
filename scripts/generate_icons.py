@@ -381,9 +381,31 @@ def generate_scrollbar_arrows():
 def generate_scrollbar_thumb():
     """Generate scrollbar thumb (elevator) pattern."""
     img, draw = create_icon(size=(16, 16))
+
+    # Main thumb body
     draw.rectangle([0, 0, 15, 15], fill=COLORS['white'], outline=COLORS['black'])
-    # Add subtle stripes or 3D look if needed, but for now just white
+
+    # 3D highlight/shadow
+    draw.line([(1, 1), (14, 1)], fill=COLORS['white'])
+    draw.line([(1, 1), (1, 14)], fill=COLORS['white'])
+    draw.line([(1, 14), (14, 14)], fill=COLORS['gray_dark'])
+    draw.line([(14, 1), (14, 14)], fill=COLORS['gray_dark'])
+
     save_icon(img, 'scrollbar-thumb', 'icons/ui')
+
+def generate_scrollbar_track():
+    """Generate scrollbar track pattern."""
+    # Scrollbar track in Mac OS 7 is often a 50% dithered gray pattern
+    img, draw = create_icon(size=(16, 16))
+
+    for y in range(16):
+        for x in range(16):
+            if (x + y) % 2 == 0:
+                draw.point((x, y), fill=COLORS['white'])
+            else:
+                draw.point((x, y), fill=COLORS['gray_light'])
+
+    save_icon(img, 'scrollbar-track', 'icons/ui')
 
 def generate_checkboxes():
     """Generate checkbox icons (checked and unchecked)."""
@@ -701,6 +723,7 @@ def generate_ui_icons():
     generate_resize_handle()
     generate_scrollbar_arrows()
     generate_scrollbar_thumb()
+    generate_scrollbar_track()
     generate_checkboxes()
     generate_radio_buttons()
     generate_cursors()
