@@ -17,6 +17,18 @@ export type WindowType =
   | 'calculator'
   | 'notepad'
   | 'control-panel'
+  | 'control-panels'
+  | 'general-settings'
+  | 'sound-settings'
+  | 'date-time-settings'
+  | 'apple-menu-settings'
+  | 'color-settings'
+  | 'desktop-patterns-settings'
+  | 'extensions-settings'
+  | 'memory-settings'
+  | 'monitors-settings'
+  | 'mouse-settings'
+  | 'startup-disk-settings'
   | 'get-info'
   | 'about'
   | 'alert'
@@ -146,6 +158,10 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   calculator: { width: 180, height: 240 },
   notepad: { width: 300, height: 400 },
   'control-panel': { width: 400, height: 300 },
+  'control-panels': { width: 400, height: 300 },
+  'general-settings': { width: 400, height: 350 },
+  'sound-settings': { width: 400, height: 350 },
+  'date-time-settings': { width: 400, height: 400 },
   'get-info': { width: 300, height: 400 },
   about: { width: 400, height: 250 },
   alert: { width: 350, height: 150 },
