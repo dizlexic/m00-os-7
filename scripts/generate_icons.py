@@ -467,6 +467,29 @@ def generate_cursors():
 
     print('Cursors complete!')
 
+def generate_menu_bar_elements():
+    """Generate menu bar related graphics."""
+    print('Generating menu bar elements...')
+
+    # Apple logo for menu bar
+    img, draw = create_icon(size=(16, 16))
+    # Very simplified Apple shape
+    # Body
+    draw.ellipse([3, 4, 13, 14], fill=COLORS['black'])
+    # Bite
+    draw.ellipse([10, 6, 15, 11], fill=(0, 0, 0, 0))
+    # Stem
+    draw.arc([6, 1, 10, 6], 0, 90, fill=COLORS['black'])
+    save_icon(img, 'apple-logo', 'icons/ui')
+
+    # Checkmark for menu items
+    img, draw = create_icon(size=(12, 12))
+    draw.line([(2, 5), (5, 8)], fill=COLORS['black'], width=2)
+    draw.line([(5, 8), (10, 2)], fill=COLORS['black'], width=2)
+    save_icon(img, 'menu-checkmark', 'icons/ui')
+
+    print('Menu bar elements complete!')
+
 
 # ============================================
 # Boot/System Icons
@@ -681,6 +704,7 @@ def generate_ui_icons():
     generate_checkboxes()
     generate_radio_buttons()
     generate_cursors()
+    generate_menu_bar_elements()
     print('UI icons complete!')
 
 def generate_small_system_icons():
