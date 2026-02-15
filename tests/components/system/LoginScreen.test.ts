@@ -1,35 +1,60 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { ref } from 'vue'
 import LoginScreen from '~/components/system/LoginScreen.vue'
 
 // Mock the useUser composable
-vi.mock('~/composables/useUser', () => ({
-  useUser: () => ({
-    login: vi.fn().mockResolvedValue(true),
-    isAuthenticated: { value: false }
-  })
-}))
+vi.mock('~/composables/useUser')
+
+import { useUser } from '~/composables/useUser'
 
 describe('LoginScreen.vue', () => {
-  it('renders login form', () => {
+  beforeEach(() => {
+    vi.mocked(useUser).mockReturnValue({
+      login: vi.fn().mockResolvedValue(true),
+      loginAsGuest: vi.fn().mockResolvedValue(true),
+      users: ref([{ id: 1, username: 'Admin' }]) as any,
+      fetchUsers: vi.fn().mockResolvedValue(undefined),
+      isAuthenticated: ref(false) as any,
+      logout: vi.fn(),
+      register: vi.fn().mockResolvedValue(true),
+      removeUser: vi.fn().mockResolvedValue(true),
+      currentUser: ref(null) as any
+    })
+  })
+
+  it('renders user selection initially', () => {
     const wrapper = mount(LoginScreen)
-    expect(wrapper.find('input[type="text"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Select User')
+    expect(wrapper.text()).toContain('Admin')
+    expect(wrapper.text()).toContain('Guest')
+  });
+
+  it('shows password entry after selecting a user', async () => {
+    const wrapper = mount(LoginScreen)
+
+    // Find the Admin user item and click it
+    const userItems = wrapper.findAll('.user-item')
+    const adminItem = userItems.find(i => i.text().includes('Admin'))
+    await adminItem?.trigger('click')
+
     expect(wrapper.find('input[type="password"]').exists()).toBe(true)
-    // Find the login button specifically
-    const buttons = wrapper.findAll('button')
-    const loginButton = buttons.find(b => b.text().includes('Login'))
-    expect(loginButton?.exists()).toBe(true)
+    expect(wrapper.text()).toContain('Password:')
   });
 
   it('calls login on button click', async () => {
     const wrapper = mount(LoginScreen)
-    await wrapper.find('input[type="text"]').setValue('testuser')
+
+    // Select Admin
+    const userItems = wrapper.findAll('.user-item')
+    const adminItem = userItems.find(i => i.text().includes('Admin'))
+    await adminItem?.trigger('click')
+
+    // Enter password
     await wrapper.find('input[type="password"]').setValue('password123')
-    
-    const buttons = wrapper.findAll('button')
-    const loginButton = buttons.find(b => b.text().includes('Login'))
-    await loginButton?.trigger('click')
-    
-    // Check if login was called (via the mock)
+
+    // Click login
+    const loginButton = wrapper.find('button.mac-button--default')
+    await loginButton.trigger('click')
   });
 });
