@@ -12,6 +12,8 @@ import { useWindowManager } from '~/composables/useWindowManager'
 import DesktopIcon from './DesktopIcon.vue'
 import Trash from './Trash.vue'
 import Window from '~/components/window/Window.vue'
+import Finder from '~/components/apps/Finder.vue'
+import { useFileSystem } from '~/composables/useFileSystem'
 
 const {
   icons,
@@ -29,6 +31,22 @@ const {
 const {
   windowList
 } = useWindowManager()
+
+const { getRoot, getNodeByPath } = useFileSystem()
+
+/**
+ * Get folder ID for Finder window
+ */
+function getFolderId(win: any): string {
+  if (win.data?.folderId) return win.data.folderId
+
+  if (win.data?.path) {
+    const node = getNodeByPath(win.data.path)
+    if (node && node.type === 'folder') return node.id
+  }
+
+  return getRoot().id
+}
 
 // Compute background style
 const backgroundStyle = computed(() => {
@@ -119,14 +137,18 @@ onUnmounted(() => {
       <DesktopIcon v-else :icon="icon" />
     </template>
 
-    <!-- Windows -->
     <Window
       v-for="win in windowList"
       :key="win.id"
       :window="win"
     >
+      <Finder
+        v-if="win.type === 'finder'"
+        :folder-id="getFolderId(win)"
+      />
+
       <!-- Window content will be rendered based on window type -->
-      <div class="window-placeholder">
+      <div v-else class="window-placeholder">
         <p>{{ win.title }}</p>
         <p>Type: {{ win.type }}</p>
       </div>
