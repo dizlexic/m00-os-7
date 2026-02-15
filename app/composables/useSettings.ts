@@ -6,13 +6,19 @@ export interface Settings {
   theme: 'classic' | 'dark' | 'high-contrast';
   soundVolume: number;
   highlightColor: string;
+  timeFormat: '12h' | '24h';
+  showSeconds: boolean;
+  dateFormat: string;
 }
 
 const defaultSettings: Settings = {
   desktopPattern: 'default',
   theme: 'classic',
   soundVolume: 75,
-  highlightColor: '#000080'
+  highlightColor: '#000080',
+  timeFormat: '12h',
+  showSeconds: false,
+  dateFormat: 'MM/DD/YYYY'
 }
 
 const settings = ref<Settings>({ ...defaultSettings })
