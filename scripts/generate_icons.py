@@ -557,9 +557,44 @@ def generate_ui_icons():
     generate_scrollbar_thumb()
     print('UI icons complete!')
 
+def generate_small_system_icons():
+    """Generate 16x16 small versions of system icons."""
+    print('Generating small system icons...')
+    size = ICON_SIZE_SMALL
+
+    # Folder
+    img, draw = create_icon(size=size)
+    draw_folder_base(draw, size=size)
+    save_icon(img, 'folder-16', 'icons/system')
+
+    # Open Folder
+    img, draw = create_icon(size=size)
+    # Simple open folder for 16x16
+    draw.rectangle([1, 4, 14, 13], fill=COLORS['folder_yellow'], outline=COLORS['black'])
+    draw.line([(1, 4), (5, 4)], fill=COLORS['folder_dark'])
+    save_icon(img, 'folder-open-16', 'icons/system')
+
+    # Document
+    img, draw = create_icon(size=size)
+    draw_document_base(draw, size=size)
+    save_icon(img, 'document-16', 'icons/system')
+
+    # Trash Empty
+    img, draw = create_icon(size=size)
+    draw_trash_base(draw, size=size, is_full=False)
+    save_icon(img, 'trash-empty-16', 'icons/system')
+
+    # Trash Full
+    img, draw = create_icon(size=size)
+    draw_trash_base(draw, size=size, is_full=True)
+    save_icon(img, 'trash-full-16', 'icons/system')
+
+    print('Small system icons complete!')
+
 def generate_all_icons():
     """Generate all icons."""
     generate_system_icons()
+    generate_small_system_icons()
     generate_app_icons()
     generate_ui_icons()
     print('\nAll icons generated successfully!')
@@ -575,6 +610,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate Mac OS 7 style icons')
     parser.add_argument('--all', action='store_true', help='Generate all icons')
     parser.add_argument('--system', action='store_true', help='Generate system icons only')
+    parser.add_argument('--small', action='store_true', help='Generate small icons only')
     parser.add_argument('--apps', action='store_true', help='Generate application icons only')
     parser.add_argument('--ui', action='store_true', help='Generate UI icons only')
 
@@ -582,6 +618,8 @@ if __name__ == '__main__':
 
     if args.system:
         generate_system_icons()
+    elif args.small:
+        generate_small_system_icons()
     elif args.apps:
         generate_app_icons()
     elif args.ui:

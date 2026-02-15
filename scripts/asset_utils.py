@@ -211,24 +211,35 @@ def draw_folder_base(
     """
     w, h = size
 
-    # Tab on top
-    tab_points = [
-        (2, 6),
-        (2, 3),
-        (12, 3),
-        (14, 6)
-    ]
-    draw.polygon(tab_points, fill=fill_color, outline=COLORS['black'])
+    if size == ICON_SIZE_SMALL:
+        # 16x16 folder
+        # Tab
+        draw.rectangle([1, 2, 6, 4], fill=fill_color, outline=COLORS['black'])
+        # Body
+        draw.rectangle([1, 4, w - 2, h - 3], fill=fill_color, outline=COLORS['black'])
+        # 3D highlight
+        draw.line([(2, 5), (w - 3, 5)], fill=COLORS['white'])
+        draw.line([(2, 5), (2, h - 4)], fill=COLORS['white'])
+    else:
+        # 32x32 folder
+        # Tab on top
+        tab_points = [
+            (2, 6),
+            (2, 3),
+            (12, 3),
+            (14, 6)
+        ]
+        draw.polygon(tab_points, fill=fill_color, outline=COLORS['black'])
 
-    # Main folder body
-    body_rect = [2, 6, w - 3, h - 3]
-    draw.rectangle(body_rect, fill=fill_color, outline=COLORS['black'])
+        # Main folder body
+        body_rect = [2, 6, w - 3, h - 3]
+        draw.rectangle(body_rect, fill=fill_color, outline=COLORS['black'])
 
-    # Add 3D effect
-    draw.line([(3, 7), (w - 4, 7)], fill=COLORS['white'])
-    draw.line([(3, 7), (3, h - 4)], fill=COLORS['white'])
-    draw.line([(3, h - 4), (w - 4, h - 4)], fill=dark_color)
-    draw.line([(w - 4, 7), (w - 4, h - 4)], fill=dark_color)
+        # Add 3D effect
+        draw.line([(3, 7), (w - 4, 7)], fill=COLORS['white'])
+        draw.line([(3, 7), (3, h - 4)], fill=COLORS['white'])
+        draw.line([(3, h - 4), (w - 4, h - 4)], fill=dark_color)
+        draw.line([(w - 4, 7), (w - 4, h - 4)], fill=dark_color)
 
 def draw_document_base(
     draw: ImageDraw.ImageDraw,
@@ -244,31 +255,49 @@ def draw_document_base(
         fill_color: Document background color
     """
     w, h = size
-    fold_size = 6
 
-    # Document outline points (with folded corner)
-    points = [
-        (4, 2),
-        (w - 4 - fold_size, 2),
-        (w - 4, 2 + fold_size),
-        (w - 4, h - 2),
-        (4, h - 2)
-    ]
-    draw.polygon(points, fill=fill_color, outline=COLORS['black'])
+    if size == ICON_SIZE_SMALL:
+        fold_size = 3
+        points = [
+            (2, 1),
+            (w - 2 - fold_size, 1),
+            (w - 2, 1 + fold_size),
+            (w - 2, h - 2),
+            (2, h - 2)
+        ]
+        draw.polygon(points, fill=fill_color, outline=COLORS['black'])
+        # Fold
+        fold_points = [
+            (w - 2 - fold_size, 1),
+            (w - 2 - fold_size, 1 + fold_size),
+            (w - 2, 1 + fold_size)
+        ]
+        draw.polygon(fold_points, fill=COLORS['gray_light'], outline=COLORS['black'])
+    else:
+        fold_size = 6
+        # Document outline points (with folded corner)
+        points = [
+            (4, 2),
+            (w - 4 - fold_size, 2),
+            (w - 4, 2 + fold_size),
+            (w - 4, h - 2),
+            (4, h - 2)
+        ]
+        draw.polygon(points, fill=fill_color, outline=COLORS['black'])
 
-    # Folded corner
-    fold_points = [
-        (w - 4 - fold_size, 2),
-        (w - 4 - fold_size, 2 + fold_size),
-        (w - 4, 2 + fold_size)
-    ]
-    draw.polygon(fold_points, fill=COLORS['gray_light'], outline=COLORS['black'])
+        # Folded corner
+        fold_points = [
+            (w - 4 - fold_size, 2),
+            (w - 4 - fold_size, 2 + fold_size),
+            (w - 4, 2 + fold_size)
+        ]
+        draw.polygon(fold_points, fill=COLORS['gray_light'], outline=COLORS['black'])
 
-    # Document lines (text representation)
-    line_y = 10
-    while line_y < h - 6:
-        draw.line([(8, line_y), (w - 8, line_y)], fill=COLORS['gray_medium'])
-        line_y += 3
+        # Document lines (text representation)
+        line_y = 10
+        while line_y < h - 6:
+            draw.line([(8, line_y), (w - 8, line_y)], fill=COLORS['gray_medium'])
+            line_y += 3
 
 def draw_trash_base(
     draw: ImageDraw.ImageDraw,
@@ -288,27 +317,41 @@ def draw_trash_base(
     # Trash can body
     body_color = COLORS['gray_light'] if not is_full else COLORS['gray_medium']
 
-    # Lid
-    draw.rectangle([6, 4, w - 7, 7], fill=COLORS['gray_medium'], outline=COLORS['black'])
-    draw.rectangle([12, 2, w - 13, 4], fill=COLORS['gray_medium'], outline=COLORS['black'])
+    if size == ICON_SIZE_SMALL:
+        # Lid
+        draw.rectangle([4, 2, w - 5, 4], fill=COLORS['gray_medium'], outline=COLORS['black'])
+        # Body
+        body_points = [
+            (5, 4),
+            (w - 6, 4),
+            (w - 7, h - 2),
+            (6, h - 2)
+        ]
+        draw.polygon(body_points, fill=body_color, outline=COLORS['black'])
+        if is_full:
+            draw.line([(7, 2), (9, 2)], fill=COLORS['white'])
+    else:
+        # Lid
+        draw.rectangle([6, 4, w - 7, 7], fill=COLORS['gray_medium'], outline=COLORS['black'])
+        draw.rectangle([12, 2, w - 13, 4], fill=COLORS['gray_medium'], outline=COLORS['black'])
 
-    # Body (tapered)
-    body_points = [
-        (8, 8),
-        (w - 9, 8),
-        (w - 10, h - 3),
-        (9, h - 3)
-    ]
-    draw.polygon(body_points, fill=body_color, outline=COLORS['black'])
+        # Body (tapered)
+        body_points = [
+            (8, 8),
+            (w - 9, 8),
+            (w - 10, h - 3),
+            (9, h - 3)
+        ]
+        draw.polygon(body_points, fill=body_color, outline=COLORS['black'])
 
-    # Vertical lines on body
-    draw.line([(12, 10), (11, h - 5)], fill=COLORS['gray_dark'])
-    draw.line([(w // 2, 10), (w // 2, h - 5)], fill=COLORS['gray_dark'])
-    draw.line([(w - 13, 10), (w - 12, h - 5)], fill=COLORS['gray_dark'])
+        # Vertical lines on body
+        draw.line([(12, 10), (11, h - 5)], fill=COLORS['gray_dark'])
+        draw.line([(w // 2, 10), (w // 2, h - 5)], fill=COLORS['gray_dark'])
+        draw.line([(w - 13, 10), (w - 12, h - 5)], fill=COLORS['gray_dark'])
 
-    # If full, add some paper sticking out
-    if is_full:
-        draw.polygon([(10, 6), (14, 2), (18, 6)], fill=COLORS['white'], outline=COLORS['black'])
+        # If full, add some paper sticking out
+        if is_full:
+            draw.polygon([(10, 6), (14, 2), (18, 6)], fill=COLORS['white'], outline=COLORS['black'])
 
 # ============================================
 # Main execution (for testing)
