@@ -342,6 +342,14 @@ export function useDesktop() {
         path: 'Macintosh HD'
       },
       {
+        name: 'Readme',
+        type: 'document',
+        icon: '/assets/icons/system/document.png',
+        position: { x: window.innerWidth - 100, y: 120 },
+        path: 'articles/welcome',
+        opensWith: 'article'
+      },
+      {
         name: 'Trash',
         type: 'trash',
         icon: '/assets/icons/system/trash-empty.png',

@@ -32,6 +32,7 @@ export type WindowType =
   | 'get-info'
   | 'about'
   | 'article'
+  | 'help'
   | 'alert'
   | 'generic'
 
@@ -166,6 +167,7 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   'get-info': { width: 300, height: 400 },
   about: { width: 400, height: 250 },
   article: { width: 600, height: 500 },
+  help: { width: 600, height: 500 },
   alert: { width: 350, height: 150 },
   generic: { width: 400, height: 300 }
 }

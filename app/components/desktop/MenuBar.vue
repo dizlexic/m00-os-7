@@ -139,11 +139,20 @@ const specialMenuItems: MenuItem[] = [
   { id: 'shut-down', label: 'Shut Down' }
 ]
 
+const helpMenuItems: MenuItem[] = [
+  { id: 'about-help', label: 'About Help...', disabled: true },
+  { id: 'sep1', label: '', isSeparator: true },
+  { id: 'show-balloons', label: 'Show Balloons', disabled: true },
+  { id: 'sep2', label: '', isSeparator: true },
+  { id: 'macos-help', label: 'Mac OS Help', action: () => handleHelp() }
+]
+
 const menus = computed<Menu[]>(() => [
   { id: 'file', label: 'File', items: fileMenuItems },
   { id: 'edit', label: 'Edit', items: editMenuItems },
   { id: 'view', label: 'View', items: viewMenuItems },
-  { id: 'special', label: 'Special', items: specialMenuItems }
+  { id: 'special', label: 'Special', items: specialMenuItems },
+  { id: 'help', label: 'Help', items: helpMenuItems }
 ])
 
 // Menu handlers
@@ -186,6 +195,20 @@ function handleAbout(): void {
     maximizable: false
   })
 }
+
+function handleHelp(): void {
+  openWindow({
+    type: 'help',
+    title: 'Mac OS Help',
+    icon: '/assets/icons/system/help.png',
+    width: 600,
+    height: 500,
+    resizable: true,
+    maximizable: true,
+    data: {
+      path: 'help/index'
+    }
+  })
 }
 
 function handleShutdown(): void {

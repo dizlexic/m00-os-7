@@ -176,7 +176,7 @@ function handleDoubleClick(): void {
     'trash': 'finder'
   }
 
-  const windowType = iconTypeToWindowType[props.icon.type] || 'generic'
+  const windowType = props.icon.opensWith as WindowType || iconTypeToWindowType[props.icon.type] || 'generic'
 
   // Open a window for this icon
   openWindow({
