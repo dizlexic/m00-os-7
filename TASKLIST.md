@@ -160,8 +160,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Accept dropped items
 - [x] `P1` Implement "Empty Trash" functionality
 - [x] `P1` Add confirmation dialog for emptying
-- [ ] `P2` Show trash contents on double-click
-- [ ] `P2` Implement "Put Away" to restore items
+- [x] `P2` Show trash contents on double-click
+- [x] `P2` Implement "Put Away" to restore items
 
 ---
 
@@ -315,8 +315,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Implement text file type (.txt)
 - [x] `P0` Implement folder type
 - [x] `P0` Implement application type
-- [ ] `P1` Implement markdown file type (.md)
-- [ ] `P1` Add image file type support
+- [x] `P1` Implement markdown file type (.md)
+- [x] `P1` Add image file type support
 - [ ] `P2` Implement alias/shortcut type
 - [ ] `P2` Add custom file type icons
 
