@@ -57,4 +57,22 @@ describe('LoginScreen.vue', () => {
     const loginButton = wrapper.find('button.mac-button--default')
     await loginButton.trigger('click')
   });
+
+  it('shows error if passwords do not match during registration', async () => {
+    const wrapper = mount(LoginScreen)
+
+    // Select New User
+    const newUserItem = wrapper.findAll('.user-item').find(i => i.text().includes('New User'))
+    await newUserItem?.trigger('click')
+
+    // Enter details
+    await wrapper.find('input#username').setValue('newuser')
+    await wrapper.find('input#password').setValue('password123')
+    await wrapper.find('input#confirm-password').setValue('password456')
+
+    // Click register
+    await wrapper.find('button.mac-button--default').trigger('click')
+
+    expect(wrapper.text()).toContain('Passwords do not match.')
+  })
 });

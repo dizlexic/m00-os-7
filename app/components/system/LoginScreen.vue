@@ -13,6 +13,7 @@ const { fetchSettingsFromServer } = useSettings()
 const selectedUser = ref<string | 'guest' | 'new'>('')
 const username = ref('')
 const password = ref('')
+const confirmPassword = ref('')
 const error = ref('')
 const isLoading = ref(false)
 const showRegister = ref(false)
@@ -39,6 +40,11 @@ async function handleLogin() {
 
   let success = false
   if (selectedUser.value === 'new') {
+    if (password.value !== confirmPassword.value) {
+      error.value = 'Passwords do not match.'
+      isLoading.value = false
+      return
+    }
     success = await register(nameToLogin, password.value)
     if (success) {
       success = await login(nameToLogin, password.value)
@@ -66,6 +72,7 @@ function selectUser(user: string | 'guest' | 'new') {
   selectedUser.value = user
   error.value = ''
   password.value = ''
+  confirmPassword.value = ''
   if (user !== 'new') {
     username.value = ''
   }
@@ -161,6 +168,17 @@ async function handleDeleteUser(id: number, name: string) {
           <input
             id="password"
             v-model="password"
+            type="password"
+            class="mac-input"
+            @keyup.enter="handleLogin"
+          />
+        </div>
+
+        <div v-if="selectedUser === 'new'" class="input-group flex flex-col gap-xs">
+          <label for="confirm-password" class="login-label">Confirm Password:</label>
+          <input
+            id="confirm-password"
+            v-model="confirmPassword"
             type="password"
             class="mac-input"
             @keyup.enter="handleLogin"
