@@ -226,6 +226,12 @@ export function useFileSystem() {
     return state.value.nodes[state.value.rootId] as FolderNode
   }
 
+  const getTrash = (): FolderNode | undefined => {
+    return Object.values(state.value.nodes).find(
+      node => node.type === 'folder' && node.name === 'Trash' && node.isSystem
+    ) as FolderNode
+  }
+
   const getPathNodes = (id: string): FileNode[] => {
     const path: FileNode[] = []
     let currentId: string | undefined = id
@@ -308,6 +314,13 @@ export function useFileSystem() {
     if (!node || node.isSystem) return
     if (node.parentId === newParentId) return
 
+    // Check if newParentId is a child of id (prevent cycles)
+    let current: string | undefined = newParentId
+    while (current) {
+      if (current === id) return
+      current = state.value.nodes[current]?.parentId
+    }
+
     const oldParentId = node.parentId
     const now = Date.now()
 
@@ -340,6 +353,13 @@ export function useFileSystem() {
 
       // Sync node
       syncNode(node)
+    }
+  }
+
+  const moveToTrash = (id: string): void => {
+    const trash = getTrash()
+    if (trash && trash.id !== id) {
+      moveNode(id, trash.id)
     }
   }
 
