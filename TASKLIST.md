@@ -398,14 +398,14 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Add navigation (back, forward, up)
 - [x] `P0` Display current path
 - [x] `P1` Implement icon view
-- [ ] `P1` Implement list view
-- [ ] `P1` Add view toggle button
+- [x] `P1` Implement list view
+- [x] `P1` Add view toggle button
 - [ ] `P2` Implement column view
 - [ ] `P2` Add sidebar with favorites
 
 ### 8.2 Finder Navigation
 - [x] `P0` Implement double-click to open folder
-- [ ] `P0` Implement double-click to open file
+- [x] `P0` Implement double-click to open file
 - [ ] `P0` Add breadcrumb path navigation
 - [ ] `P1` Implement keyboard navigation (arrows)
 - [ ] `P1` Add "Go to Folder" dialog
@@ -436,11 +436,11 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 9. Built-in Applications
 
 ### 9.1 SimpleText (Text Viewer/Editor)
-- [ ] `P0` Create SimpleText.vue component
-- [ ] `P0` Implement text display area
-- [ ] `P0` Add file open functionality
-- [ ] `P0` Implement basic text editing
-- [ ] `P0` Add file save functionality
+- [x] `P0` Create SimpleText.vue component
+- [x] `P0` Implement text display area
+- [x] `P0` Add file open functionality
+- [x] `P0` Implement basic text editing
+- [x] `P0` Add file save functionality
 - [ ] `P1` Implement text selection
 - [ ] `P1` Add copy/cut/paste
 - [ ] `P1` Implement find/replace
@@ -659,6 +659,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P1` Test Desktop component
 - [ ] `P1` Test MenuBar component
 - [x] `P2` Test Finder component
+- [x] `P2` Test SimpleText component
 - [ ] `P2` Test application components
 
 ### 15.3 E2E Tests

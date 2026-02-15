@@ -8,9 +8,9 @@ The development is organized into 6 major phases, progressing from core infrastr
 
 ```
 Phase 1: Foundation        [████████████████████] 100% → v0.1.0
-Phase 2: Core Desktop      [░░░░░░░░░░░░░░░░░░░░]   0% → v0.2.0
-Phase 3: Applications      [░░░░░░░░░░░░░░░░░░░░]   0% → v0.3.0
-Phase 4: User System       [░░░░░░░░░░░░░░░░░░░░]   0% → v0.4.0
+Phase 2: Core Desktop      [████████████████████] 100% → v0.2.0
+Phase 3: Applications      [████████████░░░░░░░░]  60% → v0.3.0
+Phase 4: User System       [██████████░░░░░░░░░░]  50% → v0.4.0
 Phase 5: Entertainment     [░░░░░░░░░░░░░░░░░░░░]   0% → v0.5.0
 Phase 6: Polish & Launch   [░░░░░░░░░░░░░░░░░░░░]   0% → v1.0.0
 ```
@@ -83,36 +83,36 @@ Build the fundamental desktop experience with window management, menu bar, and d
 ### Milestones
 
 #### 2.1 Window Management System
-- [ ] Create base Window component
-- [ ] Implement window title bar with controls
-- [ ] Add drag-to-move functionality
-- [ ] Implement window resizing
-- [ ] Create window manager composable
-- [ ] Implement z-index stacking
-- [ ] Add window minimize/maximize
-- [ ] Create custom scrollbars
+- [x] Create base Window component
+- [x] Implement window title bar with controls
+- [x] Add drag-to-move functionality
+- [x] Implement window resizing
+- [x] Create window manager composable
+- [x] Implement z-index stacking
+- [x] Add window minimize/maximize
+- [x] Create custom scrollbars
 
 #### 2.2 Desktop Environment
-- [ ] Create Desktop component
-- [ ] Implement desktop background with patterns
-- [ ] Create DesktopIcon component
-- [ ] Implement icon drag-and-drop
-- [ ] Add icon selection (single/multi)
-- [ ] Implement icon grid layout
-- [ ] Create Trash component
+- [x] Create Desktop component
+- [x] Implement desktop background with patterns
+- [x] Create DesktopIcon component
+- [x] Implement icon drag-and-drop
+- [x] Add icon selection (single/multi)
+- [x] Implement icon grid layout
+- [x] Create Trash component
 
 #### 2.3 Menu Bar
-- [ ] Create MenuBar component
-- [ ] Implement Apple menu
-- [ ] Create dropdown menu system
-- [ ] Add Clock component
-- [ ] Implement dynamic menus per application
-- [ ] Add keyboard shortcuts display
+- [x] Create MenuBar component
+- [x] Implement Apple menu
+- [x] Create dropdown menu system
+- [x] Add Clock component
+- [x] Implement dynamic menus per application
+- [x] Add keyboard shortcuts display
 
 #### 2.4 System Dialogs
-- [ ] Create AlertDialog component
-- [ ] Implement modal overlay system
-- [ ] Add confirmation dialogs
+- [x] Create AlertDialog component
+- [x] Implement modal overlay system
+- [x] Add confirmation dialogs
 - [ ] Create input prompt dialogs
 
 ### Deliverables
@@ -135,28 +135,28 @@ Implement the essential applications: Finder, SimpleText, Calculator, and Contro
 ### Milestones
 
 #### 3.1 Virtual Filesystem
-- [ ] Create filesystem data structures
-- [ ] Implement folder hierarchy
-- [ ] Create default filesystem structure
-- [ ] Implement file CRUD operations
-- [ ] Add file type associations
-- [ ] Create filesystem composable
+- [x] Create filesystem data structures
+- [x] Implement folder hierarchy
+- [x] Create default filesystem structure
+- [x] Implement file CRUD operations
+- [x] Add file type associations
+- [x] Create filesystem composable
 
 #### 3.2 Finder Application
-- [ ] Create Finder window component
-- [ ] Implement folder content display
-- [ ] Add icon view and list view
-- [ ] Implement navigation (back, forward, up)
+- [x] Create Finder window component
+- [x] Implement folder content display
+- [x] Add icon view and list view
+- [x] Implement navigation (back, forward, up)
 - [ ] Add file operations (copy, move, delete)
 - [ ] Implement "Get Info" dialog
-- [ ] Add "New Folder" functionality
-- [ ] Integrate with menu bar
+- [x] Add "New Folder" functionality
+- [x] Integrate with menu bar
 
 #### 3.3 SimpleText Application
-- [ ] Create SimpleText component
-- [ ] Implement text display area
-- [ ] Add file open/save functionality
-- [ ] Implement basic text editing
+- [x] Create SimpleText component
+- [x] Implement text display area
+- [x] Add file open/save functionality
+- [x] Implement basic text editing
 - [ ] Add copy/cut/paste
 - [ ] Implement find/replace
 - [ ] Add font selection
