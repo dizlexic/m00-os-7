@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 /**
  * Root Application Component
  *
@@ -8,25 +9,43 @@
 import Desktop from "~/components/desktop/Desktop.vue";
 import MenuBar from "~/components/desktop/MenuBar.vue";
 import AlertDialog from "~/components/system/AlertDialog.vue";
+import BootScreen from "~/components/system/BootScreen.vue";
+import LoginScreen from "~/components/system/LoginScreen.vue";
 import { useAlert } from "~/composables/useAlert";
 import { useFileSystem } from "~/composables/useFileSystem";
+import { useUser } from "~/composables/useUser";
 
 const { alertState, hideAlert } = useAlert();
 const { initialize } = useFileSystem();
+const { isAuthenticated } = useUser();
+
+const isBooting = ref(true);
 
 // Initialize filesystem on app start
 initialize();
+
+function onBootComplete() {
+  isBooting.value = false;
+}
 </script>
 
 <template>
   <div class="app">
     <NuxtRouteAnnouncer />
 
-    <!-- Menu Bar -->
-    <MenuBar app-name="Finder" />
+    <BootScreen v-if="isBooting" @complete="onBootComplete" />
 
-    <!-- Desktop Environment -->
-    <Desktop />
+    <template v-else>
+      <LoginScreen v-if="!isAuthenticated" />
+
+      <template v-else>
+        <!-- Menu Bar -->
+        <MenuBar app-name="Finder" />
+
+        <!-- Desktop Environment -->
+        <Desktop />
+      </template>
+    </template>
 
     <!-- System Alerts -->
     <AlertDialog
