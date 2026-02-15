@@ -5,21 +5,16 @@
  * and whether it's empty or full.
  */
 
-import { ref, computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useDesktop } from '~/composables/useDesktop'
-
-interface TrashItem {
-  id: string
-  name: string
-  type: string
-  originalPath: string
-  deletedAt: number
-}
-
-const items = ref<TrashItem[]>([])
+import { useFileSystem } from '~/composables/useFileSystem'
 
 export function useTrash() {
-  const { removeIcon, updateIcon, icons } = useDesktop()
+  const { updateIcon, icons, removeIcon } = useDesktop()
+  const { getTrash, getChildren, moveToTrash: fsMoveToTrash, emptyTrash: fsEmptyTrash, moveNode } = useFileSystem()
+
+  const trashFolder = computed(() => getTrash())
+  const items = computed(() => trashFolder.value ? getChildren(trashFolder.value.id) : [])
 
   const isEmpty = computed(() => items.value.length === 0)
 
@@ -27,31 +22,21 @@ export function useTrash() {
     isEmpty.value ? '/assets/icons/system/trash-empty.png' : '/assets/icons/system/trash-full.png'
   )
 
+  // Watch for changes in isEmpty to update desktop icon
+  watch(isEmpty, () => {
+    updateTrashIconOnDesktop()
+  })
+
   /**
    * Moves an item to the trash
    */
   function moveToTrash(id: string): void {
-    const desktopIcon = icons.value.find(icon => icon.id === id)
-    if (!desktopIcon) return
+    fsMoveToTrash(id)
 
-    // Don't trash the trash itself or the hard drive
-    if (desktopIcon.type === 'trash' || desktopIcon.type === 'hard-drive') return
-
-    const item: TrashItem = {
-      id: desktopIcon.id,
-      name: desktopIcon.name,
-      type: desktopIcon.type,
-      originalPath: desktopIcon.path,
-      deletedAt: Date.now()
+    // If it's on the desktop, remove it from there too
+    if (icons.value.some(icon => icon.id === id)) {
+      removeIcon(id)
     }
-
-    items.value.push(item)
-
-    // Remove from desktop
-    removeIcon(id)
-
-    // Update trash icon state on desktop
-    updateTrashIconOnDesktop()
   }
 
   /**
@@ -70,26 +55,23 @@ export function useTrash() {
    * Empties the trash
    */
   function emptyTrash(): void {
-    items.value = []
-    updateTrashIconOnDesktop()
+    fsEmptyTrash()
   }
 
   /**
    * Restores an item from the trash (Put Away)
    */
   function restoreItem(id: string): void {
-    const index = items.value.findIndex(item => item.id === id)
-    if (index === -1) return
-
-    const item = items.value[index]
-    // In a real system we'd restore it to its original path
-    // For now, we'll just remove it from trash
-    items.value.splice(index, 1)
-    updateTrashIconOnDesktop()
+    // For now, move it back to root if we don't know original path
+    // In a better implementation, we'd store original parent ID
+    const root = getTrash()?.parentId
+    if (root) {
+      moveNode(id, root)
+    }
   }
 
   return {
-    items: computed(() => items.value),
+    items,
     isEmpty,
     trashIcon,
     moveToTrash,

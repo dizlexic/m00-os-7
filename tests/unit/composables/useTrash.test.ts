@@ -1,14 +1,15 @@
+import { ref, nextTick } from 'vue'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useTrash } from '~/composables/useTrash'
 import { useDesktop } from '~/composables/useDesktop'
 
 // Define stable mocks outside the factory
-const mockIcons = {
-  value: [
-    { id: '1', name: 'File 1', type: 'document', path: '/file1', icon: 'file.png' },
-    { id: 'trash-id', name: 'Trash', type: 'trash', path: '/trash', icon: '/assets/icons/system/trash-empty.png' }
-  ]
-}
+const mockIcons = ref([
+  { id: '1', name: 'File 1', type: 'document', path: '/file1', icon: 'file.png' },
+  { id: 'trash-id', name: 'Trash', type: 'trash', path: '/trash', icon: '/assets/icons/system/trash-empty.png' }
+])
+const mockTrashItems = ref<any[]>([])
+
 const mockRemoveIcon = vi.fn((id: string) => {
   mockIcons.value = mockIcons.value.filter(i => i.id !== id)
 })
@@ -28,6 +29,28 @@ vi.mock('~/composables/useDesktop', () => {
   }
 })
 
+// Mock useFileSystem
+const mockFileSystem = {
+  getTrash: vi.fn(() => ({ id: 'trash-folder-id', name: 'Trash', type: 'folder', isSystem: true })),
+  getChildren: vi.fn((id: string) => id === 'trash-folder-id' ? mockTrashItems.value : []),
+  moveToTrash: vi.fn((id: string) => {
+    // Don't trash the trash icon itself
+    if (id === 'trash-id') return
+    const item = mockIcons.value.find(i => i.id === id)
+    if (item) {
+      mockTrashItems.value = [...mockTrashItems.value, item]
+    }
+  }),
+  emptyTrash: vi.fn(() => {
+    mockTrashItems.value = []
+  }),
+  moveNode: vi.fn()
+}
+
+vi.mock('~/composables/useFileSystem', () => ({
+  useFileSystem: () => mockFileSystem
+}))
+
 describe('useTrash', () => {
   beforeEach(() => {
     // Reset icons
@@ -35,8 +58,7 @@ describe('useTrash', () => {
       { id: '1', name: 'File 1', type: 'document', path: '/file1', icon: 'file.png' },
       { id: 'trash-id', name: 'Trash', type: 'trash', path: '/trash', icon: '/assets/icons/system/trash-empty.png' }
     ]
-    const { emptyTrash } = useTrash()
-    emptyTrash()
+    mockTrashItems.value = []
     vi.clearAllMocks()
   })
 
@@ -64,11 +86,12 @@ describe('useTrash', () => {
     expect(isEmpty.value).toBe(true)
   })
 
-  it('should update trash icon when items are added', () => {
+  it('should update trash icon when items are added', async () => {
     const { moveToTrash, trashIcon } = useTrash()
     const { updateIcon } = useDesktop()
 
     moveToTrash('1')
+    await nextTick()
 
     expect(trashIcon.value).toContain('trash-full.png')
     expect(updateIcon).toHaveBeenCalledWith('trash-id', expect.objectContaining({
