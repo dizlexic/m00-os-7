@@ -65,10 +65,24 @@ export function initDb(database?: Database.Database): void {
       type TEXT NOT NULL,
       content TEXT,
       owner_id INTEGER,
+      size INTEGER DEFAULT 0,
+      is_system INTEGER DEFAULT 0,
       permissions TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `);
+
+  // Migrations: Add size and is_system columns if they don't exist
+  try {
+    connection.exec('ALTER TABLE filesystem ADD COLUMN size INTEGER DEFAULT 0');
+  } catch (e) {
+    // Column might already exist
+  }
+  try {
+    connection.exec('ALTER TABLE filesystem ADD COLUMN is_system INTEGER DEFAULT 0');
+  } catch (e) {
+    // Column might already exist
+  }
 }
