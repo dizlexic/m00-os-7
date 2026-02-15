@@ -9,6 +9,7 @@
 import { onMounted, onUnmounted, computed } from 'vue'
 import { useDesktop } from '~/composables/useDesktop'
 import { useWindowManager } from '~/composables/useWindowManager'
+import { useSharedDesktop } from '~/composables/useSharedDesktop'
 import DesktopIcon from './DesktopIcon.vue'
 import Trash from './Trash.vue'
 import Window from '~/components/window/Window.vue'
@@ -21,9 +22,11 @@ import ControlPanels from '~/components/apps/ControlPanels.vue'
 import GeneralSettings from '~/components/apps/GeneralSettings.vue'
 import SoundSettings from '~/components/apps/SoundSettings.vue'
 import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
+import STCSettings from '~/components/apps/STCSettings.vue'
 import AboutMac from '~/components/apps/AboutMac.vue'
 import ArticleViewer from '~/components/apps/ArticleViewer.vue'
 import ImageViewer from '~/components/apps/ImageViewer.vue'
+import RemoteCursor from '~/components/stc/RemoteCursor.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useClipboard } from '~/composables/useClipboard'
 import ContextMenu from './ContextMenu.vue'
@@ -52,6 +55,14 @@ const {
 
 const { getRoot, getNodeByPath, createFolder, moveToTrash } = useFileSystem()
 const { clipboard, copy, cut, paste } = useClipboard()
+
+// STC (Share the Computer) mode
+const {
+  settings: stcSettings,
+  isInSession,
+  remoteUsersList,
+  sendCursorPosition
+} = useSharedDesktop()
 
 /**
  * Get folder ID for Finder window
@@ -110,6 +121,11 @@ function handleMouseDown(event: MouseEvent): void {
 function handleMouseMove(event: MouseEvent): void {
   if (marquee.value.isActive) {
     updateMarquee({ x: event.clientX, y: event.clientY })
+  }
+
+  // Broadcast cursor position when in STC session
+  if (isInSession.value) {
+    sendCursorPosition({ x: event.clientX, y: event.clientY })
   }
 }
 
@@ -297,6 +313,10 @@ onUnmounted(() => {
         v-else-if="win.type === 'date-time-settings'"
       />
 
+      <STCSettings
+        v-else-if="win.type === 'stc-settings'"
+      />
+
       <AboutMac
         v-else-if="win.type === 'about'"
       />
@@ -334,6 +354,16 @@ onUnmounted(() => {
       @item-click="handleMenuItemClick"
       @close="hideContextMenu"
     />
+
+    <!-- Remote Cursors (STC Mode) -->
+    <template v-if="isInSession && stcSettings.showRemoteCursors">
+      <RemoteCursor
+        v-for="user in remoteUsersList"
+        :key="user.id"
+        :user="user"
+        :show-label="stcSettings.showCursorLabels"
+      />
+    </template>
   </div>
 </template>
 

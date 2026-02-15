@@ -49,6 +49,12 @@ const controlPanels: ControlPanelItem[] = [
     name: 'Mouse',
     icon: '/assets/icons/system/preferences.png',
     type: 'mouse-settings'
+  },
+  {
+    id: 'share-computer',
+    name: 'Share Computer',
+    icon: '/assets/icons/system/preferences.png',
+    type: 'stc-settings'
   }
 ]
 
