@@ -20,23 +20,21 @@ const alertSounds = [
   { id: 'wild-eep', name: 'Wild Eep' }
 ]
 
-const selectedSound = ref('beep')
-
 function handleVolumeChange(event: Event) {
   const value = (event.target as HTMLInputElement).value
   updateSetting('soundVolume', parseInt(value))
 }
 
 function playSelectedSound() {
-  if (selectedSound.value === 'beep') {
+  if (settings.value.alertSound === 'beep') {
     playBeep()
   } else {
-    playSystemSound(selectedSound.value)
+    playSystemSound(settings.value.alertSound)
   }
 }
 
 function selectSound(id: string) {
-  selectedSound.value = id
+  updateSetting('alertSound', id)
   playSelectedSound()
 }
 </script>
@@ -67,7 +65,7 @@ function selectSound(id: string) {
           v-for="sound in alertSounds"
           :key="sound.id"
           class="sound-settings__sound-item"
-          :class="{ 'sound-settings__sound-item--active': selectedSound === sound.id }"
+          :class="{ 'sound-settings__sound-item--active': settings.alertSound === sound.id }"
           @click="selectSound(sound.id)"
         >
           {{ sound.name }}

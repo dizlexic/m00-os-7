@@ -15,6 +15,7 @@ import { useClipboard } from '~/composables/useClipboard'
 import { useDesktop } from '~/composables/useDesktop'
 import { useAlert } from '~/composables/useAlert'
 import { useTrash } from '~/composables/useTrash'
+import { useUser } from '~/composables/useUser'
 import type { WindowType } from '~/types/window'
 import type { RecentItem } from '~/types/recent'
 import type { MenuItem, Menu } from '~/types/menu'
@@ -26,6 +27,7 @@ const { clipboard, copy, cut, paste } = useClipboard()
 const { icons: desktopIcons } = useDesktop()
 const { showAlert } = useAlert()
 const { restoreItem, items: trashItems, emptyTrash: confirmEmptyTrash } = useTrash()
+const { logout, currentUser } = useUser()
 
 // Props
 interface Props {
@@ -50,8 +52,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       type: 'notepad',
       title: 'Note Pad',
       icon: '/assets/icons/apps/notepad.png',
-      width: 300,
-      height: 400,
+      size: { width: 300, height: 400 },
       resizable: true,
       maximizable: false
     })
@@ -175,15 +176,16 @@ const viewMenuItems: MenuItem[] = [
   { id: 'clean-up', label: 'Clean Up Desktop' }
 ]
 
-const specialMenuItems: MenuItem[] = [
+const specialMenuItems = computed<MenuItem[]>(() => [
   { id: 'empty-trash', label: 'Empty Trash...', action: () => confirmEmptyTrash() },
   { id: 'sep1', label: '', isSeparator: true },
   { id: 'eject', label: 'Eject', disabled: true },
   { id: 'erase-disk', label: 'Erase Disk...', disabled: true },
   { id: 'sep2', label: '', isSeparator: true },
-  { id: 'restart', label: 'Restart' },
-  { id: 'shut-down', label: 'Shut Down' }
-]
+  { id: 'restart', label: 'Restart', action: () => handleRestart() },
+  { id: 'shut-down', label: 'Shut Down', action: () => handleShutdown() },
+  { id: 'logout', label: `Logout ${currentUser.value?.username}...`, action: () => handleLogout() }
+])
 
 const helpMenuItems: MenuItem[] = [
   { id: 'about-help', label: 'About Help...', disabled: true },
@@ -197,7 +199,7 @@ const menus = computed<Menu[]>(() => [
   { id: 'file', label: 'File', items: fileMenuItems.value },
   { id: 'edit', label: 'Edit', items: editMenuItems.value },
   { id: 'view', label: 'View', items: viewMenuItems },
-  { id: 'special', label: 'Special', items: specialMenuItems },
+  { id: 'special', label: 'Special', items: specialMenuItems.value },
   { id: 'help', label: 'Help', items: helpMenuItems }
 ])
 
@@ -235,8 +237,7 @@ function handleAbout(): void {
     type: 'about',
     title: 'About This Macintosh',
     icon: '/assets/icons/system/finder.png',
-    width: 380,
-    height: 220,
+    size: { width: 380, height: 220 },
     resizable: false,
     maximizable: false
   })
@@ -247,8 +248,7 @@ function handleHelp(): void {
     type: 'help',
     title: 'Mac OS Help',
     icon: '/assets/icons/system/help.png',
-    width: 600,
-    height: 500,
+    size: { width: 600, height: 500 },
     resizable: true,
     maximizable: true,
     data: {
@@ -258,8 +258,55 @@ function handleHelp(): void {
 }
 
 function handleShutdown(): void {
-  console.warn('Shut Down')
-  // TODO: Implement shutdown sequence
+  showAlert({
+    message: 'Are you sure you want to shut down your computer?',
+    title: 'Shut Down',
+    type: 'caution',
+    buttons: [
+      { label: 'Cancel', value: 'cancel' },
+      { label: 'Shut Down', value: 'shutdown', isDefault: true }
+    ],
+    onClose: (value) => {
+      if (value === 'shutdown') {
+        // Redirect to a black screen or just reload
+        window.location.reload()
+      }
+    }
+  })
+}
+
+function handleRestart(): void {
+  showAlert({
+    message: 'Are you sure you want to restart your computer?',
+    title: 'Restart',
+    type: 'caution',
+    buttons: [
+      { label: 'Cancel', value: 'cancel' },
+      { label: 'Restart', value: 'restart', isDefault: true }
+    ],
+    onClose: (value) => {
+      if (value === 'restart') {
+        window.location.reload()
+      }
+    }
+  })
+}
+
+function handleLogout(): void {
+  showAlert({
+    message: `Are you sure you want to log out ${currentUser.value?.username}?`,
+    title: 'Logout',
+    type: 'caution',
+    buttons: [
+      { label: 'Cancel', value: 'cancel' },
+      { label: 'Logout', value: 'logout', isDefault: true }
+    ],
+    onClose: async (value) => {
+      if (value === 'logout') {
+        await logout()
+      }
+    }
+  })
 }
 
 function handleGoToFolder(): void {
@@ -386,8 +433,7 @@ function handleControlPanels(): void {
     type: 'control-panels',
     title: 'Control Panels',
     icon: '/assets/icons/system/preferences.png',
-    width: 400,
-    height: 300
+    size: { width: 400, height: 300 }
   })
 }
 
@@ -396,8 +442,7 @@ function handleControlPanel(title: string, type: string): void {
     type: type as WindowType,
     title,
     icon: '/assets/icons/system/preferences.png',
-    width: 400,
-    height: 300,
+    size: { width: 400, height: 350 },
     resizable: false,
     maximizable: false
   })
@@ -440,8 +485,7 @@ function handleGetInfo(): void {
           title: `Info: ${node.name}`,
           icon: '/assets/icons/system/document.png',
           data: { nodeId: node.id },
-          width: 300,
-          height: 400,
+          size: { width: 300, height: 400 },
           resizable: false,
           maximizable: false
         })

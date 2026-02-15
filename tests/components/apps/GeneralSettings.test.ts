@@ -3,18 +3,17 @@ import { mount } from '@vue/test-utils'
 import GeneralSettings from '~/components/apps/GeneralSettings.vue'
 import { useSettings } from '~/composables/useSettings'
 
+import { ref } from 'vue'
+
 const mockUpdateSetting = vi.fn()
-const mockSettings = {
+const mockSettings = ref({
   desktopPattern: 'default',
   highlightColor: '#000080'
-}
+})
 
 vi.mock('~/composables/useSettings', () => ({
   useSettings: () => ({
-    settings: {
-      value: mockSettings,
-      ...mockSettings
-    },
+    settings: mockSettings,
     updateSetting: mockUpdateSetting
   })
 }))

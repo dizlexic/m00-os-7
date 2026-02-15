@@ -7,14 +7,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import Clock from '~/components/system/Clock.vue'
-import { nextTick, reactive } from 'vue'
+import { ref, nextTick, reactive } from 'vue'
 
 // Mock useSettings
-const mockSettings = reactive({
+const mockSettings = ref({
   timeFormat: '12h',
   showSeconds: false,
+  showDayOfWeek: false,
   dateFormat: 'MM/DD/YYYY',
-  timezone: 'UTC'
+  timezone: 'UTC',
+  daylightSaving: false
 })
 
 vi.mock('~/composables/useSettings', () => ({
@@ -31,9 +33,14 @@ describe('Clock.vue', () => {
     // Set a fixed time for testing: 1991-05-13 10:30:00 UTC
     const date = new Date('1991-05-13T10:30:00Z')
     vi.setSystemTime(date)
-    mockSettings.timeFormat = '12h'
-    mockSettings.showSeconds = false
-    mockSettings.timezone = 'UTC'
+    mockSettings.value = {
+      timeFormat: '12h',
+      showSeconds: false,
+      showDayOfWeek: false,
+      dateFormat: 'MM/DD/YYYY',
+      timezone: 'UTC',
+      daylightSaving: false
+    }
   })
 
   afterEach(() => {
@@ -99,11 +106,20 @@ describe('Clock.vue', () => {
     expect(wrapper.text()).toContain('10:30 AM')
 
     // Change timezone to Tokyo (UTC+9)
-    mockSettings.timezone = 'Asia/Tokyo'
+    mockSettings.value.timezone = 'Asia/Tokyo'
     await nextTick()
-    
+
     // 10:30 UTC -> 19:30 Tokyo
     // In 12h format: 7:30 PM
     expect(wrapper.text()).toContain('7:30 PM')
+  })
+
+  it('should show the day of the week when enabled', async () => {
+    mockSettings.value.showDayOfWeek = true
+    wrapper = mount(Clock)
+    await nextTick()
+    
+    // 1991-05-13 is a Monday
+    expect(wrapper.text()).toContain('Mon')
   })
 })

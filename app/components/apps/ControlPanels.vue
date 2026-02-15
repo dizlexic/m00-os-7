@@ -65,8 +65,7 @@ function openControlPanel(panel: ControlPanelItem) {
     type: panel.type as any,
     title: panel.name,
     icon: panel.icon,
-    width: 400,
-    height: 300,
+    size: { width: 400, height: 350 },
     resizable: false,
     maximizable: false
   })

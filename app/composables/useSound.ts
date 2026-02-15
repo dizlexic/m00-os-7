@@ -8,7 +8,7 @@ export function useSound() {
    * Looks for the sound in /assets/sounds/[name].mp3
    */
   const playSystemSound = (name: string) => {
-    const volume = settings.soundVolume / 100
+    const volume = settings.value.soundVolume / 100
     const audio = new Audio(`/assets/sounds/${name}.mp3`)
     audio.volume = volume
     audio.play().catch((err) => {
@@ -32,7 +32,7 @@ export function useSound() {
       const oscillator = context.createOscillator()
       const gainNode = context.createGain()
 
-      const volume = settings.soundVolume / 100
+      const volume = settings.value.soundVolume / 100
 
       oscillator.type = 'sine'
       oscillator.frequency.setValueAtTime(440, context.currentTime) // A4 note

@@ -36,9 +36,9 @@ const formattedTime = computed(() => {
     const options: Intl.DateTimeFormatOptions = {
       hour: 'numeric',
       minute: '2-digit',
-      second: settings.showSeconds ? '2-digit' : undefined,
-      hour12: settings.timeFormat === '12h',
-      timeZone: settings.timezone
+      second: settings.value.showSeconds ? '2-digit' : undefined,
+      hour12: settings.value.timeFormat === '12h',
+      timeZone: settings.value.timezone
     }
     return new Intl.DateTimeFormat('en-US', options).format(currentTime.value)
   } catch (e) {
@@ -53,7 +53,7 @@ const formattedDate = computed(() => {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-      timeZone: settings.timezone
+      timeZone: settings.value.timezone
     }
     return new Intl.DateTimeFormat('en-US', options).format(currentTime.value)
   } catch (e) {
@@ -66,7 +66,15 @@ function setTimeFormat(format: '12h' | '24h') {
 }
 
 function toggleSeconds() {
-  updateSetting('showSeconds', !settings.showSeconds)
+  updateSetting('showSeconds', !settings.value.showSeconds)
+}
+
+function toggleDayOfWeek() {
+  updateSetting('showDayOfWeek', !settings.value.showDayOfWeek)
+}
+
+function toggleDaylightSaving() {
+  updateSetting('daylightSaving', !settings.value.daylightSaving)
 }
 </script>
 
@@ -109,6 +117,14 @@ function toggleSeconds() {
           ></div>
           <span @click="toggleSeconds">Show seconds</span>
         </label>
+        <label class="mac-checkbox">
+          <div
+            class="mac-checkbox__box"
+            :class="{ 'mac-checkbox__box--checked': settings.showDayOfWeek }"
+            @click="toggleDayOfWeek"
+          ></div>
+          <span @click="toggleDayOfWeek">Show day of week</span>
+        </label>
       </div>
     </div>
 
@@ -139,6 +155,16 @@ function toggleSeconds() {
             {{ tz }}
           </option>
         </select>
+      </div>
+      <div class="datetime-settings__options" style="margin-top: var(--spacing-md)">
+        <label class="mac-checkbox">
+          <div
+            class="mac-checkbox__box"
+            :class="{ 'mac-checkbox__box--checked': settings.daylightSaving }"
+            @click="toggleDaylightSaving"
+          ></div>
+          <span @click="toggleDaylightSaving">Daylight Saving Time</span>
+        </label>
       </div>
     </div>
   </div>

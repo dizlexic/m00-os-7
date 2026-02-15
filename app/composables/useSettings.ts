@@ -5,22 +5,28 @@ export interface Settings {
   desktopPattern: string;
   theme: 'classic' | 'dark' | 'high-contrast';
   soundVolume: number;
+  alertSound: string;
   highlightColor: string;
   timeFormat: '12h' | '24h';
   showSeconds: boolean;
+  showDayOfWeek: boolean;
   dateFormat: string;
   timezone: string;
+  daylightSaving: boolean;
 }
 
 const defaultSettings: Settings = {
   desktopPattern: 'default',
   theme: 'classic',
   soundVolume: 75,
+  alertSound: 'beep',
   highlightColor: '#000080',
   timeFormat: '12h',
   showSeconds: false,
+  showDayOfWeek: false,
   dateFormat: 'MM/DD/YYYY',
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  daylightSaving: false
 }
 
 const settings = ref<Settings>({ ...defaultSettings })

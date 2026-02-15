@@ -139,9 +139,8 @@ onUnmounted(() => {
   flex-direction: column;
   padding: var(--spacing-md);
   background-color: var(--color-gray-light);
-  width: 160px;
-  height: 240px;
-  border: 1px solid var(--color-black);
+  width: 100%;
+  height: 100%;
 }
 
 .calculator__display {

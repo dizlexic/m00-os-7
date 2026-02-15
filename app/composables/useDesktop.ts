@@ -325,7 +325,21 @@ export function useDesktop() {
 
     // Watch for highlight color changes
     watch(() => settings.value.highlightColor, (newColor) => {
-      document.documentElement.style.setProperty('--color-highlight', newColor)
+      if (typeof document !== 'undefined') {
+        document.documentElement.style.setProperty('--color-highlight', newColor)
+        
+        // Calculate contrast text color
+        // Simple luminance check
+        const hex = newColor.replace('#', '')
+        const r = parseInt(hex.substring(0, 2), 16)
+        const g = parseInt(hex.substring(2, 4), 16)
+        const b = parseInt(hex.substring(4, 6), 16)
+        
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+        const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF'
+        
+        document.documentElement.style.setProperty('--color-highlight-text', textColor)
+      }
     }, { immediate: true })
 
     // Clear existing icons

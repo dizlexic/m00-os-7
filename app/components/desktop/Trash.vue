@@ -51,8 +51,7 @@ function handleOpenTrash() {
       folderId: trashFolder.id,
       path: 'Macintosh HD/Trash'
     },
-    width: 400,
-    height: 300
+    size: { width: 400, height: 300 }
   })
 }
 

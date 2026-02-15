@@ -21,13 +21,13 @@ function updateDisplay(): void {
   const now = new Date()
 
   if (showDate.value) {
-    // Date Format: respect settings.dateFormat and settings.timezone
+    // Date Format: respect settings.value.dateFormat and settings.value.timezone
     try {
       const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
-        timeZone: settings.timezone
+        timeZone: settings.value.timezone
       }
       const formatter = new Intl.DateTimeFormat('en-US', options)
       const parts = formatter.formatToParts(now)
@@ -35,9 +35,9 @@ function updateDisplay(): void {
       const month = parts.find(p => p.type === 'month')?.value || ''
       const year = parts.find(p => p.type === 'year')?.value || ''
 
-      if (settings.dateFormat === 'DD/MM/YYYY') {
+      if (settings.value.dateFormat === 'DD/MM/YYYY') {
         displayValue.value = `${day}/${month}/${year}`
-      } else if (settings.dateFormat === 'YYYY-MM-DD') {
+      } else if (settings.value.dateFormat === 'YYYY-MM-DD') {
         displayValue.value = `${year}-${month}-${day}`
       } else {
         displayValue.value = `${month}/${day}/${year}`
@@ -53,12 +53,13 @@ function updateDisplay(): void {
     // Time Format: "10:30:00 AM" or "22:30:00"
     try {
       const options: Intl.DateTimeFormatOptions = {
+        weekday: settings.value.showDayOfWeek ? 'short' : undefined,
         hour: 'numeric',
         minute: '2-digit',
-        second: settings.showSeconds ? '2-digit' : undefined,
-        hour12: settings.timeFormat === '12h',
-        timeZone: settings.timezone,
-        hourCycle: settings.timeFormat === '24h' ? 'h23' : 'h12'
+        second: settings.value.showSeconds ? '2-digit' : undefined,
+        hour12: settings.value.timeFormat === '12h',
+        timeZone: settings.value.timezone,
+        hourCycle: settings.value.timeFormat === '24h' ? 'h23' : 'h12'
       }
       displayValue.value = new Intl.DateTimeFormat('en-US', options).format(now)
     } catch (e) {
@@ -68,11 +69,17 @@ function updateDisplay(): void {
 }
 
 // Watch for settings changes to update display immediately
-watch(() => [settings.timeFormat, settings.showSeconds, settings.dateFormat, settings.timezone], () => {
+watch(() => [
+  settings.value.timeFormat,
+  settings.value.showSeconds,
+  settings.value.showDayOfWeek,
+  settings.value.dateFormat,
+  settings.value.timezone
+], () => {
   updateDisplay()
 
   // If showing seconds, we need faster updates
-  if (settings.showSeconds) {
+  if (settings.value.showSeconds) {
     startTimer(1000)
   } else {
     startTimer(60000)
@@ -91,7 +98,7 @@ function startTimer(ms: number) {
 onMounted(() => {
   updateDisplay()
   // Initial timer based on settings
-  startTimer(settings.showSeconds ? 1000 : 60000)
+  startTimer(settings.value.showSeconds ? 1000 : 60000)
 })
 
 onUnmounted(() => {

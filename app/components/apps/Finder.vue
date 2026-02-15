@@ -269,8 +269,7 @@ function handleDoubleClick(item: FileNode) {
         type: 'calculator',
         title: 'Calculator',
         icon: '/assets/icons/apps/calculator.png',
-        width: 178,
-        height: 280,
+        size: { width: 182, height: 281 },
         resizable: false,
         maximizable: false
       })
@@ -279,8 +278,7 @@ function handleDoubleClick(item: FileNode) {
         type: 'notepad',
         title: 'Note Pad',
         icon: '/assets/icons/apps/notepad.png',
-        width: 300,
-        height: 400,
+        size: { width: 300, height: 400 },
         resizable: true,
         maximizable: false
       })

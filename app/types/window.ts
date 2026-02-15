@@ -158,7 +158,7 @@ export type ResizeDirection =
 export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   finder: { width: 500, height: 350 },
   simpletext: { width: 450, height: 400 },
-  calculator: { width: 180, height: 240 },
+  calculator: { width: 182, height: 281 },
   notepad: { width: 300, height: 400 },
   'control-panel': { width: 400, height: 300 },
   'control-panels': { width: 400, height: 300 },

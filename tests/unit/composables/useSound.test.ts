@@ -6,7 +6,9 @@ import { useSettings } from '~/composables/useSettings'
 vi.mock('~/composables/useSettings', () => ({
   useSettings: vi.fn(() => ({
     settings: {
-      soundVolume: 75
+      value: {
+        soundVolume: 75
+      }
     }
   }))
 }))

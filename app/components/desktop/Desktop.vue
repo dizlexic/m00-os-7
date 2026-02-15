@@ -155,8 +155,7 @@ function handleContextMenu(event: MouseEvent): void {
           type: 'general-settings',
           title: 'General Controls',
           icon: '/assets/icons/system/preferences.png',
-          width: 400,
-          height: 300
+          size: { width: 400, height: 350 }
         })
       }
     }
@@ -192,8 +191,7 @@ function handleIconContextMenu(event: MouseEvent, icon: any): void {
           title: `Info: ${icon.name}`,
           icon: icon.icon,
           data: { nodeId: icon.id },
-          width: 300,
-          height: 400,
+          size: { width: 300, height: 400 },
           resizable: false,
           maximizable: false
         })
@@ -288,7 +286,7 @@ onUnmounted(() => {
       />
 
       <GeneralSettings
-        v-else-if="win.type === 'general-settings'"
+        v-else-if="win.type === 'general-settings' || win.type === 'desktop-patterns-settings'"
       />
 
       <SoundSettings
@@ -353,7 +351,8 @@ onUnmounted(() => {
 .desktop__marquee {
   position: absolute;
   border: 1px dashed var(--color-black);
-  background-color: rgba(0, 0, 128, 0.1);
+  background-color: var(--color-highlight);
+  opacity: 0.2;
   pointer-events: none;
   z-index: var(--z-desktop-icons);
 }

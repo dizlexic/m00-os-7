@@ -1,17 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
-import { reactive } from 'vue'
+import { ref, reactive } from 'vue'
 
-const mockSettings = reactive({
+const mockSettings = ref({
   timeFormat: '12h',
   showSeconds: false,
+  showDayOfWeek: false,
   dateFormat: 'MM/DD/YYYY',
-  timezone: 'UTC'
+  timezone: 'UTC',
+  daylightSaving: false
 } as any)
 
 const mockUpdateSetting = vi.fn((key, value) => {
-  mockSettings[key] = value
+  mockSettings.value[key] = value
 })
 
 vi.mock('~/composables/useSettings', () => ({
@@ -27,10 +29,14 @@ describe('DateTimeSettings.vue', () => {
     // 2026-02-15 12:00:00 UTC
     vi.setSystemTime(new Date('2026-02-15T12:00:00Z'))
     mockUpdateSetting.mockClear()
-    mockSettings.timeFormat = '12h'
-    mockSettings.showSeconds = false
-    mockSettings.dateFormat = 'MM/DD/YYYY'
-    mockSettings.timezone = 'UTC'
+    mockSettings.value = {
+      timeFormat: '12h',
+      showSeconds: false,
+      showDayOfWeek: false,
+      dateFormat: 'MM/DD/YYYY',
+      timezone: 'UTC',
+      daylightSaving: false
+    }
   })
 
   afterEach(() => {
@@ -83,5 +89,22 @@ describe('DateTimeSettings.vue', () => {
     expect(timezoneSelect?.exists()).toBe(true)
     await timezoneSelect?.setValue('America/New_York')
     expect(mockUpdateSetting).toHaveBeenCalledWith('timezone', 'America/New_York')
+  })
+
+  it('updates settings when show day of week is toggled', async () => {
+    const wrapper = mount(DateTimeSettings)
+    // Find the "Show day of week" checkbox
+    // It should be the second checkbox if we add it after showSeconds
+    const checkboxes = wrapper.findAll('.mac-checkbox__box')
+    await checkboxes[1].trigger('click')
+    expect(mockUpdateSetting).toHaveBeenCalledWith('showDayOfWeek', true)
+  })
+
+  it('updates settings when daylight saving is toggled', async () => {
+    const wrapper = mount(DateTimeSettings)
+    // Find the "Daylight Saving" checkbox
+    const checkboxes = wrapper.findAll('.mac-checkbox__box')
+    await checkboxes[2].trigger('click')
+    expect(mockUpdateSetting).toHaveBeenCalledWith('daylightSaving', true)
   })
 })
