@@ -262,7 +262,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Display message text
 - [x] `P0` Add configurable buttons
 - [x] `P1` Implement keyboard shortcuts (Enter, Escape)
-- [ ] `P1` Add input field variant (prompt)
+- [x] `P1` Add input field variant (prompt)
 - [ ] `P2` Implement dialog stacking
 - [ ] `P2` Add dialog animations
 
@@ -420,8 +420,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P1` Implement copy/paste operations
 - [ ] `P1` Implement move operations
 - [x] `P1` Add "New Folder" creation
-- [ ] `P1` Implement rename functionality
-- [ ] `P1` Add delete (move to trash)
+- [x] `P1` Implement rename functionality
+- [x] `P1` Add delete (move to trash)
 - [ ] `P2` Implement duplicate
 - [ ] `P2` Add "Make Alias" functionality
 
