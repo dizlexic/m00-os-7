@@ -21,39 +21,54 @@ function updateDisplay(): void {
   const now = new Date()
 
   if (showDate.value) {
-    // Date Format: respect settings.dateFormat
-    const now = new Date()
-    const day = now.getDate().toString().padStart(2, '0')
-    const month = (now.getMonth() + 1).toString().padStart(2, '0')
-    const year = now.getFullYear()
+    // Date Format: respect settings.dateFormat and settings.timezone
+    try {
+      const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone: settings.timezone
+      }
+      const formatter = new Intl.DateTimeFormat('en-US', options)
+      const parts = formatter.formatToParts(now)
+      const day = parts.find(p => p.type === 'day')?.value || ''
+      const month = parts.find(p => p.type === 'month')?.value || ''
+      const year = parts.find(p => p.type === 'year')?.value || ''
 
-    if (settings.dateFormat === 'DD/MM/YYYY') {
-      displayValue.value = `${day}/${month}/${year}`
-    } else if (settings.dateFormat === 'YYYY-MM-DD') {
-      displayValue.value = `${year}-${month}-${day}`
-    } else {
+      if (settings.dateFormat === 'DD/MM/YYYY') {
+        displayValue.value = `${day}/${month}/${year}`
+      } else if (settings.dateFormat === 'YYYY-MM-DD') {
+        displayValue.value = `${year}-${month}-${day}`
+      } else {
+        displayValue.value = `${month}/${day}/${year}`
+      }
+    } catch (e) {
+      // Fallback if timezone is invalid or not supported
+      const day = now.getDate().toString().padStart(2, '0')
+      const month = (now.getMonth() + 1).toString().padStart(2, '0')
+      const year = now.getFullYear()
       displayValue.value = `${month}/${day}/${year}`
     }
   } else {
     // Time Format: "10:30:00 AM" or "22:30:00"
-    let hours = now.getHours()
-    const minutes = now.getMinutes().toString().padStart(2, '0')
-    const seconds = now.getSeconds().toString().padStart(2, '0')
-    const timeStr = `${minutes}${settings.showSeconds ? ':' + seconds : ''}`
-
-    if (settings.timeFormat === '12h') {
-      const ampm = hours >= 12 ? 'PM' : 'AM'
-      const displayHours = hours % 12 || 12
-      displayValue.value = `${displayHours}:${timeStr} ${ampm}`
-    } else {
-      const displayHours = hours.toString().padStart(2, '0')
-      displayValue.value = `${displayHours}:${timeStr}`
+    try {
+      const options: Intl.DateTimeFormatOptions = {
+        hour: 'numeric',
+        minute: '2-digit',
+        second: settings.showSeconds ? '2-digit' : undefined,
+        hour12: settings.timeFormat === '12h',
+        timeZone: settings.timezone,
+        hourCycle: settings.timeFormat === '24h' ? 'h23' : 'h12'
+      }
+      displayValue.value = new Intl.DateTimeFormat('en-US', options).format(now)
+    } catch (e) {
+      displayValue.value = now.toLocaleTimeString()
     }
   }
 }
 
 // Watch for settings changes to update display immediately
-watch(() => [settings.timeFormat, settings.showSeconds, settings.dateFormat], () => {
+watch(() => [settings.timeFormat, settings.showSeconds, settings.dateFormat, settings.timezone], () => {
   updateDisplay()
 
   // If showing seconds, we need faster updates
