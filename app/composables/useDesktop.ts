@@ -4,7 +4,7 @@
  * Manages the desktop environment state including icons, selection, and background.
  */
 
-import { ref, computed, readonly } from 'vue'
+import { ref, computed, readonly, watch } from 'vue'
 import type {
   DesktopIcon,
   DesktopPattern,
@@ -14,6 +14,7 @@ import type {
   ContextMenuState
 } from '~/types/desktop'
 import { DEFAULT_PATTERNS, DEFAULT_GRID_SIZE } from '~/types/desktop'
+import { useSettings } from '~/composables/useSettings'
 
 /** Generate unique ID */
 function generateId(): string {
@@ -308,6 +309,25 @@ export function useDesktop() {
 
   // Initialize with default icons
   function initializeDesktop(): void {
+    const { settings } = useSettings()
+
+    // Sync background pattern with settings
+    const currentPattern = DEFAULT_PATTERNS.find(p => p.id === settings.value.desktopPattern) || DEFAULT_PATTERNS[0]
+    backgroundPattern.value = currentPattern
+
+    // Watch for settings changes
+    watch(() => settings.value.desktopPattern, (newPatternId) => {
+      const pattern = DEFAULT_PATTERNS.find(p => p.id === newPatternId)
+      if (pattern) {
+        backgroundPattern.value = pattern
+      }
+    })
+
+    // Watch for highlight color changes
+    watch(() => settings.value.highlightColor, (newColor) => {
+      document.documentElement.style.setProperty('--color-highlight', newColor)
+    }, { immediate: true })
+
     // Clear existing icons
     icons.value = []
     selectedIds.value = []
