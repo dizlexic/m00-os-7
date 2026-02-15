@@ -346,6 +346,45 @@ def generate_scrollbar_thumb():
     # Add subtle stripes or 3D look if needed, but for now just white
     save_icon(img, 'scrollbar-thumb', 'icons/ui')
 
+def generate_checkboxes():
+    """Generate checkbox icons (checked and unchecked)."""
+    # Unchecked
+    img, draw = create_icon(size=(12, 12))
+    draw.rectangle([0, 0, 11, 11], fill=COLORS['white'], outline=COLORS['black'])
+    # 3D inner shadow
+    draw.line([(1, 1), (10, 1)], fill=COLORS['gray_medium'])
+    draw.line([(1, 1), (1, 10)], fill=COLORS['gray_medium'])
+    save_icon(img, 'checkbox-unchecked', 'icons/ui')
+
+    # Checked
+    img, draw = create_icon(size=(12, 12))
+    draw.rectangle([0, 0, 11, 11], fill=COLORS['white'], outline=COLORS['black'])
+    # 3D inner shadow
+    draw.line([(1, 1), (10, 1)], fill=COLORS['gray_medium'])
+    draw.line([(1, 1), (1, 10)], fill=COLORS['gray_medium'])
+    # Checkmark (X-style or tick? Mac OS 7 uses a heavy checkmark)
+    draw.line([(2, 4), (5, 9)], fill=COLORS['black'], width=2)
+    draw.line([(5, 9), (9, 2)], fill=COLORS['black'], width=2)
+    save_icon(img, 'checkbox-checked', 'icons/ui')
+
+def generate_radio_buttons():
+    """Generate radio button icons (selected and unselected)."""
+    # Unselected
+    img, draw = create_icon(size=(12, 12))
+    draw.ellipse([0, 0, 11, 11], fill=COLORS['white'], outline=COLORS['black'])
+    # 3D inner shadow
+    draw.arc([1, 1, 10, 10], 180, 270, fill=COLORS['gray_medium'])
+    save_icon(img, 'radio-unselected', 'icons/ui')
+
+    # Selected
+    img, draw = create_icon(size=(12, 12))
+    draw.ellipse([0, 0, 11, 11], fill=COLORS['white'], outline=COLORS['black'])
+    # 3D inner shadow
+    draw.arc([1, 1, 10, 10], 180, 270, fill=COLORS['gray_medium'])
+    # Inner dot
+    draw.ellipse([3, 3, 8, 8], fill=COLORS['black'])
+    save_icon(img, 'radio-selected', 'icons/ui')
+
 
 # ============================================
 # Boot/System Icons
@@ -555,6 +594,8 @@ def generate_ui_icons():
     generate_resize_handle()
     generate_scrollbar_arrows()
     generate_scrollbar_thumb()
+    generate_checkboxes()
+    generate_radio_buttons()
     print('UI icons complete!')
 
 def generate_small_system_icons():
