@@ -4,7 +4,7 @@
 # ============================================
 # Stage 1: Dependencies
 # ============================================
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 
 WORKDIR /app
 
