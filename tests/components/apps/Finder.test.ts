@@ -20,6 +20,10 @@ const { mockFileSystem } = vi.hoisted(() => ({
       return undefined
     }),
     getRoot: vi.fn(() => ({ id: 'root', name: 'Macintosh HD' })),
+    getPathNodes: vi.fn((id) => {
+      if (id === 'root') return [{ id: 'root', name: 'Macintosh HD', type: 'folder' }]
+      return []
+    }),
     renameNode: vi.fn(),
     deleteNode: vi.fn()
   }
@@ -42,7 +46,7 @@ describe('Finder.vue', () => {
         folderId: 'root'
       }
     })
-    
+
     expect(wrapper.find('.finder').exists()).toBe(true)
     expect(wrapper.findAll('.finder__item')).toHaveLength(2)
     expect(wrapper.text()).toContain('Documents')
@@ -55,7 +59,7 @@ describe('Finder.vue', () => {
         folderId: 'root'
       }
     })
-    
+
     expect(wrapper.find('.finder__header-title').text()).toBe('Macintosh HD')
   })
 
@@ -65,10 +69,10 @@ describe('Finder.vue', () => {
         folderId: 'root'
       }
     })
-    
+
     const folderItem = wrapper.findAll('.finder__item').find(w => w.text().includes('Documents'))
     await folderItem?.trigger('dblclick')
-    
+
     // In this implementation, opening a folder might either change current view or open new window
     // For classic Mac OS, it usually opens a new window unless specified otherwise.
     // However, for this web clone, we'll follow what's most practical.
@@ -95,7 +99,7 @@ describe('Finder.vue', () => {
     })
 
     expect(wrapper.find('.finder__header-title').text()).toBe('Documents')
-    
+
     const upButton = wrapper.find('.finder__up-button')
     await upButton.trigger('click')
 
