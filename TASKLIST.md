@@ -59,7 +59,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Create base icon generation utilities
 - [x] `P0` Define Mac OS 7 color palette constants
 - [x] `P0` Implement 32x32 icon template generator
-- [ ] `P1` Implement 16x16 small icon generator
+- [x] `P1` Implement 16x16 small icon generator
 - [x] `P1` Add icon shadow and highlight effects
 
 ### 2.2 System Icons
@@ -69,15 +69,15 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Generate Trash icons (empty/full)
 - [x] `P0` Generate hard drive icon
 - [x] `P1` Generate application icons (generic)
-- [ ] `P1` Generate system preference icons
+- [x] `P1` Generate system preference icons
 - [x] `P2` Generate alert/warning icons
 
 ### 2.3 Application Icons
 - [x] `P1` Generate Calculator icon
 - [x] `P1` Generate SimpleText icon
 - [x] `P1` Generate NotePad icon
-- [ ] `P1` Generate Scrapbook icon
-- [ ] `P2` Generate Solitaire icon
+- [x] `P1` Generate Scrapbook icon
+- [x] `P2` Generate Solitaire icon
 - [ ] `P2` Generate Tetris icon
 - [ ] `P2` Generate Chat/IM icon
 - [ ] `P3` Generate Browser icon
@@ -85,25 +85,25 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 
 ### 2.4 UI Elements
 - [x] `P0` Generate window control buttons (close, zoom, collapse)
-- [ ] `P0` Generate scrollbar elements
-- [ ] `P0` Generate checkbox and radio button graphics
-- [ ] `P1` Generate menu bar elements
+- [x] `P0` Generate scrollbar elements
+- [x] `P0` Generate checkbox and radio button graphics
+- [x] `P1` Generate menu bar elements
 - [x] `P1` Generate resize handle graphic
-- [ ] `P1` Generate cursor graphics (arrow, hand, wait, text)
-- [ ] `P2` Generate progress bar elements
+- [x] `P1` Generate cursor graphics (arrow, hand, wait, text)
+- [x] `P2` Generate progress bar elements
 
 ### 2.5 Desktop Patterns
 - [x] `P0` Generate default gray pattern
 - [x] `P1` Generate classic Mac patterns (stripes, dots, etc.)
-- [ ] `P1` Generate at least 10 pattern variations
+- [x] `P1` Generate at least 10 pattern variations
 - [ ] `P2` Create pattern preview thumbnails
 - [ ] `P3` Implement custom pattern creator
 
 ### 2.6 Miscellaneous Graphics
 - [x] `P0` Generate "Happy Mac" boot icon
 - [x] `P0` Generate "Sad Mac" error icon
-- [ ] `P1` Generate Apple logo for menu bar
-- [ ] `P1` Generate dialog box graphics
+- [x] `P1` Generate Apple logo for menu bar
+- [x] `P1` Generate dialog box graphics
 - [ ] `P2` Generate About box graphics
 - [ ] `P3` Generate splash screen elements
 
