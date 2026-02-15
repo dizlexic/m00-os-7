@@ -11,13 +11,17 @@ import MenuDropdown from '~/components/desktop/MenuDropdown.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
+import { useClipboard } from '~/composables/useClipboard'
+import { useDesktop } from '~/composables/useDesktop'
 import type { WindowType } from '~/types/window'
 import type { RecentItem } from '~/types/recent'
 import type { MenuItem, Menu } from '~/types/menu'
 
-const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode } = useFileSystem()
+const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash } = useFileSystem()
 const { activeWindow, openWindow } = useWindowManager()
 const { recentApps, recentDocs } = useRecentItems()
+const { clipboard, copy, cut, paste } = useClipboard()
+const { icons: desktopIcons } = useDesktop()
 
 // Props
 interface Props {
@@ -90,6 +94,30 @@ const appleMenuItems = computed<MenuItem[]>(() => [
   { id: 'shutdown', label: 'Shut Down', action: () => handleShutdown() }
 ])
 
+const canCopy = computed(() => {
+  if (activeWindow.value) {
+    if (activeWindow.value.type === 'finder') {
+      return !!(activeWindow.value.data as any)?.selectedItemId
+    }
+  } else {
+    // Desktop selection
+    return desktopIcons.value.some(icon => icon.isSelected && icon.type !== 'hard-drive' && icon.type !== 'trash')
+  }
+  return false
+})
+
+const canPaste = computed(() => {
+  if (activeWindow.value) {
+    if (activeWindow.value.type === 'finder') {
+      return !!clipboard.value
+    }
+  } else {
+    // Desktop paste
+    return !!clipboard.value
+  }
+  return false
+})
+
 const fileMenuItems: MenuItem[] = [
   { id: 'new-folder', label: 'New Folder', shortcut: '⌘N', action: () => handleNewFolder() },
   { id: 'open', label: 'Open', shortcut: '⌘O' },
@@ -108,16 +136,16 @@ const fileMenuItems: MenuItem[] = [
   { id: 'print', label: 'Print...', shortcut: '⌘P', disabled: true }
 ]
 
-const editMenuItems: MenuItem[] = [
+const editMenuItems = computed<MenuItem[]>(() => [
   { id: 'undo', label: 'Undo', shortcut: '⌘Z', disabled: true },
   { id: 'sep1', label: '', isSeparator: true },
-  { id: 'cut', label: 'Cut', shortcut: '⌘X', disabled: true },
-  { id: 'copy', label: 'Copy', shortcut: '⌘C', disabled: true },
-  { id: 'paste', label: 'Paste', shortcut: '⌘V', disabled: true },
-  { id: 'clear', label: 'Clear', disabled: true },
+  { id: 'cut', label: 'Cut', shortcut: '⌘X', disabled: !canCopy.value, action: () => handleCut() },
+  { id: 'copy', label: 'Copy', shortcut: '⌘C', disabled: !canCopy.value, action: () => handleCopy() },
+  { id: 'paste', label: 'Paste', shortcut: '⌘V', disabled: !canPaste.value, action: () => handlePaste() },
+  { id: 'clear', label: 'Clear', disabled: !canCopy.value, action: () => handleDelete() },
   { id: 'sep2', label: '', isSeparator: true },
   { id: 'select-all', label: 'Select All', shortcut: '⌘A' }
-]
+])
 
 const viewMenuItems: MenuItem[] = [
   { id: 'by-icon', label: 'by Icon' },
@@ -149,7 +177,7 @@ const helpMenuItems: MenuItem[] = [
 
 const menus = computed<Menu[]>(() => [
   { id: 'file', label: 'File', items: fileMenuItems },
-  { id: 'edit', label: 'Edit', items: editMenuItems },
+  { id: 'edit', label: 'Edit', items: editMenuItems.value },
   { id: 'view', label: 'View', items: viewMenuItems },
   { id: 'special', label: 'Special', items: specialMenuItems },
   { id: 'help', label: 'Help', items: helpMenuItems }
@@ -238,6 +266,63 @@ function handleEmptyTrash(): void {
   emptyTrash()
 }
 
+function handleCopy() {
+  if (activeWindow.value?.type === 'finder') {
+    const selectedId = (activeWindow.value.data as any)?.selectedItemId
+    if (selectedId) {
+      copy([selectedId])
+    }
+  } else if (!activeWindow.value) {
+    const selectedIds = desktopIcons.value
+      .filter(icon => icon.isSelected && icon.type !== 'hard-drive' && icon.type !== 'trash')
+      .map(icon => icon.id)
+    if (selectedIds.length > 0) {
+      copy(selectedIds)
+    }
+  }
+}
+
+function handleCut() {
+  if (activeWindow.value?.type === 'finder') {
+    const selectedId = (activeWindow.value.data as any)?.selectedItemId
+    if (selectedId) {
+      cut([selectedId])
+    }
+  } else if (!activeWindow.value) {
+    const selectedIds = desktopIcons.value
+      .filter(icon => icon.isSelected && icon.type !== 'hard-drive' && icon.type !== 'trash')
+      .map(icon => icon.id)
+    if (selectedIds.length > 0) {
+      cut(selectedIds)
+    }
+  }
+}
+
+function handlePaste() {
+  if (activeWindow.value?.type === 'finder') {
+    const folderId = (activeWindow.value.data as any)?.folderId
+    if (folderId) {
+      paste(folderId)
+    }
+  } else if (!activeWindow.value) {
+    paste(getRoot().id)
+  }
+}
+
+function handleDelete() {
+  if (activeWindow.value?.type === 'finder') {
+    const selectedId = (activeWindow.value.data as any)?.selectedItemId
+    if (selectedId) {
+      moveToTrash(selectedId)
+    }
+  } else if (!activeWindow.value) {
+    const selectedIds = desktopIcons.value
+      .filter(icon => icon.isSelected && icon.type !== 'hard-drive' && icon.type !== 'trash')
+      .map(icon => icon.id)
+    selectedIds.forEach(id => moveToTrash(id))
+  }
+}
+
 function handleControlPanels(): void {
   openWindow({
     type: 'control-panels',
@@ -307,13 +392,61 @@ function handleGetInfo(): void {
   }
 }
 
+function handleKeyDown(event: KeyboardEvent) {
+  // Don't trigger shortcuts if an input is focused
+  if (['INPUT', 'TEXTAREA'].includes((event.target as HTMLElement).tagName)) {
+    return
+  }
+
+  const isCmd = event.metaKey || event.ctrlKey
+
+  if (isCmd) {
+    switch (event.key.toLowerCase()) {
+      case 'c':
+        if (canCopy.value) {
+          event.preventDefault()
+          handleCopy()
+        }
+        break
+      case 'x':
+        if (canCopy.value) {
+          event.preventDefault()
+          handleCut()
+        }
+        break
+      case 'v':
+        if (canPaste.value) {
+          event.preventDefault()
+          handlePaste()
+        }
+        break
+      case 'n':
+        event.preventDefault()
+        handleNewFolder()
+        break
+      case 'i':
+        event.preventDefault()
+        handleGetInfo()
+        break
+      case 'backspace':
+        if (canCopy.value) {
+          event.preventDefault()
+          handleDelete()
+        }
+        break
+    }
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  document.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('keydown', handleKeyDown)
 })
 </script>
 
