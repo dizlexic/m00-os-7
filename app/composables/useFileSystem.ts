@@ -481,6 +481,8 @@ export function useFileSystem() {
     copyNode,
     getNodeByPath,
     fetchFilesFromServer,
+    getTrash,
+    moveToTrash,
     emptyTrash
   }
 }
