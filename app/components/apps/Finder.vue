@@ -285,23 +285,29 @@ function handleDoubleClick(item: FileNode) {
         maximizable: false
       })
     }
-  } else if (item.type === 'file') {
+  } else if (item.type === 'file' || item.type === 'markdown' || item.type === 'image') {
     // Track recent doc
     addRecentDoc({
       id: item.id,
       name: item.name,
       type: 'file',
-      icon: '/assets/icons/system/document.png',
+      icon: getIcon(item),
       data: {
         fileId: item.id
       }
     })
 
-    // Open file in SimpleText
+    // Open file in appropriate app
+    const typeToWindow: Record<string, any> = {
+      'file': 'simpletext',
+      'markdown': 'simpletext',
+      'image': 'imageviewer'
+    }
+
     openWindow({
-      type: 'simpletext',
+      type: typeToWindow[item.type] || 'simpletext',
       title: item.name,
-      icon: '/assets/icons/system/document.png',
+      icon: getIcon(item),
       data: {
         fileId: item.id
       }

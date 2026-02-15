@@ -23,6 +23,7 @@ import SoundSettings from '~/components/apps/SoundSettings.vue'
 import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
 import AboutMac from '~/components/apps/AboutMac.vue'
 import ArticleViewer from '~/components/apps/ArticleViewer.vue'
+import ImageViewer from '~/components/apps/ImageViewer.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useClipboard } from '~/composables/useClipboard'
 import ContextMenu from './ContextMenu.vue'
@@ -305,6 +306,12 @@ onUnmounted(() => {
       <ArticleViewer
         v-else-if="win.type === 'article' || win.type === 'help'"
         :path="win.data?.path"
+      />
+
+      <ImageViewer
+        v-else-if="win.type === 'imageviewer'"
+        :file-id="(win.data as any)?.fileId"
+        :is-active="win.isActive"
       />
 
       <!-- Window content will be rendered based on window type -->

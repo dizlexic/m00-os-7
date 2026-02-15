@@ -172,6 +172,8 @@ function handleDoubleClick(): void {
     'folder': 'finder',
     'hard-drive': 'finder',
     'document': 'simpletext',
+    'markdown': 'simpletext',
+    'image': 'imageviewer',
     'application': 'generic',
     'trash': 'finder'
   }

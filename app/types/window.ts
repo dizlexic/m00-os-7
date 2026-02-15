@@ -34,6 +34,7 @@ export type WindowType =
   | 'article'
   | 'help'
   | 'alert'
+  | 'imageviewer'
   | 'generic'
 
 /** Window configuration for creating new windows */
@@ -169,6 +170,7 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   article: { width: 600, height: 500 },
   help: { width: 600, height: 500 },
   alert: { width: 350, height: 150 },
+  imageviewer: { width: 400, height: 350 },
   generic: { width: 400, height: 300 }
 }
 
