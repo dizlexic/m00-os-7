@@ -116,7 +116,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Implement desktop background with pattern support
 - [x] `P0` Handle desktop click events (deselect, context menu)
 - [x] `P0` Implement icon grid layout system
-- [ ] `P1` Add desktop right-click context menu
+- [x] `P1` Add desktop right-click context menu
 - [x] `P1` Implement marquee selection for multiple icons
 - [x] `P2` Add snap-to-grid functionality
 - [x] `P2` Implement "Clean Up Desktop" feature

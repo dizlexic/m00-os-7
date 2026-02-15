@@ -4,6 +4,8 @@
  * Types for the desktop environment including icons, positions, and settings.
  */
 
+import type { MenuItem } from './menu'
+
 /** Position coordinates */
 export interface Position {
   x: number
@@ -73,26 +75,6 @@ export interface DesktopState {
   showGrid: boolean
 }
 
-/** Desktop context menu item */
-export interface ContextMenuItem {
-  /** Menu item identifier */
-  id: string
-  /** Display label */
-  label: string
-  /** Keyboard shortcut display */
-  shortcut?: string
-  /** Icon path */
-  icon?: string
-  /** Whether item is disabled */
-  disabled?: boolean
-  /** Whether item is a separator */
-  isSeparator?: boolean
-  /** Submenu items */
-  submenu?: ContextMenuItem[]
-  /** Action handler */
-  action?: () => void
-}
-
 /** Desktop context menu state */
 export interface ContextMenuState {
   /** Whether menu is visible */
@@ -100,7 +82,7 @@ export interface ContextMenuState {
   /** Menu position */
   position: Position
   /** Menu items */
-  items: ContextMenuItem[]
+  items: MenuItem[]
 }
 
 /** Marquee selection state */

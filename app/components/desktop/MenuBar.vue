@@ -13,26 +13,11 @@ import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
 import type { WindowType } from '~/types/window'
 import type { RecentItem } from '~/types/recent'
+import type { MenuItem, Menu } from '~/types/menu'
 
 const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode } = useFileSystem()
 const { activeWindow, openWindow } = useWindowManager()
 const { recentApps, recentDocs } = useRecentItems()
-
-interface MenuItem {
-  id: string
-  label: string
-  shortcut?: string
-  disabled?: boolean
-  isSeparator?: boolean
-  action?: () => void
-  submenu?: MenuItem[]
-}
-
-interface Menu {
-  id: string
-  label: string
-  items: MenuItem[]
-}
 
 // Props
 interface Props {

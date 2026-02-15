@@ -6,16 +6,7 @@
  */
 
 import { ref } from 'vue'
-
-interface MenuItem {
-  id: string
-  label: string
-  shortcut?: string
-  disabled?: boolean
-  isSeparator?: boolean
-  action?: () => void
-  submenu?: MenuItem[]
-}
+import type { MenuItem } from '~/types/menu'
 
 interface Props {
   items: MenuItem[]
