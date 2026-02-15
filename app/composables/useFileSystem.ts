@@ -338,6 +338,19 @@ export function useFileSystem() {
     return current
   }
 
+  const emptyTrash = (): void => {
+    const root = getRoot()
+    const children = getChildren(root.id)
+    const trash = children.find((child: FileNode) => child.name === 'Trash' && child.type === 'folder')
+
+    if (trash) {
+      const trashItems = getChildren(trash.id)
+      trashItems.forEach((item: FileNode) => {
+        deleteNode(item.id)
+      })
+    }
+  }
+
   return {
     state: readonly(state),
     initialize,
@@ -350,6 +363,7 @@ export function useFileSystem() {
     renameNode,
     moveNode,
     getNodeByPath,
-    fetchFilesFromServer
+    fetchFilesFromServer,
+    emptyTrash
   }
 }
