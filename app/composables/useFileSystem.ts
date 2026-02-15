@@ -278,6 +278,17 @@ export function useFileSystem() {
     syncNode(node)
   }
 
+  const updateFileContent = (id: string, content: string): void => {
+    const node = state.value.nodes[id]
+    if (!node || node.type !== 'file') return
+    node.content = content
+    node.size = content.length
+    node.modifiedAt = Date.now()
+
+    // Sync node
+    syncNode(node)
+  }
+
   const moveNode = (id: string, newParentId: string): void => {
     const node = state.value.nodes[id]
     if (!node || node.isSystem) return
@@ -361,6 +372,7 @@ export function useFileSystem() {
     createFolder,
     deleteNode,
     renameNode,
+    updateFileContent,
     moveNode,
     getNodeByPath,
     fetchFilesFromServer,
