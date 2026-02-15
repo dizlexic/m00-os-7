@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { nextTick } from 'vue'
+import { ref, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import Finder from '~/components/apps/Finder.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 
 // Mock the composables
-const { mockFileSystem } = vi.hoisted(() => ({
+const { mockFileSystem, mockDesktop } = vi.hoisted(() => ({
   mockFileSystem: {
+    // ... (keep existing)
     getChildren: vi.fn((folderId) => {
       if (folderId === 'root') {
         return [
@@ -25,10 +26,19 @@ const { mockFileSystem } = vi.hoisted(() => ({
       if (id === 'root') return [{ id: 'root', name: 'Macintosh HD', type: 'folder' }]
       return []
     }),
+    getTrash: vi.fn(),
     renameNode: vi.fn(),
     deleteNode: vi.fn(),
     moveToTrash: vi.fn(),
-    createFolder: vi.fn()
+    createFolder: vi.fn(),
+    moveNode: vi.fn(),
+    updateNode: vi.fn()
+  },
+  mockDesktop: {
+    showContextMenu: vi.fn(),
+    hideContextMenu: vi.fn(),
+    removeIcon: vi.fn(),
+    updateIcon: vi.fn()
   }
 }))
 
@@ -38,7 +48,22 @@ vi.mock('~/composables/useFileSystem', () => ({
 
 vi.mock('~/composables/useWindowManager', () => ({
   useWindowManager: () => ({
-    openWindow: vi.fn()
+    openWindow: vi.fn(),
+    updateWindow: vi.fn()
+  })
+}))
+
+vi.mock('~/composables/useDesktop', () => ({
+  useDesktop: () => mockDesktop
+}))
+
+vi.mock('~/composables/useTrash', () => ({
+  useTrash: () => ({
+    restoreItem: vi.fn(),
+    moveToTrash: vi.fn(),
+    emptyTrash: vi.fn(),
+    isEmpty: ref(true),
+    items: ref([])
   })
 }))
 
@@ -185,5 +210,59 @@ describe('Finder.vue', () => {
     await deleteButton.trigger('click')
 
     expect(mockFileSystem.moveToTrash).toHaveBeenCalledWith('folder-1')
+  })
+
+  it('shows "Put Away" for items in trash', async () => {
+    mockFileSystem.getTrash.mockReturnValue({ id: 'trash-folder-id' })
+    mockFileSystem.getChildren.mockImplementation((id) => {
+      if (id === 'trash-folder-id') {
+        return [
+          { id: 'file-in-trash', name: 'Trashed File', type: 'file', parentId: 'trash-folder-id' }
+        ]
+      }
+      return []
+    })
+
+    const wrapper = mount(Finder, {
+      props: {
+        folderId: 'trash-folder-id'
+      }
+    })
+
+    await nextTick()
+
+    const trashingItem = wrapper.find('.finder__item--icon')
+    expect(trashingItem.exists()).toBe(true)
+    await trashingItem.trigger('contextmenu')
+
+    expect(mockDesktop.showContextMenu).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'put-away', label: 'Put Away' })
+      ])
+    )
+  })
+
+  it('assigns correct icons to different file types', async () => {
+    mockFileSystem.getChildren.mockReturnValue([
+      { id: 'app-1', name: 'Calculator', type: 'application', icon: 'calculator' },
+      { id: 'app-2', name: 'Unknown App', type: 'application' },
+      { id: 'folder-1', name: 'Folder', type: 'folder' },
+      { id: 'file-1', name: 'File', type: 'file' }
+    ])
+
+    const wrapper = mount(Finder, {
+      props: {
+        folderId: 'root'
+      }
+    })
+
+    await nextTick()
+
+    const items = wrapper.findAll('.finder__item-icon img')
+    expect(items[0].attributes('src')).toBe('/assets/icons/apps/calculator.png')
+    expect(items[1].attributes('src')).toBe('/assets/icons/system/application.png')
+    expect(items[2].attributes('src')).toBe('/assets/icons/system/folder.png')
+    expect(items[3].attributes('src')).toBe('/assets/icons/system/document.png')
   })
 })

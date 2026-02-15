@@ -3,6 +3,8 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
+import { useDesktop } from '~/composables/useDesktop'
+import { useTrash } from '~/composables/useTrash'
 import type { FileNode, FolderNode } from '~/types/filesystem'
 
 interface Props {
@@ -24,6 +26,8 @@ const {
 } = useFileSystem()
 const { openWindow, updateWindow } = useWindowManager()
 const { addRecentDoc } = useRecentItems()
+const { showContextMenu } = useDesktop()
+const { restoreItem } = useTrash()
 
 const currentFolderId = ref(props.folderId)
 
@@ -306,10 +310,84 @@ function handleDoubleClick(item: FileNode) {
 }
 
 function getIcon(item: FileNode) {
+  if (item.icon) {
+    if (item.type === 'application') return `/assets/icons/apps/${item.icon}.png`
+    return `/assets/icons/system/${item.icon}.png`
+  }
   if (item.type === 'folder') return '/assets/icons/system/folder.png'
-  if (item.type === 'file') return '/assets/icons/system/document.png'
-  if (item.type === 'application') return '/assets/icons/apps/generic.png'
+  if (item.type === 'file' || item.type === 'markdown' || item.type === 'image') return '/assets/icons/system/document.png'
+  if (item.type === 'application') {
+    // Try to match common application names if no icon specified
+    const name = item.name.toLowerCase()
+    if (name.includes('calculator')) return '/assets/icons/apps/calculator.png'
+    if (name.includes('notepad')) return '/assets/icons/apps/notepad.png'
+    if (name.includes('simpletext')) return '/assets/icons/apps/simpletext.png'
+    if (name.includes('scrapbook')) return '/assets/icons/apps/scrapbook.png'
+    if (name.includes('solitaire')) return '/assets/icons/apps/solitaire.png'
+    return '/assets/icons/system/application.png'
+  }
   return '/assets/icons/system/document.png'
+}
+
+function getKindLabel(item: FileNode): string {
+  switch (item.type) {
+    case 'folder': return 'Folder'
+    case 'file': return 'Document'
+    case 'markdown': return 'Markdown Document'
+    case 'image': return 'Image File'
+    case 'application': return 'Application'
+    case 'alias': return 'Alias'
+    default: return item.type.charAt(0).toUpperCase() + item.type.slice(1)
+  }
+}
+
+function handleItemContextMenu(event: MouseEvent, item: FileNode) {
+  selectItem(item.id)
+
+  const { getTrash } = useFileSystem()
+  const trash = getTrash()
+  const isInTrash = item.parentId === trash?.id
+
+  const items = [
+    {
+      id: 'open',
+      label: 'Open',
+      action: () => handleDoubleClick(item)
+    },
+    { id: 'sep1', label: '', isSeparator: true },
+    {
+      id: 'get-info',
+      label: 'Get Info',
+      action: () => {
+        openWindow({
+          type: 'get-info',
+          title: `Info: ${item.name}`,
+          icon: getIcon(item),
+          data: { nodeId: item.id },
+          width: 300,
+          height: 400,
+          resizable: false,
+          maximizable: false
+        })
+      }
+    }
+  ]
+
+  if (isInTrash) {
+    items.push({
+      id: 'put-away',
+      label: 'Put Away',
+      action: () => restoreItem(item.id)
+    })
+  } else if (!item.isSystem) {
+    items.push({
+      id: 'move-to-trash',
+      label: 'Move to Trash',
+      action: () => moveToTrash(item.id)
+    })
+  }
+
+  showContextMenu({ x: event.clientX, y: event.clientY }, items)
 }
 </script>
 
@@ -377,6 +455,7 @@ function getIcon(item: FileNode) {
           :class="{ 'finder__item--selected': selectedItemId === item.id }"
           @click.stop="selectItem(item.id)"
           @dblclick.stop="handleDoubleClick(item)"
+          @contextmenu.stop.prevent="handleItemContextMenu($event, item)"
         >
           <div class="finder__item-icon">
             <img :src="getIcon(item)" :alt="item.name" draggable="false" />
@@ -417,6 +496,7 @@ function getIcon(item: FileNode) {
           :class="{ 'finder__item--selected': selectedItemId === item.id }"
           @click.stop="selectItem(item.id)"
           @dblclick.stop="handleDoubleClick(item)"
+          @contextmenu.stop.prevent="handleItemContextMenu($event, item)"
         >
           <div class="finder__list-col finder__list-col--name">
             <img :src="getIcon(item)" :alt="item.name" class="finder__item-mini-icon" />
@@ -445,7 +525,7 @@ function getIcon(item: FileNode) {
             {{ item.type === 'folder' ? '--' : `${Math.ceil(item.size / 1024)}K` }}
           </div>
           <div class="finder__list-col finder__list-col--kind">
-            {{ item.type.charAt(0).toUpperCase() + item.type.slice(1) }}
+            {{ getKindLabel(item) }}
           </div>
         </div>
       </template>
