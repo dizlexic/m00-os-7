@@ -409,7 +409,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Implement double-click to open file
 - [x] `P0` Add breadcrumb path navigation
 - [x] `P1` Implement keyboard navigation (arrows)
-- [ ] `P1` Add "Go to Folder" dialog
+- [x] `P1` Add "Go to Folder" dialog
 - [ ] `P2` Implement folder history
 - [ ] `P2` Add bookmarks/favorites
 - [ ] `P2` Implement folder tree view
