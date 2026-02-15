@@ -14,16 +14,18 @@ import { useRecentItems } from '~/composables/useRecentItems'
 import { useClipboard } from '~/composables/useClipboard'
 import { useDesktop } from '~/composables/useDesktop'
 import { useAlert } from '~/composables/useAlert'
+import { useTrash } from '~/composables/useTrash'
 import type { WindowType } from '~/types/window'
 import type { RecentItem } from '~/types/recent'
 import type { MenuItem, Menu } from '~/types/menu'
 
-const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash } = useFileSystem()
+const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash, getTrash } = useFileSystem()
 const { activeWindow, openWindow, updateWindow } = useWindowManager()
 const { recentApps, recentDocs } = useRecentItems()
 const { clipboard, copy, cut, paste } = useClipboard()
 const { icons: desktopIcons } = useDesktop()
 const { showAlert } = useAlert()
+const { restoreItem, items: trashItems, emptyTrash: confirmEmptyTrash } = useTrash()
 
 // Props
 interface Props {
@@ -120,7 +122,20 @@ const canPaste = computed(() => {
   return false
 })
 
-const fileMenuItems: MenuItem[] = [
+const canPutAway = computed(() => {
+  if (activeWindow.value?.type === 'finder') {
+    const data = activeWindow.value.data as any
+    const selectedId = data?.selectedItemId
+    if (selectedId) {
+      const node = getNode(selectedId)
+      const trash = getTrash()
+      return node?.parentId === trash?.id
+    }
+  }
+  return false
+})
+
+const fileMenuItems = computed<MenuItem[]>(() => [
   { id: 'new-folder', label: 'New Folder', shortcut: '⌘N', action: () => handleNewFolder() },
   { id: 'open', label: 'Open', shortcut: '⌘O' },
   { id: 'sep1', label: '', isSeparator: true },
@@ -130,14 +145,14 @@ const fileMenuItems: MenuItem[] = [
   { id: 'sep3', label: '', isSeparator: true },
   { id: 'duplicate', label: 'Duplicate', shortcut: '⌘D', disabled: true },
   { id: 'make-alias', label: 'Make Alias', shortcut: '⌘M', disabled: true },
-  { id: 'put-away', label: 'Put Away', shortcut: '⌘Y', disabled: true },
+  { id: 'put-away', label: 'Put Away', shortcut: '⌘Y', disabled: !canPutAway.value, action: () => handlePutAway() },
   { id: 'sep4', label: '', isSeparator: true },
   { id: 'find', label: 'Find...', shortcut: '⌘F' },
   { id: 'go-to-folder', label: 'Go to Folder...', shortcut: '⌘G', action: () => handleGoToFolder() },
   { id: 'sep5', label: '', isSeparator: true },
   { id: 'page-setup', label: 'Page Setup...', disabled: true },
   { id: 'print', label: 'Print...', shortcut: '⌘P', disabled: true }
-]
+])
 
 const editMenuItems = computed<MenuItem[]>(() => [
   { id: 'undo', label: 'Undo', shortcut: '⌘Z', disabled: true },
@@ -161,7 +176,7 @@ const viewMenuItems: MenuItem[] = [
 ]
 
 const specialMenuItems: MenuItem[] = [
-  { id: 'empty-trash', label: 'Empty Trash...', action: () => handleEmptyTrash() },
+  { id: 'empty-trash', label: 'Empty Trash...', action: () => confirmEmptyTrash() },
   { id: 'sep1', label: '', isSeparator: true },
   { id: 'eject', label: 'Eject', disabled: true },
   { id: 'erase-disk', label: 'Erase Disk...', disabled: true },
@@ -179,7 +194,7 @@ const helpMenuItems: MenuItem[] = [
 ]
 
 const menus = computed<Menu[]>(() => [
-  { id: 'file', label: 'File', items: fileMenuItems },
+  { id: 'file', label: 'File', items: fileMenuItems.value },
   { id: 'edit', label: 'Edit', items: editMenuItems.value },
   { id: 'view', label: 'View', items: viewMenuItems },
   { id: 'special', label: 'Special', items: specialMenuItems },
@@ -299,8 +314,14 @@ function handleNewFolder(): void {
   createFolder('untitled folder', parentId)
 }
 
-function handleEmptyTrash(): void {
-  emptyTrash()
+function handlePutAway(): void {
+  if (activeWindow.value?.type === 'finder') {
+    const data = activeWindow.value.data as any
+    const selectedId = data?.selectedItemId
+    if (selectedId) {
+      restoreItem(selectedId)
+    }
+  }
 }
 
 function handleCopy() {
@@ -468,6 +489,12 @@ function handleKeyDown(event: KeyboardEvent) {
       case 'i':
         event.preventDefault()
         handleGetInfo()
+        break
+      case 'y':
+        if (canPutAway.value) {
+          event.preventDefault()
+          handlePutAway()
+        }
         break
       case 'backspace':
         if (canCopy.value) {

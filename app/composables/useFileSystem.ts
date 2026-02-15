@@ -308,6 +308,15 @@ export function useFileSystem() {
     syncNode(node)
   }
 
+  const updateNode = (id: string, updates: Partial<FileNode>): void => {
+    const node = state.value.nodes[id]
+    if (!node) return
+    
+    Object.assign(node, updates)
+    node.modifiedAt = Date.now()
+    syncNode(node)
+  }
+
   const updateFileContent = (id: string, content: string): void => {
     const node = state.value.nodes[id]
     if (!node || node.type !== 'file') return
@@ -434,7 +443,13 @@ export function useFileSystem() {
   const moveToTrash = (id: string): void => {
     const trash = getTrash()
     if (trash && trash.id !== id) {
-      moveNode(id, trash.id)
+      const node = state.value.nodes[id]
+      if (node && !node.isSystem) {
+        // Store original parent ID in metadata for "Put Away"
+        if (!node.metadata) node.metadata = {}
+        node.metadata.originalParentId = node.parentId
+        moveNode(id, trash.id)
+      }
     }
   }
 
@@ -482,6 +497,7 @@ export function useFileSystem() {
     createFolder,
     deleteNode,
     renameNode,
+    updateNode,
     updateFileContent,
     moveNode,
     copyNode,

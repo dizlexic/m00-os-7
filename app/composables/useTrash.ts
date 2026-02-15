@@ -8,6 +8,7 @@
 import { computed, watch } from 'vue'
 import { useDesktop } from '~/composables/useDesktop'
 import { useFileSystem } from '~/composables/useFileSystem'
+import { useAlert } from '~/composables/useAlert'
 
 export function useTrash() {
   const { updateIcon, icons, removeIcon } = useDesktop()
@@ -52,21 +53,60 @@ export function useTrash() {
   }
 
   /**
-   * Empties the trash
+   * Empties the trash with a confirmation dialog
    */
   function emptyTrash(): void {
-    fsEmptyTrash()
+    if (isEmpty.value) return
+
+    const { showAlert } = useAlert()
+    const count = items.value.length
+    const message = count === 1
+      ? 'The Trash contains 1 item. It will be permanently deleted.'
+      : `The Trash contains ${count} items. They will be permanently deleted.`
+
+    showAlert({
+      message,
+      type: 'caution',
+      buttons: [
+        { label: 'Cancel', value: 'cancel' },
+        { label: 'OK', value: 'ok', isDefault: true }
+      ],
+      onClose: (value) => {
+        if (value === 'ok') {
+          fsEmptyTrash()
+        }
+      }
+    })
   }
 
   /**
    * Restores an item from the trash (Put Away)
    */
   function restoreItem(id: string): void {
-    // For now, move it back to root if we don't know original path
-    // In a better implementation, we'd store original parent ID
-    const root = getTrash()?.parentId
-    if (root) {
-      moveNode(id, root)
+    const { state, moveNode, updateNode, getNode, getRoot } = useFileSystem()
+    const node = state.value.nodes[id]
+    
+    if (node && node.metadata?.originalParentId) {
+      const originalParentId = node.metadata.originalParentId
+      // Check if original parent still exists
+      const parent = getNode(originalParentId)
+      
+      if (parent) {
+        moveNode(id, originalParentId)
+      } else {
+        // Fallback: move it back to root
+        const root = getRoot()
+        moveNode(id, root.id)
+      }
+      
+      // Clear the original parent ID
+      const newMetadata = { ...node.metadata }
+      delete newMetadata.originalParentId
+      updateNode(id, { metadata: newMetadata })
+    } else {
+      // Fallback: move it back to root
+      const root = getRoot()
+      moveNode(id, root.id)
     }
   }
 

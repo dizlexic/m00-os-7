@@ -31,8 +31,12 @@ vi.mock('~/composables/useDesktop', () => {
 
 // Mock useFileSystem
 const mockFileSystem = {
+  // ... (keep existing)
+  state: ref({ nodes: {} as Record<string, any> }),
   getTrash: vi.fn(() => ({ id: 'trash-folder-id', name: 'Trash', type: 'folder', isSystem: true })),
   getChildren: vi.fn((id: string) => id === 'trash-folder-id' ? mockTrashItems.value : []),
+  getNode: vi.fn((id: string) => mockFileSystem.state.value.nodes[id]),
+  getRoot: vi.fn(() => ({ id: 'root', name: 'Macintosh HD', type: 'folder' })),
   moveToTrash: vi.fn((id: string) => {
     // Don't trash the trash icon itself
     if (id === 'trash-id') return
@@ -44,11 +48,23 @@ const mockFileSystem = {
   emptyTrash: vi.fn(() => {
     mockTrashItems.value = []
   }),
-  moveNode: vi.fn()
+  moveNode: vi.fn(),
+  updateNode: vi.fn()
 }
 
 vi.mock('~/composables/useFileSystem', () => ({
   useFileSystem: () => mockFileSystem
+}))
+
+const mockShowAlert = vi.fn((options: any) => {
+  if (options.onClose) options.onClose('ok')
+})
+
+vi.mock('~/composables/useAlert', () => ({
+  useAlert: () => ({
+    showAlert: mockShowAlert,
+    hideAlert: vi.fn()
+  })
 }))
 
 describe('useTrash', () => {
@@ -99,12 +115,60 @@ describe('useTrash', () => {
     }))
   })
 
-  it('should empty the trash', () => {
+  it('should empty the trash after confirmation', () => {
     const { moveToTrash, emptyTrash, isEmpty } = useTrash()
     moveToTrash('1')
     expect(isEmpty.value).toBe(false)
 
     emptyTrash()
+    
+    expect(mockShowAlert).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'caution',
+      message: expect.stringContaining('permanently deleted')
+    }))
     expect(isEmpty.value).toBe(true)
+  })
+
+  it('should restore item from trash (put away)', () => {
+    const { restoreItem } = useTrash()
+
+    // Setup node with metadata
+    const node = {
+      id: '1',
+      name: 'File 1',
+      parentId: 'trash-folder-id',
+      metadata: { originalParentId: 'root' }
+    }
+    mockFileSystem.state.value.nodes = {
+      '1': node,
+      'root': { id: 'root', type: 'folder' }
+    }
+
+    restoreItem('1')
+
+    expect(mockFileSystem.moveNode).toHaveBeenCalledWith('1', 'root')
+    expect(mockFileSystem.updateNode).toHaveBeenCalledWith('1', expect.objectContaining({
+      metadata: expect.not.objectContaining({ originalParentId: expect.anything() })
+    }))
+  })
+
+  it('should restore to root if original parent is missing', () => {
+    const { restoreItem } = useTrash()
+
+    // Setup node with metadata but missing parent
+    const node = {
+      id: '1',
+      name: 'File 1',
+      parentId: 'trash-folder-id',
+      metadata: { originalParentId: 'non-existent' }
+    }
+    mockFileSystem.state.value.nodes = {
+      '1': node,
+      'root': { id: 'root', name: 'Macintosh HD', type: 'folder' }
+    }
+
+    restoreItem('1')
+
+    expect(mockFileSystem.moveNode).toHaveBeenCalledWith('1', 'root')
   })
 })
