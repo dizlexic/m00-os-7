@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { getDb, initDb } from '../../../server/utils/db';
-import { createUser, getUserByName, validatePassword } from '../../../server/utils/users';
+import { createUser, getUserByName, validatePassword, getAllUsers, deleteUser } from '../../../server/utils/users';
 import type { Database } from 'better-sqlite3';
 
 describe('users utility', () => {
@@ -43,5 +43,21 @@ describe('users utility', () => {
   it('should not allow duplicate usernames', () => {
     createUser('testuser', 'password123', db);
     expect(() => createUser('testuser', 'otherpass', db)).toThrow();
+  });
+
+  it('should get all users', () => {
+    createUser('user1', 'pass1', db);
+    createUser('user2', 'pass2', db);
+    const users = getAllUsers(db);
+    expect(users).toHaveLength(2);
+    expect(users.find(u => u.username === 'user1')).toBeDefined();
+    expect(users.find(u => u.username === 'user2')).toBeDefined();
+  });
+
+  it('should delete a user', () => {
+    const userId = createUser('tobedeleted', 'pass', db);
+    const success = deleteUser(userId, db);
+    expect(success).toBe(true);
+    expect(getUserByName('tobedeleted', db)).toBeNull();
   });
 });

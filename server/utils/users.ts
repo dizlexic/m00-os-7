@@ -51,7 +51,7 @@ export function createUser(username: string, password_plain: string, database?: 
 export function getUserByName(username: string, database?: Database): User | null {
   const db = database || getDb();
   const stmt = db.prepare('SELECT * FROM users WHERE username = ?');
-  return stmt.get(username) as User | null;
+  return (stmt.get(username) as User) || null;
 }
 
 /**
@@ -60,5 +60,24 @@ export function getUserByName(username: string, database?: Database): User | nul
 export function getUserById(id: number, database?: Database): User | null {
   const db = database || getDb();
   const stmt = db.prepare('SELECT * FROM users WHERE id = ?');
-  return stmt.get(id) as User | null;
+  return (stmt.get(id) as User) || null;
+}
+
+/**
+ * Get all users (ID and username only).
+ */
+export function getAllUsers(database?: Database): Pick<User, 'id' | 'username'>[] {
+  const db = database || getDb();
+  const stmt = db.prepare('SELECT id, username FROM users ORDER BY username ASC');
+  return stmt.all() as Pick<User, 'id' | 'username'>[];
+}
+
+/**
+ * Delete a user by ID.
+ */
+export function deleteUser(id: number, database?: Database): boolean {
+  const db = database || getDb();
+  const stmt = db.prepare('DELETE FROM users WHERE id = ?');
+  const result = stmt.run(id);
+  return result.changes > 0;
 }
