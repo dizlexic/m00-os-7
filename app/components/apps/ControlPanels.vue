@@ -5,6 +5,7 @@
  * Displays a list of available control panels for system settings.
  * Styled to look like a Finder window in icon view.
  */
+import { ref, computed } from 'vue'
 import { useWindowManager } from '~/composables/useWindowManager'
 
 const { openWindow } = useWindowManager()
@@ -15,6 +16,8 @@ interface ControlPanelItem {
   icon: string
   type: string
 }
+
+const searchQuery = ref('')
 
 const controlPanels: ControlPanelItem[] = [
   {
@@ -49,9 +52,17 @@ const controlPanels: ControlPanelItem[] = [
   }
 ]
 
+const filteredPanels = computed(() => {
+  if (!searchQuery.value) return controlPanels
+  const query = searchQuery.value.toLowerCase()
+  return controlPanels.filter(panel =>
+    panel.name.toLowerCase().includes(query)
+  )
+})
+
 function openControlPanel(panel: ControlPanelItem) {
   openWindow({
-    type: panel.type,
+    type: panel.type as any,
     title: panel.name,
     icon: panel.icon,
     width: 400,
@@ -63,33 +74,71 @@ function openControlPanel(panel: ControlPanelItem) {
 </script>
 
 <template>
-  <div class="control-panels">
-    <div
-      v-for="panel in controlPanels"
-      :key="panel.id"
-      class="control-panels__item"
-      @dblclick="openControlPanel(panel)"
-    >
-      <div class="control-panels__item-icon">
-        <img :src="panel.icon" :alt="panel.name" draggable="false" />
+  <div class="control-panels-container">
+    <div class="control-panels__search">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search..."
+        class="mac-input"
+      />
+    </div>
+    <div class="control-panels">
+      <div
+        v-for="panel in filteredPanels"
+        :key="panel.id"
+        class="control-panels__item"
+        @dblclick="openControlPanel(panel)"
+      >
+        <div class="control-panels__item-icon">
+          <img :src="panel.icon" :alt="panel.name" draggable="false" />
+        </div>
+        <div class="control-panels__item-label">
+          {{ panel.name }}
+        </div>
       </div>
-      <div class="control-panels__item-label">
-        {{ panel.name }}
+      <div v-if="filteredPanels.length === 0" class="control-panels__no-results">
+        No matching control panels found.
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.control-panels-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--color-white);
+}
+
+.control-panels__search {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-black);
+  background-color: var(--color-gray-light);
+}
+
+.control-panels__search input {
+  width: 100%;
+}
+
 .control-panels {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  grid-auto-rows: min-content;
   grid-gap: var(--spacing-md);
   padding: var(--spacing-md);
-  background-color: var(--color-white);
-  height: 100%;
   overflow-y: auto;
   user-select: none;
+}
+
+.control-panels__no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--spacing-xl);
+  font-family: var(--font-system);
+  color: var(--color-gray-dark);
 }
 
 .control-panels__item {
