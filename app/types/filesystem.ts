@@ -2,7 +2,7 @@
  * Virtual Filesystem Types
  */
 
-export type FileNodeType = 'file' | 'folder' | 'application' | 'alias';
+export type FileNodeType = 'file' | 'folder' | 'application' | 'alias' | 'markdown' | 'image';
 
 export interface FileNode {
   id: string;

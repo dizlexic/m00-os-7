@@ -185,7 +185,13 @@ export function useFileSystem() {
   }
 
   const createFile = (name: string, parentId: string, content: string = '', additionalProps: Partial<FileNode> = {}): FileNode => {
-    return createNode(name, 'file', parentId, { content, size: content.length, ...additionalProps })
+    let type: FileNodeType = 'file'
+    if (name.toLowerCase().endsWith('.md')) {
+      type = 'markdown'
+    } else if (name.toLowerCase().endsWith('.png') || name.toLowerCase().endsWith('.jpg') || name.toLowerCase().endsWith('.jpeg') || name.toLowerCase().endsWith('.gif')) {
+      type = 'image'
+    }
+    return createNode(name, type, parentId, { content, size: content.length, ...additionalProps })
   }
 
   const createFolder = (name: string, parentId: string, additionalProps: Partial<FileNode> = {}): FolderNode => {

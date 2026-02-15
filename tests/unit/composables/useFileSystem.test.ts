@@ -146,6 +146,17 @@ describe('useFileSystem', () => {
     expect(typeof (fs as any).moveToTrash).toBe('function')
   })
 
+  it('should create a file with correct type based on extension', () => {
+    const root = fs.getRoot()
+    const mdFile = fs.createFile('Readme.md', root.id, '# Title')
+    const imgFile = fs.createFile('Picture.png', root.id, 'image-data')
+    const txtFile = fs.createFile('Notes.txt', root.id, 'plain text')
+
+    expect(mdFile.type).toBe('markdown')
+    expect(imgFile.type).toBe('image')
+    expect(txtFile.type).toBe('file')
+  })
+
   it('should initialize with default structure', async () => {
     await fs.initialize()
 
