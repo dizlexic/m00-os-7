@@ -95,12 +95,12 @@ describe('Trash.vue', () => {
     const desktopIcon = wrapper.findComponent(DesktopIcon)
     await desktopIcon.trigger('contextmenu', { clientX: 100, clientY: 200, preventDefault: vi.fn() })
 
-    expect(mockShowContextMenu).toHaveBeenCalledWith(expect.objectContaining({
-      position: { x: 100, y: 200 },
-      items: expect.arrayContaining([
+    expect(mockShowContextMenu).toHaveBeenCalledWith(
+      { x: 100, y: 200 },
+      expect.arrayContaining([
         expect.objectContaining({ label: 'Open' }),
         expect.objectContaining({ label: 'Empty Trash...' })
       ])
-    }))
+    )
   })
 })

@@ -46,20 +46,22 @@ function handleDragOver(event: DragEvent) {
 }
 
 function handleContextMenu(event: MouseEvent) {
-  showContextMenu({
-    position: { x: event.clientX, y: event.clientY },
-    items: [
+  showContextMenu(
+    { x: event.clientX, y: event.clientY },
+    [
       {
+        id: 'open-trash',
         label: 'Open',
         action: () => { /* Open trash window */ }
       },
       {
+        id: 'empty-trash',
         label: 'Empty Trash...',
         action: () => confirmEmptyTrash(),
         disabled: isEmpty.value
       }
     ]
-  })
+  )
 }
 
 function confirmEmptyTrash() {
