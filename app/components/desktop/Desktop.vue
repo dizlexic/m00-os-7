@@ -18,6 +18,8 @@ import Calculator from '~/components/apps/Calculator.vue'
 import GetInfo from '~/components/apps/GetInfo.vue'
 import ControlPanels from '~/components/apps/ControlPanels.vue'
 import GeneralSettings from '~/components/apps/GeneralSettings.vue'
+import SoundSettings from '~/components/apps/SoundSettings.vue'
+import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 
 const {
@@ -174,6 +176,14 @@ onUnmounted(() => {
 
       <GeneralSettings
         v-else-if="win.type === 'general-settings'"
+      />
+
+      <SoundSettings
+        v-else-if="win.type === 'sound-settings'"
+      />
+
+      <DateTimeSettings
+        v-else-if="win.type === 'date-time-settings'"
       />
 
       <!-- Window content will be rendered based on window type -->
