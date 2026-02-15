@@ -77,6 +77,9 @@ function onBootComplete() {
       :title="alertState.title"
       :type="alertState.type"
       :buttons="alertState.buttons"
+      :show-input="alertState.showInput"
+      :default-value="alertState.defaultValue"
+      :input-placeholder="alertState.inputPlaceholder"
       @close="hideAlert"
     />
   </div>

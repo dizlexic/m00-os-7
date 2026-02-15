@@ -13,7 +13,10 @@ interface AlertState {
   title?: string
   type: AlertType
   buttons: AlertButton[]
-  onClose?: (value: string) => void
+  showInput?: boolean
+  defaultValue?: string
+  inputPlaceholder?: string
+  onClose?: (value: string, inputValue?: string) => void
 }
 
 const state = ref<AlertState>({
@@ -32,7 +35,10 @@ export function useAlert() {
     title?: string
     type?: AlertType
     buttons?: AlertButton[]
-    onClose?: (value: string) => void
+    showInput?: boolean
+    defaultValue?: string
+    inputPlaceholder?: string
+    onClose?: (value: string, inputValue?: string) => void
   }): void {
     state.value = {
       isVisible: true,
@@ -40,6 +46,9 @@ export function useAlert() {
       title: options.title,
       type: options.type || 'note',
       buttons: options.buttons || [{ label: 'OK', value: 'ok', isDefault: true }],
+      showInput: options.showInput,
+      defaultValue: options.defaultValue,
+      inputPlaceholder: options.inputPlaceholder,
       onClose: options.onClose
     }
   }
@@ -47,11 +56,11 @@ export function useAlert() {
   /**
    * Hides the current alert dialog
    */
-  function hideAlert(value: string = 'cancel'): void {
+  function hideAlert(value: string = 'cancel', inputValue?: string): void {
     const callback = state.value.onClose
     state.value.isVisible = false
     if (callback) {
-      callback(value)
+      callback(value, inputValue)
     }
   }
 
