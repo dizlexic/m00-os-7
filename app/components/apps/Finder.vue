@@ -149,6 +149,67 @@ function handleRenameKeyDown(event: KeyboardEvent) {
   }
 }
 
+function handleGlobalKeyDown(event: KeyboardEvent) {
+  if (props.windowId) {
+    const { activeWindow } = useWindowManager()
+    if (activeWindow.value?.id !== props.windowId) return
+  }
+
+  // If renaming, handleRenameKeyDown takes over
+  if (isRenamingId.value) return
+
+  if (['INPUT', 'TEXTAREA'].includes((event.target as HTMLElement).tagName)) {
+    return
+  }
+
+  switch (event.key) {
+    case 'ArrowRight':
+      event.preventDefault()
+      selectNextItem(1)
+      break
+    case 'ArrowLeft':
+      event.preventDefault()
+      selectNextItem(-1)
+      break
+    case 'ArrowDown':
+      event.preventDefault()
+      selectNextItem(viewMode.value === 'icon' ? 4 : 1)
+      break
+    case 'ArrowUp':
+      event.preventDefault()
+      selectNextItem(viewMode.value === 'icon' ? -4 : -1)
+      break
+    case 'Enter':
+      event.preventDefault()
+      if (selectedItemId.value) {
+        const item = getNode(selectedItemId.value)
+        if (item) handleDoubleClick(item)
+      }
+      break
+  }
+}
+
+function selectNextItem(delta: number) {
+  if (items.value.length === 0) return
+
+  let index = items.value.findIndex(i => i.id === selectedItemId.value)
+  if (index === -1) {
+    index = delta >= 0 ? 0 : items.value.length - 1
+  } else {
+    index = (index + delta + items.value.length) % items.value.length
+  }
+
+  selectedItemId.value = items.value[index].id
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleGlobalKeyDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeyDown)
+})
+
 function handleDoubleClick(item: FileNode) {
   if (item.type === 'folder') {
     if (item.name === 'Control Panels' && item.isSystem) {
