@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
@@ -26,6 +26,15 @@ const { openWindow, updateWindow } = useWindowManager()
 const { addRecentDoc } = useRecentItems()
 
 const currentFolderId = ref(props.folderId)
+
+// Watch for prop changes (e.g. from Go to Folder)
+watch(() => props.folderId, (newId) => {
+  if (newId && newId !== currentFolderId.value) {
+    currentFolderId.value = newId
+    selectedItemId.value = null
+  }
+})
+
 const currentFolder = computed(() => getNode(currentFolderId.value) as FolderNode)
 const items = computed(() => getChildren(currentFolderId.value))
 const selectedItemId = ref<string | null>(null)
@@ -60,13 +69,26 @@ function goUp() {
 
   const parentId = currentFolder.value?.parentId
   if (parentId) {
-    currentFolderId.value = parentId
+    navigateTo(parentId)
   }
 }
 
 function navigateTo(id: string) {
   currentFolderId.value = id
   selectedItemId.value = null
+
+  if (props.windowId) {
+    const node = getNode(id)
+    if (node) {
+      updateWindow(props.windowId, {
+        title: node.name,
+        data: {
+          ...getNode(id), // Include all node data just in case
+          folderId: id
+        }
+      })
+    }
+  }
 }
 
 function selectItem(id: string) {
