@@ -1,16 +1,31 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUser } from '~/composables/useUser'
+import { useAlert } from '~/composables/useAlert'
 
-const { login } = useUser()
+const { login, loginAsGuest, register, fetchUsers, users, removeUser } = useUser()
+const { showAlert } = useAlert()
 
+const selectedUser = ref<string | 'guest' | 'new'>('')
 const username = ref('')
 const password = ref('')
 const error = ref('')
 const isLoading = ref(false)
+const showRegister = ref(false)
+
+onMounted(async () => {
+  await fetchUsers()
+})
 
 async function handleLogin() {
-  if (!username.value || !password.value) {
+  if (selectedUser.value === 'guest') {
+    loginAsGuest()
+    return
+  }
+
+  const nameToLogin = selectedUser.value === 'new' ? username.value : selectedUser.value
+
+  if (!nameToLogin || (!password.value && selectedUser.value !== 'guest')) {
     error.value = 'Please enter both name and password.'
     return
   }
@@ -18,13 +33,55 @@ async function handleLogin() {
   error.value = ''
   isLoading.value = true
 
-  const success = await login(username.value, password.value)
-
-  if (!success) {
-    error.value = 'Invalid name or password.'
+  let success = false
+  if (selectedUser.value === 'new') {
+    success = await register(nameToLogin, password.value)
+    if (success) {
+      success = await login(nameToLogin, password.value)
+    } else {
+      error.value = 'Registration failed. Username might be taken.'
+    }
+  } else {
+    success = await login(nameToLogin, password.value)
+    if (!success) {
+      error.value = 'Invalid password.'
+    }
   }
 
   isLoading.value = false
+}
+
+function selectUser(user: string | 'guest' | 'new') {
+  selectedUser.value = user
+  error.value = ''
+  password.value = ''
+  if (user !== 'new') {
+    username.value = ''
+  }
+}
+
+async function handleDeleteUser(id: number, name: string) {
+  showAlert({
+    message: `Are you sure you want to delete user "${name}"?`,
+    title: 'Delete User',
+    type: 'caution',
+    buttons: [
+      { label: 'Cancel', value: 'cancel' },
+      { label: 'Delete', value: 'delete' }
+    ],
+    onClose: async (value) => {
+      if (value === 'delete') {
+        const success = await removeUser(id)
+        if (success) {
+          if (selectedUser.value === name) {
+            selectedUser.value = ''
+          }
+        } else {
+          error.value = 'Failed to delete user.'
+        }
+      }
+    }
+  })
 }
 </script>
 
@@ -39,18 +96,56 @@ async function handleLogin() {
       </div>
 
       <div class="login-content flex flex-col gap-lg">
-        <div class="input-group flex flex-col gap-xs">
-          <label for="username" class="login-label">Name:</label>
+        <div class="user-list-container">
+          <label class="login-label mb-xs block">Select User:</label>
+          <div class="user-list mac-inset-border">
+            <div
+              v-for="user in users"
+              :key="user.id"
+              class="user-item flex justify-between items-center"
+              :class="{ 'user-item--selected': selectedUser === user.username }"
+              @click="selectUser(user.username)"
+            >
+              <span>{{ user.username }}</span>
+              <button
+                v-if="user.username !== 'Admin'"
+                class="delete-user-btn"
+                @click.stop="handleDeleteUser(user.id, user.username)"
+                title="Delete User"
+              >
+                ×
+              </button>
+            </div>
+            <div
+              class="user-item"
+              :class="{ 'user-item--selected': selectedUser === 'guest' }"
+              @click="selectUser('guest')"
+            >
+              Guest
+            </div>
+            <div
+              class="user-item user-item--new"
+              :class="{ 'user-item--selected': selectedUser === 'new' }"
+              @click="selectUser('new')"
+            >
+              + New User...
+            </div>
+          </div>
+        </div>
+
+        <div v-if="selectedUser === 'new'" class="input-group flex flex-col gap-xs">
+          <label for="username" class="login-label">New Name:</label>
           <input
             id="username"
             v-model="username"
             type="text"
             class="mac-input"
+            placeholder="Min 3 characters"
             @keyup.enter="handleLogin"
           />
         </div>
 
-        <div class="input-group flex flex-col gap-xs">
+        <div v-if="selectedUser && selectedUser !== 'guest'" class="input-group flex flex-col gap-xs">
           <label for="password" class="login-label">Password:</label>
           <input
             id="password"
@@ -66,15 +161,15 @@ async function handleLogin() {
         </div>
 
         <div class="login-actions flex justify-between items-center mt-md">
-          <button class="mac-button" @click="username = ''; password = ''; error = ''">
+          <button class="mac-button" @click="selectedUser = ''; username = ''; password = ''; error = ''">
             Clear
           </button>
           <button
             class="mac-button mac-button--default"
-            :disabled="isLoading"
+            :disabled="isLoading || !selectedUser"
             @click="handleLogin"
           >
-            {{ isLoading ? 'Logging in...' : 'Login' }}
+            {{ isLoading ? 'Processing...' : (selectedUser === 'new' ? 'Register' : 'Login') }}
           </button>
         </div>
       </div>
@@ -147,5 +242,74 @@ async function handleLogin() {
 
 .mt-md {
   margin-top: var(--spacing-md);
+}
+
+.user-list {
+  background-color: var(--color-white);
+  height: 120px;
+  overflow-y: auto;
+  border: 1px solid var(--color-black);
+}
+
+.user-item {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-gray-light);
+}
+
+.user-item:last-child {
+  border-bottom: none;
+}
+
+.user-item:hover {
+  background-color: var(--color-gray-light);
+}
+
+.user-item--selected {
+  background-color: var(--color-highlight) !important;
+  color: var(--color-highlight-text);
+}
+
+.user-item--new {
+  font-style: italic;
+  color: var(--color-gray-dark);
+}
+
+.user-item--new.user-item--selected {
+  color: var(--color-highlight-text);
+}
+
+.delete-user-btn {
+  background: none;
+  border: none;
+  color: var(--color-gray-dark);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-user-btn:hover {
+  color: var(--color-red);
+}
+
+.user-item--selected .delete-user-btn {
+  color: var(--color-highlight-text);
+}
+
+.mac-inset-border {
+  border: 1px solid var(--color-black);
+  box-shadow: inset 1px 1px 0 var(--color-gray-dark);
+}
+
+.mb-xs {
+  margin-bottom: var(--spacing-xs);
+}
+
+.block {
+  display: block;
 }
 </style>
