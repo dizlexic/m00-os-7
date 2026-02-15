@@ -205,8 +205,28 @@ function getIcon(item: FileNode) {
 .finder__header-info {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   font-size: var(--font-size-sm);
+}
+
+.finder__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.finder__view-toggle {
+  background: var(--color-gray-light);
+  border: 1px solid var(--color-black);
+  font-size: 10px;
+  padding: 0 4px;
+  cursor: pointer;
+}
+
+.finder__view-toggle:active {
+  background: var(--color-black);
+  color: var(--color-white);
 }
 
 .finder__header-title {
@@ -216,19 +236,73 @@ function getIcon(item: FileNode) {
 .finder__content {
   flex: 1;
   padding: var(--spacing-md);
+  overflow-y: auto;
+}
+
+.finder__content:not(.finder__content--list) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   grid-gap: var(--spacing-md);
   align-content: start;
-  overflow-y: auto;
 }
 
-.finder__item {
+.finder__content--list {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.finder__list-header {
+  display: flex;
+  background-color: var(--color-gray-light);
+  border-bottom: 1px solid var(--color-black);
+  font-weight: bold;
+  font-size: var(--font-size-sm);
+  position: sticky;
+  top: 0;
+}
+
+.finder__list-col {
+  padding: 2px 8px;
+  border-right: 1px solid var(--color-gray-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.finder__list-col--name { flex: 3; }
+.finder__list-col--size { flex: 1; }
+.finder__list-col--kind { flex: 2; border-right: none; }
+
+.finder__item--icon {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 80px;
   cursor: default;
+}
+
+.finder__item--list {
+  display: flex;
+  width: 100%;
+  cursor: default;
+  font-size: var(--font-size-sm);
+}
+
+.finder__item--list:hover {
+  background-color: var(--color-gray-light);
+}
+
+.finder__item--selected.finder__item--list {
+  background-color: var(--color-highlight);
+  color: var(--color-highlight-text);
+}
+
+.finder__item-mini-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  vertical-align: middle;
 }
 
 .finder__item-icon {
