@@ -7,6 +7,7 @@
 
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import Clock from '~/components/system/Clock.vue'
+import MenuDropdown from '~/components/desktop/MenuDropdown.vue'
 
 interface MenuItem {
   id: string
@@ -40,7 +41,22 @@ const activeMenuId = ref<string | null>(null)
 const appleMenuItems: MenuItem[] = [
   { id: 'about', label: 'About This Macintosh', action: () => handleAbout() },
   { id: 'sep1', label: '', isSeparator: true },
-  { id: 'control-panels', label: 'Control Panels', submenu: [] },
+  {
+    id: 'control-panels',
+    label: 'Control Panels',
+    submenu: [
+      { id: 'cp-apple-menu', label: 'Apple Menu Options' },
+      { id: 'cp-color', label: 'Color' },
+      { id: 'cp-date-time', label: 'Date & Time' },
+      { id: 'cp-desktop-patterns', label: 'Desktop Patterns' },
+      { id: 'cp-extensions', label: 'Extensions Manager' },
+      { id: 'cp-memory', label: 'Memory' },
+      { id: 'cp-monitors', label: 'Monitors' },
+      { id: 'cp-mouse', label: 'Mouse' },
+      { id: 'cp-sound', label: 'Sound' },
+      { id: 'cp-startup-disk', label: 'Startup Disk' }
+    ]
+  },
   { id: 'sep2', label: '', isSeparator: true },
   { id: 'recent-apps', label: 'Recent Applications', disabled: true },
   { id: 'recent-docs', label: 'Recent Documents', disabled: true },
@@ -165,25 +181,11 @@ onUnmounted(() => {
       <span class="menu-bar__apple-logo">&#63743;</span>
 
       <!-- Apple Menu Dropdown -->
-      <div v-if="activeMenuId === 'apple'" class="menu-bar__dropdown">
-        <div
-          v-for="item in appleMenuItems"
-          :key="item.id"
-          class="menu-bar__dropdown-item"
-          :class="{
-            'menu-bar__dropdown-item--separator': item.isSeparator,
-            'menu-bar__dropdown-item--disabled': item.disabled
-          }"
-          @click="handleMenuItemClick(item)"
-        >
-          <template v-if="!item.isSeparator">
-            <span class="menu-bar__dropdown-label">{{ item.label }}</span>
-            <span v-if="item.shortcut" class="menu-bar__dropdown-shortcut">
-              {{ item.shortcut }}
-            </span>
-          </template>
-        </div>
-      </div>
+      <MenuDropdown
+        v-if="activeMenuId === 'apple'"
+        :items="appleMenuItems"
+        @item-click="handleMenuItemClick"
+      />
     </div>
 
     <!-- Application Name -->
@@ -203,25 +205,11 @@ onUnmounted(() => {
       {{ menu.label }}
 
       <!-- Menu Dropdown -->
-      <div v-if="activeMenuId === menu.id" class="menu-bar__dropdown">
-        <div
-          v-for="item in menu.items"
-          :key="item.id"
-          class="menu-bar__dropdown-item"
-          :class="{
-            'menu-bar__dropdown-item--separator': item.isSeparator,
-            'menu-bar__dropdown-item--disabled': item.disabled
-          }"
-          @click="handleMenuItemClick(item)"
-        >
-          <template v-if="!item.isSeparator">
-            <span class="menu-bar__dropdown-label">{{ item.label }}</span>
-            <span v-if="item.shortcut" class="menu-bar__dropdown-shortcut">
-              {{ item.shortcut }}
-            </span>
-          </template>
-        </div>
-      </div>
+      <MenuDropdown
+        v-if="activeMenuId === menu.id"
+        :items="menu.items"
+        @item-click="handleMenuItemClick"
+      />
     </div>
 
     <!-- Spacer -->
@@ -283,55 +271,5 @@ onUnmounted(() => {
 
 .menu-bar__spacer {
   flex: 1;
-}
-
-.menu-bar__dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  min-width: 200px;
-  background-color: var(--color-white);
-  border: 1px solid var(--color-black);
-  box-shadow: 2px 2px 0 var(--color-black);
-  z-index: var(--z-dropdown);
-}
-
-.menu-bar__dropdown-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-xs) var(--spacing-md);
-  color: var(--color-black);
-  cursor: default;
-}
-
-.menu-bar__dropdown-item:hover:not(.menu-bar__dropdown-item--separator):not(.menu-bar__dropdown-item--disabled) {
-  background-color: var(--color-highlight);
-  color: var(--color-highlight-text);
-}
-
-.menu-bar__dropdown-item--separator {
-  height: 1px;
-  padding: 0;
-  margin: var(--spacing-xs) var(--spacing-sm);
-  background-color: var(--color-gray-medium);
-}
-
-.menu-bar__dropdown-item--disabled {
-  color: var(--color-gray-medium);
-}
-
-.menu-bar__dropdown-label {
-  flex: 1;
-}
-
-.menu-bar__dropdown-shortcut {
-  margin-left: var(--spacing-lg);
-  color: inherit;
-  opacity: 0.7;
-}
-
-.menu-bar__dropdown-item:hover:not(.menu-bar__dropdown-item--separator):not(.menu-bar__dropdown-item--disabled) .menu-bar__dropdown-shortcut {
-  opacity: 1;
 }
 </style>

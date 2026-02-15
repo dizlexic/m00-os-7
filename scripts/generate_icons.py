@@ -315,6 +315,37 @@ def generate_resize_handle():
 
     save_icon(img, 'resize-handle', 'icons/ui')
 
+def generate_scrollbar_arrows():
+    """Generate scrollbar arrow icons."""
+    size = (16, 16)
+
+    # Arrow Up
+    img, draw = create_icon(size=size)
+    draw.polygon([(8, 4), (4, 11), (12, 11)], fill=COLORS['black'])
+    save_icon(img, 'scroll-arrow-up', 'icons/ui')
+
+    # Arrow Down
+    img, draw = create_icon(size=size)
+    draw.polygon([(8, 11), (4, 4), (12, 4)], fill=COLORS['black'])
+    save_icon(img, 'scroll-arrow-down', 'icons/ui')
+
+    # Arrow Left
+    img, draw = create_icon(size=size)
+    draw.polygon([(4, 8), (11, 4), (11, 12)], fill=COLORS['black'])
+    save_icon(img, 'scroll-arrow-left', 'icons/ui')
+
+    # Arrow Right
+    img, draw = create_icon(size=size)
+    draw.polygon([(11, 8), (4, 4), (4, 12)], fill=COLORS['black'])
+    save_icon(img, 'scroll-arrow-right', 'icons/ui')
+
+def generate_scrollbar_thumb():
+    """Generate scrollbar thumb (elevator) pattern."""
+    img, draw = create_icon(size=(16, 16))
+    draw.rectangle([0, 0, 15, 15], fill=COLORS['white'], outline=COLORS['black'])
+    # Add subtle stripes or 3D look if needed, but for now just white
+    save_icon(img, 'scrollbar-thumb', 'icons/ui')
+
 
 # ============================================
 # Boot/System Icons
@@ -522,6 +553,8 @@ def generate_ui_icons():
     generate_zoom_button()
     generate_collapse_button()
     generate_resize_handle()
+    generate_scrollbar_arrows()
+    generate_scrollbar_thumb()
     print('UI icons complete!')
 
 def generate_all_icons():

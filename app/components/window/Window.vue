@@ -5,10 +5,11 @@
  * Mac OS 7 style window with title bar, content area, and resize handle.
  */
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import type { WindowInstance } from '~/types/window'
 import { useWindowManager } from '~/composables/useWindowManager'
 import WindowTitleBar from './WindowTitleBar.vue'
+import ScrollBar from './ScrollBar.vue'
 
 interface Props {
   window: WindowInstance
@@ -33,6 +34,66 @@ const dragOffset = ref({ x: 0, y: 0 })
 // Resize state
 const isResizing = ref(false)
 const resizeStart = ref({ x: 0, y: 0, width: 0, height: 0 })
+
+// Scroll state
+const contentRef = ref<HTMLElement | null>(null)
+const scrollX = ref(0)
+const scrollY = ref(0)
+const contentTotalWidth = ref(0)
+const contentTotalHeight = ref(0)
+const contentVisibleWidth = ref(0)
+const contentVisibleHeight = ref(0)
+
+function updateContentSizes(): void {
+  if (contentRef.value) {
+    contentTotalWidth.value = contentRef.value.scrollWidth
+    contentTotalHeight.value = contentRef.value.scrollHeight
+    contentVisibleWidth.value = contentRef.value.clientWidth
+    contentVisibleHeight.value = contentRef.value.clientHeight
+    scrollX.value = contentRef.value.scrollLeft
+    scrollY.value = contentRef.value.scrollTop
+  }
+}
+
+function handleContentScroll(): void {
+  if (contentRef.value) {
+    scrollX.value = contentRef.value.scrollLeft
+    scrollY.value = contentRef.value.scrollTop
+  }
+}
+
+watch(scrollX, (newVal) => {
+  if (contentRef.value && contentRef.value.scrollLeft !== newVal) {
+    contentRef.value.scrollLeft = newVal
+  }
+})
+
+watch(scrollY, (newVal) => {
+  if (contentRef.value && contentRef.value.scrollTop !== newVal) {
+    contentRef.value.scrollTop = newVal
+  }
+})
+
+// Update sizes when window size changes
+watch(() => props.window.size, () => {
+  setTimeout(updateContentSizes, 0)
+}, { deep: true })
+
+let resizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+  updateContentSizes()
+  if (contentRef.value) {
+    resizeObserver = new ResizeObserver(updateContentSizes)
+    resizeObserver.observe(contentRef.value)
+  }
+})
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+  }
+})
 
 // Computed styles
 const windowStyle = computed(() => ({
@@ -177,9 +238,38 @@ function handleTitleBarDoubleClick(): void {
     <!-- Content Area -->
     <div
       v-if="window.state !== 'collapsed'"
-      class="window__content"
+      class="window__body"
     >
-      <slot />
+      <div
+        ref="contentRef"
+        class="window__content"
+        @scroll="handleContentScroll"
+      >
+        <slot />
+      </div>
+
+      <!-- Vertical ScrollBar -->
+      <ScrollBar
+        orientation="vertical"
+        v-model="scrollY"
+        :total-size="contentTotalHeight"
+        :viewport-size="contentVisibleHeight"
+        :is-active="window.isActive"
+        class="window__scrollbar-v"
+      />
+
+      <!-- Horizontal ScrollBar -->
+      <ScrollBar
+        orientation="horizontal"
+        v-model="scrollX"
+        :total-size="contentTotalWidth"
+        :viewport-size="contentVisibleWidth"
+        :is-active="window.isActive"
+        class="window__scrollbar-h"
+      />
+
+      <!-- Scrollbar Corner -->
+      <div class="window__scrollbar-corner" />
     </div>
 
     <!-- Resize Handle -->
@@ -218,28 +308,72 @@ function handleTitleBarDoubleClick(): void {
   cursor: se-resize;
 }
 
-.window__content {
+.window__body {
   flex: 1;
-  overflow: auto;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 16px;
+  grid-template-rows: 1fr 16px;
+  overflow: hidden;
   background-color: var(--color-white);
   border: 1px solid var(--color-black);
   margin: 0 1px 1px 1px;
 }
 
-.window--collapsed .window__content {
+.window__content {
+  grid-area: 1 / 1 / 2 / 2;
+  overflow: scroll;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.window__content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.window__scrollbar-v {
+  grid-area: 1 / 2 / 2 / 3;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.window__scrollbar-h {
+  grid-area: 2 / 1 / 3 / 2;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.window__scrollbar-corner {
+  grid-area: 2 / 2 / 3 / 3;
+  background-color: var(--color-white);
+  border-top: 1px solid var(--color-black);
+  border-left: 1px solid var(--color-black);
+}
+
+.window--collapsed .window__body {
   display: none;
 }
 
 .window__resize-handle {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  right: 1px;
+  bottom: 1px;
   width: 16px;
   height: 16px;
+  z-index: 10;
   cursor: se-resize;
-  background-color: var(--color-window-bg, #CCCCCC);
+  background-color: var(--color-white);
   border-left: 1px solid var(--color-black);
   border-top: 1px solid var(--color-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.window:not(.window--active) .window__resize-lines {
+  display: none;
 }
 
 .window__resize-lines {
@@ -267,28 +401,5 @@ function handleTitleBarDoubleClick(): void {
       var(--color-gray-dark) 80%,
       transparent 80%
     );
-}
-
-/* Scrollbar styling for window content */
-.window__content::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
-}
-
-.window__content::-webkit-scrollbar-track {
-  background-color: var(--color-gray-light);
-  border: 1px solid var(--color-black);
-}
-
-.window__content::-webkit-scrollbar-thumb {
-  background-color: var(--color-white);
-  border: 1px solid var(--color-black);
-}
-
-.window__content::-webkit-scrollbar-button {
-  background-color: var(--color-white);
-  border: 1px solid var(--color-black);
-  height: 16px;
-  width: 16px;
 }
 </style>

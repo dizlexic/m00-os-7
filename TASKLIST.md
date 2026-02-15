@@ -143,12 +143,12 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Add keyboard shortcuts display
 - [ ] `P1` Implement dynamic menu based on active app
 - [x] `P2` Add menu separators and disabled items
-- [ ] `P2` Implement hierarchical submenus
+- [x] `P2` Implement hierarchical submenus
 
 ### 3.4 Apple Menu
-- [x] `P0` Create AppleMenu.vue component
+- [x] `P0` Create Apple Menu integration in MenuBar
 - [x] `P0` Add "About This Macintosh" item
-- [~] `P1` Add Control Panels submenu
+- [x] `P1` Add Control Panels submenu
 - [ ] `P1` Add recent applications list
 - [ ] `P2` Add Chooser item (printer selection mock)
 - [x] `P2` Add Shut Down option
@@ -209,12 +209,12 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P2` Implement window groups
 
 ### 4.5 Scrollbars
-- [~] `P0` Create custom scrollbar component
+- [x] `P0` Create custom scrollbar component
 - [x] `P0` Implement vertical scrollbar
 - [x] `P0` Implement horizontal scrollbar
-- [ ] `P1` Add scroll arrows (top/bottom)
-- [ ] `P1` Implement scroll thumb dragging
-- [ ] `P1` Add page up/down on track click
+- [x] `P1` Add scroll arrows (top/bottom)
+- [x] `P1` Implement scroll thumb dragging
+- [x] `P1` Add page up/down on track click
 - [x] `P2` Style to match Mac OS 7 appearance
 
 ---
