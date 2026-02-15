@@ -807,12 +807,26 @@ def generate_small_system_icons():
 
     print('Small system icons complete!')
 
+def generate_miscellaneous_graphics():
+    """Generate miscellaneous system graphics."""
+    print('Generating miscellaneous graphics...')
+
+    # Dialog box border (small sample to show the style)
+    # Mac OS 7 dialogs have a 2px black border, then a 1px white, then 1px black
+    img, draw = create_icon(size=(32, 32))
+    draw.rectangle([0, 0, 31, 31], fill=COLORS['white'], outline=COLORS['black'], width=2)
+    draw.rectangle([3, 3, 28, 28], outline=COLORS['black'], width=1)
+    save_icon(img, 'dialog-border-sample', 'icons/ui')
+
+    print('Miscellaneous graphics complete!')
+
 def generate_all_icons():
     """Generate all icons."""
     generate_system_icons()
     generate_small_system_icons()
     generate_app_icons()
     generate_ui_icons()
+    generate_miscellaneous_graphics()
     print('\nAll icons generated successfully!')
 
 
