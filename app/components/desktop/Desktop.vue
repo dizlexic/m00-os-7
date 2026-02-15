@@ -14,6 +14,8 @@ import Trash from './Trash.vue'
 import Window from '~/components/window/Window.vue'
 import Finder from '~/components/apps/Finder.vue'
 import SimpleText from '~/components/apps/SimpleText.vue'
+import Calculator from '~/components/apps/Calculator.vue'
+import GetInfo from '~/components/apps/GetInfo.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 
 const {
@@ -146,12 +148,22 @@ onUnmounted(() => {
       <Finder
         v-if="win.type === 'finder'"
         :folder-id="getFolderId(win)"
+        :window-id="win.id"
       />
 
       <SimpleText
         v-else-if="win.type === 'simpletext'"
         :file-id="(win.data as any)?.fileId"
         :is-active="win.isActive"
+      />
+
+      <Calculator
+        v-else-if="win.type === 'calculator'"
+      />
+
+      <GetInfo
+        v-else-if="win.type === 'get-info'"
+        :node-id="(win.data as any)?.nodeId"
       />
 
       <!-- Window content will be rendered based on window type -->
