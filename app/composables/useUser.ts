@@ -33,9 +33,30 @@ export function useUser() {
     return true
   }
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // @ts-ignore
+      await $fetch('/api/auth/logout', { method: 'POST' })
+    } catch (e) {
+      console.error('Logout failed:', e)
+    }
     currentUser.value = null
     isAuthenticated.value = false
+  }
+
+  const init = async () => {
+    try {
+      // @ts-ignore
+      const response = await $fetch('/api/auth/me') as { user: User | null }
+      if (response.user) {
+        currentUser.value = response.user
+        isAuthenticated.value = true
+        return true
+      }
+    } catch (e) {
+      console.error('Init auth failed:', e)
+    }
+    return false
   }
 
   const fetchUsers = async () => {
@@ -84,6 +105,7 @@ export function useUser() {
     login,
     loginAsGuest,
     logout,
+    init,
     fetchUsers,
     register,
     removeUser

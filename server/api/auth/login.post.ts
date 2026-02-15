@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody, createError } from 'h3';
+import { defineEventHandler, readBody, createError, setCookie } from 'h3';
 import { getUserByName, validatePassword } from '../../utils/users';
 
 export default defineEventHandler(async (event) => {
@@ -21,8 +21,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // In a real app, we would set a session cookie here
-  // For now, we just return the user info
+  // Set a session cookie
+  setCookie(event, 'user_id', user.id.toString(), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 7 // 1 week
+  });
+
   return {
     user: {
       id: user.id,
