@@ -7,15 +7,33 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import Clock from '~/components/system/Clock.vue'
+import { nextTick, reactive } from 'vue'
+
+// Mock useSettings
+const mockSettings = reactive({
+  timeFormat: '12h',
+  showSeconds: false,
+  dateFormat: 'MM/DD/YYYY',
+  timezone: 'UTC'
+})
+
+vi.mock('~/composables/useSettings', () => ({
+  useSettings: () => ({
+    settings: mockSettings
+  })
+}))
 
 describe('Clock.vue', () => {
   let wrapper: VueWrapper
 
   beforeEach(() => {
     vi.useFakeTimers()
-    // Set a fixed time for testing: 1991-05-13 10:30:00 AM
-    const date = new Date(1991, 4, 13, 10, 30, 0)
+    // Set a fixed time for testing: 1991-05-13 10:30:00 UTC
+    const date = new Date('1991-05-13T10:30:00Z')
     vi.setSystemTime(date)
+    mockSettings.timeFormat = '12h'
+    mockSettings.showSeconds = false
+    mockSettings.timezone = 'UTC'
   })
 
   afterEach(() => {
@@ -56,9 +74,8 @@ describe('Clock.vue', () => {
 
     await wrapper.find('.clock').trigger('click')
 
-    // We'll use a format like "Mon, May 13, 1991" or "5/13/91"
-    // Let's go with "May 13, 1991" for now as a baseline
-    expect(wrapper.text()).toContain('May 13, 1991')
+    // Expect numeric date based on default MM/DD/YYYY
+    expect(wrapper.text()).toContain('05/13/1991')
   })
 
   it('should toggle back to time when clicked again', async () => {
@@ -74,5 +91,19 @@ describe('Clock.vue', () => {
     wrapper = mount(Clock)
     expect(wrapper.find('.clock').attributes('role')).toBe('timer')
     expect(wrapper.find('.clock').attributes('aria-live')).toBe('polite')
+  })
+
+  it('should respect the timezone setting', async () => {
+    wrapper = mount(Clock)
+    await nextTick()
+    expect(wrapper.text()).toContain('10:30 AM')
+
+    // Change timezone to Tokyo (UTC+9)
+    mockSettings.timezone = 'Asia/Tokyo'
+    await nextTick()
+    
+    // 10:30 UTC -> 19:30 Tokyo
+    // In 12h format: 7:30 PM
+    expect(wrapper.text()).toContain('7:30 PM')
   })
 })
