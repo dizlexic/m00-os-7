@@ -164,7 +164,7 @@ function handleDoubleClick(item: FileNode) {
       openWindow({
         type: 'finder',
         title: item.name,
-        icon: '/assets/icons/system/folder-closed.png', // Fallback icon
+        icon: '/assets/icons/system/folder.png', // Fallback icon
         data: {
           folderId: item.id
         }
@@ -213,7 +213,7 @@ function handleDoubleClick(item: FileNode) {
 }
 
 function getIcon(item: FileNode) {
-  if (item.type === 'folder') return '/assets/icons/system/folder-closed.png'
+  if (item.type === 'folder') return '/assets/icons/system/folder.png'
   if (item.type === 'file') return '/assets/icons/system/document.png'
   if (item.type === 'application') return '/assets/icons/apps/generic.png'
   return '/assets/icons/system/document.png'

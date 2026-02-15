@@ -11,7 +11,7 @@ const node = computed(() => getNode(props.nodeId))
 
 const icon = computed(() => {
   if (!node.value) return '/assets/icons/system/document.png'
-  if (node.value.type === 'folder') return '/assets/icons/system/folder-closed.png'
+  if (node.value.type === 'folder') return '/assets/icons/system/folder.png'
   if (node.value.type === 'application') {
     if (node.value.name === 'Calculator') return '/assets/icons/apps/calculator.png'
     if (node.value.name === 'SimpleText') return '/assets/icons/apps/simpletext.png'
