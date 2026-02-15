@@ -258,6 +258,45 @@ def generate_notepad_icon():
     img = add_shadow(img)
     save_icon(img, 'notepad', 'icons/apps')
 
+def generate_scrapbook_icon():
+    """Generate Scrapbook application icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Book cover
+    draw.rectangle([4, 2, w - 6, h - 4], fill=COLORS['magenta'], outline=COLORS['black'])
+
+    # Book spine
+    draw.rectangle([4, 2, 8, h - 4], fill=COLORS['black'])
+
+    # Pages showing at the bottom/right
+    draw.line([(w - 5, 4), (w - 5, h - 5)], fill=COLORS['black'])
+    draw.line([(6, h - 3), (w - 7, h - 3)], fill=COLORS['black'])
+
+    # Decorative element on cover (Scrapbook 'S')
+    draw.text((12, 10), "S", fill=COLORS['white'])
+
+    img = add_shadow(img)
+    save_icon(img, 'scrapbook', 'icons/apps')
+
+def generate_solitaire_icon():
+    """Generate Solitaire game icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Playing cards
+    # Card 1 (back)
+    draw.rectangle([4, 4, 20, 24], fill=COLORS['red'], outline=COLORS['black'])
+    draw.rectangle([6, 6, 18, 22], outline=COLORS['white'])
+
+    # Card 2 (front, slightly offset)
+    draw.rectangle([10, 8, 26, 28], fill=COLORS['white'], outline=COLORS['black'])
+    # Heart symbol
+    draw.polygon([(18, 14), (20, 12), (22, 14), (18, 20), (14, 14), (16, 12)], fill=COLORS['red'])
+
+    img = add_shadow(img)
+    save_icon(img, 'solitaire', 'icons/apps')
+
 
 # ============================================
 # UI Elements
@@ -583,6 +622,8 @@ def generate_app_icons():
     generate_calculator_icon()
     generate_simpletext_icon()
     generate_notepad_icon()
+    generate_scrapbook_icon()
+    generate_solitaire_icon()
     print('Application icons complete!')
 
 def generate_ui_icons():
