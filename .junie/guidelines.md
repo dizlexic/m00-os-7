@@ -631,7 +631,7 @@ describe('useWindowManager', () => {
 
 #### Step 3: Run the Test (Expect Failure)
 ```bash
-npm run test -- --watch
+npm run test:watch
 ```
 Verify the test fails for the right reason - this confirms the test is valid.
 
@@ -1172,7 +1172,8 @@ npm run build         # Build for production
 npm run preview       # Preview production build
 
 # Testing
-npm run test          # Run unit tests
+npm run test          # Run unit tests (single run)
+npm run test:watch    # Run unit tests (watch mode)
 npm run test:e2e      # Run E2E tests
 npm run test:coverage # Run with coverage
 
