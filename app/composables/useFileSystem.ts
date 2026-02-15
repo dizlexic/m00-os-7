@@ -4,6 +4,11 @@ import { useUser } from '~/composables/useUser'
 
 // Default root ID
 const ROOT_ID = 'root'
+const SYSTEM_FOLDER_ID = 'system-folder'
+const APPS_FOLDER_ID = 'apps-folder'
+const DOCS_FOLDER_ID = 'docs-folder'
+const TRASH_FOLDER_ID = 'trash-folder'
+const NOTEPAD_FILE_ID = 'notepad-file'
 
 // Initial state
 const state = ref<FileSystemState>({
@@ -65,7 +70,7 @@ export function useFileSystem() {
   }
 
   const syncNode = async (node: FileNode) => {
-    if (isAuthenticated.value && !node.isSystem) {
+    if (isAuthenticated.value && (!node.isSystem || node.id === NOTEPAD_FILE_ID)) {
       try {
         await $fetch('/api/files', {
           method: 'POST',
@@ -141,7 +146,7 @@ export function useFileSystem() {
     parentId: string,
     additionalProps: Partial<FileNode> = {}
   ): FileNode => {
-    const id = generateId()
+    const id = additionalProps.id || generateId()
     const now = Date.now()
 
     const newNode: FileNode = {
@@ -179,12 +184,12 @@ export function useFileSystem() {
     return newNode
   }
 
-  const createFile = (name: string, parentId: string, content: string = ''): FileNode => {
-    return createNode(name, 'file', parentId, { content, size: content.length })
+  const createFile = (name: string, parentId: string, content: string = '', additionalProps: Partial<FileNode> = {}): FileNode => {
+    return createNode(name, 'file', parentId, { content, size: content.length, ...additionalProps })
   }
 
-  const createFolder = (name: string, parentId: string): FolderNode => {
-    return createNode(name, 'folder', parentId) as FolderNode
+  const createFolder = (name: string, parentId: string, additionalProps: Partial<FileNode> = {}): FolderNode => {
+    return createNode(name, 'folder', parentId, additionalProps) as FolderNode
   }
 
   const initialize = async () => {
@@ -194,28 +199,27 @@ export function useFileSystem() {
     const rootId = state.value.rootId
 
     // System Folder
-    const systemFolder = createFolder('System Folder', rootId)
-    systemFolder.isSystem = true
+    const systemFolder = createFolder('System Folder', rootId, { id: SYSTEM_FOLDER_ID, isSystem: true })
 
-    createFile('Finder', systemFolder.id, 'Finder System File').isSystem = true
-    createFile('System', systemFolder.id, 'System Resources').isSystem = true
-    createFolder('Control Panels', systemFolder.id).isSystem = true
-    createFolder('Extensions', systemFolder.id).isSystem = true
-    createFolder('Preferences', systemFolder.id).isSystem = true
+    createFile('Finder', systemFolder.id, 'Finder System File', { isSystem: true })
+    createFile('System', systemFolder.id, 'System Resources', { isSystem: true })
+    createFolder('Control Panels', systemFolder.id, { isSystem: true })
+    createFolder('Extensions', systemFolder.id, { isSystem: true })
+    createFolder('Preferences', systemFolder.id, { isSystem: true })
+    createFile('Note Pad File', systemFolder.id, JSON.stringify(['']), { id: NOTEPAD_FILE_ID, isSystem: true })
 
     // Applications
-    const appsFolder = createFolder('Applications', rootId)
-    createNode('Calculator', 'application', appsFolder.id, { icon: 'calculator' })
-    createNode('SimpleText', 'application', appsFolder.id, { icon: 'simpletext' })
-    createNode('NotePad', 'application', appsFolder.id, { icon: 'notepad' })
+    const appsFolder = createFolder('Applications', rootId, { id: APPS_FOLDER_ID, isSystem: true })
+    createNode('Calculator', 'application', appsFolder.id, { icon: 'calculator', isSystem: true })
+    createNode('SimpleText', 'application', appsFolder.id, { icon: 'simpletext', isSystem: true })
+    createNode('NotePad', 'application', appsFolder.id, { icon: 'notepad', isSystem: true })
 
     // Documents
-    const docsFolder = createFolder('Documents', rootId)
-    createFile('Read Me', docsFolder.id, 'Welcome to Mac OS 7 Web Clone!')
+    const docsFolder = createFolder('Documents', rootId, { id: DOCS_FOLDER_ID, isSystem: true })
+    createFile('Read Me', docsFolder.id, 'Welcome to Mac OS 7 Web Clone!', { isSystem: true })
 
     // Trash
-    const trashFolder = createFolder('Trash', rootId)
-    trashFolder.isSystem = true
+    createFolder('Trash', rootId, { id: TRASH_FOLDER_ID, isSystem: true })
 
     // Fetch from server if authenticated
     if (isAuthenticated.value) {
