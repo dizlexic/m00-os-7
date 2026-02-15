@@ -13,15 +13,17 @@ import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
 import { useClipboard } from '~/composables/useClipboard'
 import { useDesktop } from '~/composables/useDesktop'
+import { useAlert } from '~/composables/useAlert'
 import type { WindowType } from '~/types/window'
 import type { RecentItem } from '~/types/recent'
 import type { MenuItem, Menu } from '~/types/menu'
 
 const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash } = useFileSystem()
-const { activeWindow, openWindow } = useWindowManager()
+const { activeWindow, openWindow, updateWindow } = useWindowManager()
 const { recentApps, recentDocs } = useRecentItems()
 const { clipboard, copy, cut, paste } = useClipboard()
 const { icons: desktopIcons } = useDesktop()
+const { showAlert } = useAlert()
 
 // Props
 interface Props {
@@ -131,6 +133,7 @@ const fileMenuItems: MenuItem[] = [
   { id: 'put-away', label: 'Put Away', shortcut: '⌘Y', disabled: true },
   { id: 'sep4', label: '', isSeparator: true },
   { id: 'find', label: 'Find...', shortcut: '⌘F' },
+  { id: 'go-to-folder', label: 'Go to Folder...', shortcut: '⌘G', action: () => handleGoToFolder() },
   { id: 'sep5', label: '', isSeparator: true },
   { id: 'page-setup', label: 'Page Setup...', disabled: true },
   { id: 'print', label: 'Print...', shortcut: '⌘P', disabled: true }
@@ -242,6 +245,40 @@ function handleHelp(): void {
 function handleShutdown(): void {
   console.warn('Shut Down')
   // TODO: Implement shutdown sequence
+}
+
+function handleGoToFolder(): void {
+  if (activeWindow.value && activeWindow.value.type === 'finder') {
+    showAlert({
+      message: 'Enter the path of the folder to open:',
+      title: 'Go to Folder',
+      showInput: true,
+      inputPlaceholder: 'Macintosh HD/Documents',
+      buttons: [
+        { label: 'Cancel', value: 'cancel' },
+        { label: 'Go', value: 'go', isDefault: true }
+      ],
+      onClose: (value, path) => {
+        if (value === 'go' && path) {
+          const node = getNodeByPath(path)
+          if (node && node.type === 'folder') {
+            updateWindow(activeWindow.value!.id, {
+              title: node.name,
+              data: {
+                ...activeWindow.value!.data,
+                folderId: node.id
+              }
+            })
+          } else {
+            showAlert({
+              message: `The folder "${path}" could not be found.`,
+              type: 'stop'
+            })
+          }
+        }
+      }
+    })
+  }
 }
 
 function handleNewFolder(): void {
@@ -423,6 +460,10 @@ function handleKeyDown(event: KeyboardEvent) {
       case 'n':
         event.preventDefault()
         handleNewFolder()
+        break
+      case 'g':
+        event.preventDefault()
+        handleGoToFolder()
         break
       case 'i':
         event.preventDefault()
