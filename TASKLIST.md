@@ -270,15 +270,15 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Display current time in menu bar
 - [x] `P0` Update time every minute
 - [x] `P1` Add click to show date
-- [ ] `P1` Implement 12/24 hour format toggle
+- [x] `P1` Implement 12/24 hour format toggle
 - [ ] `P1` Add timezone support
 - [ ] `P2` Show day of week option
 - [ ] `P2` Add alarm functionality
 
 ### 5.6 Sound System
-- [ ] `P1` Create useSound.ts composable
-- [ ] `P1` Implement sound effect playback
-- [ ] `P1` Add system beep sound
+- [x] `P1` Create useSound.ts composable
+- [x] `P1` Implement sound effect playback
+- [x] `P1` Add system beep sound
 - [ ] `P2` Add startup chime
 - [ ] `P2` Add trash empty sound
 - [ ] `P2` Add window open/close sounds
@@ -332,36 +332,36 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 7. Settings & Control Panels
 
 ### 7.1 Control Panels Window
-- [ ] `P0` Create ControlPanels.vue component
-- [ ] `P0` Display list of available control panels
-- [ ] `P0` Implement panel selection and opening
-- [ ] `P1` Add icon view for panels
-- [ ] `P1` Implement panel search/filter
+- [x] `P0` Create ControlPanels.vue component
+- [x] `P0` Display list of available control panels
+- [x] `P0` Implement panel selection and opening
+- [x] `P1` Add icon view for panels
+- [x] `P1` Implement panel search/filter
 - [ ] `P2` Add panel categories
 
 ### 7.2 General Settings Panel
-- [ ] `P0` Create GeneralSettings.vue component
-- [ ] `P0` Implement desktop pattern selection
-- [ ] `P0` Add highlight color selection
+- [x] `P0` Create GeneralSettings.vue component
+- [x] `P0` Implement desktop pattern selection
+- [x] `P0` Add highlight color selection
 - [ ] `P1` Implement system font size setting
 - [ ] `P1` Add menu blinking option
 - [ ] `P2` Implement recent items count setting
 
 ### 7.3 Date & Time Panel
-- [ ] `P0` Create DateTimeSettings.vue component
+- [x] `P0` Create DateTimeSettings.vue component
 - [ ] `P0` Implement timezone selection
-- [ ] `P0` Add date format options
-- [ ] `P0` Add time format (12/24 hour)
-- [ ] `P1` Implement clock display options
+- [x] `P0` Add date format options
+- [x] `P0` Add time format (12/24 hour)
+- [x] `P1` Implement clock display options
 - [ ] `P2` Add daylight saving toggle
 - [ ] `P3` Implement NTP sync simulation
 
 ### 7.4 Sound Panel
-- [ ] `P1` Create SoundSettings.vue component
-- [ ] `P1` Implement system volume slider
-- [ ] `P1` Add alert sound selection
+- [x] `P1` Create SoundSettings.vue component
+- [x] `P1` Implement system volume slider
+- [x] `P1` Add alert sound selection
 - [ ] `P2` Implement sound on/off toggle
-- [ ] `P2` Add sound preview playback
+- [x] `P2` Add sound preview playback
 - [ ] `P3` Implement custom sound upload
 
 ### 7.5 Users & Groups Panel
