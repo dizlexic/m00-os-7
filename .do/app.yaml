@@ -1,0 +1,63 @@
+# Digital Ocean App Platform Configuration
+# m00-os-7 - Mac OS 7 Web Clone
+# https://docs.digitalocean.com/products/app-platform/reference/app-spec/
+
+name: m00-os-7
+
+# Region for deployment (nyc = New York)
+region: nyc
+
+# Services configuration
+services:
+  - name: web
+    # Use Dockerfile for building
+    dockerfile_path: Dockerfile
+
+    # GitHub repository configuration
+    # Update these values with your actual repository
+    github:
+      repo: dizlexic/m00-os-7
+      branch: main
+      deploy_on_push: true
+
+    # HTTP configuration
+    http_port: 3000
+
+    # Instance configuration
+    instance_count: 1
+    instance_size_slug: basic-xxs
+
+    # Health check configuration
+    health_check:
+      http_path: /api/health
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 10
+      success_threshold: 1
+      failure_threshold: 3
+
+    # Environment variables
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: NUXT_HOST
+        value: "0.0.0.0"
+      - key: NUXT_PORT
+        value: "3000"
+      - key: NUXT_PUBLIC_APP_NAME
+        value: m00-os-7
+      - key: NUXT_PUBLIC_APP_VERSION
+        value: "0.1.0"
+      # Secret key for sessions (set this in DO dashboard or use encrypted value)
+      - key: NUXT_SECRET_KEY
+        type: SECRET
+        value: "${SECRET_KEY}"
+
+    # Routes configuration
+    routes:
+      - path: /
+
+# Alerts configuration (optional)
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
