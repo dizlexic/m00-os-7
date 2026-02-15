@@ -42,12 +42,12 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P2` Add configuration validation on startup
 
 ### 1.4 Database & Persistence
-- [ ] `P0` Choose and configure database (SQLite/PostgreSQL)
-- [ ] `P0` Set up database schema for users
-- [ ] `P0` Set up database schema for user settings
-- [ ] `P1` Set up database schema for filesystem
-- [ ] `P1` Implement database migrations system
-- [ ] `P1` Create seed data for default filesystem
+- [x] `P0` Choose and configure database (SQLite/PostgreSQL)
+- [x] `P0` Set up database schema for users
+- [x] `P0` Set up database schema for user settings
+- [x] `P1` Set up database schema for filesystem
+- [x] `P1` Implement database migrations system
+- [x] `P1` Create seed data for default filesystem
 - [ ] `P2` Implement data backup/export functionality
 
 ---
@@ -233,11 +233,11 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Add startup key combinations (skip login, etc.)
 
 ### 5.2 Login Screen
-- [ ] `P0` Create LoginScreen.vue component
+- [x] `P0` Create LoginScreen.vue component
 - [ ] `P0` Display user selection list
-- [ ] `P0` Implement password input field
+- [x] `P0` Implement password input field
 - [ ] `P0` Add "Guest" login option
-- [ ] `P0` Handle login authentication
+- [x] `P0` Handle login authentication
 - [ ] `P1` Show user icons/avatars
 - [ ] `P1` Add "Cancel" to return to user list
 - [ ] `P2` Implement "Forgot Password" flow
@@ -246,8 +246,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 
 ### 5.3 User Management
 - [ ] `P0` Create user registration flow
-- [ ] `P0` Implement user data storage
-- [ ] `P0` Create user settings storage
+- [x] `P0` Implement user data storage
+- [x] `P0` Create user settings storage
 - [ ] `P1` Implement user profile editing
 - [ ] `P1` Add user avatar/icon selection
 - [ ] `P2` Implement user deletion
@@ -726,9 +726,9 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 18. Security
 
 ### 18.1 Authentication Security
-- [ ] `P0` Implement secure password hashing
+- [x] `P0` Implement secure password hashing
 - [ ] `P0` Add CSRF protection
-- [ ] `P1` Implement session management
+- [x] `P1` Implement session management
 - [ ] `P1` Add rate limiting for login attempts
 - [ ] `P2` Implement account lockout
 
