@@ -8,6 +8,11 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import Clock from '~/components/system/Clock.vue'
 import MenuDropdown from '~/components/desktop/MenuDropdown.vue'
+import { useFileSystem } from '~/composables/useFileSystem'
+import { useWindowManager } from '~/composables/useWindowManager'
+
+const { createFolder, getRoot, getNodeByPath, emptyTrash } = useFileSystem()
+const { activeWindow } = useWindowManager()
 
 interface MenuItem {
   id: string
@@ -65,7 +70,7 @@ const appleMenuItems: MenuItem[] = [
 ]
 
 const fileMenuItems: MenuItem[] = [
-  { id: 'new-folder', label: 'New Folder', shortcut: '⌘N' },
+  { id: 'new-folder', label: 'New Folder', shortcut: '⌘N', action: () => handleNewFolder() },
   { id: 'open', label: 'Open', shortcut: '⌘O' },
   { id: 'sep1', label: '', isSeparator: true },
   { id: 'close', label: 'Close Window', shortcut: '⌘W' },
@@ -104,7 +109,7 @@ const viewMenuItems: MenuItem[] = [
 ]
 
 const specialMenuItems: MenuItem[] = [
-  { id: 'empty-trash', label: 'Empty Trash...' },
+  { id: 'empty-trash', label: 'Empty Trash...', action: () => handleEmptyTrash() },
   { id: 'sep1', label: '', isSeparator: true },
   { id: 'eject', label: 'Eject', disabled: true },
   { id: 'erase-disk', label: 'Erase Disk...', disabled: true },
@@ -157,6 +162,28 @@ function handleAbout(): void {
 function handleShutdown(): void {
   console.warn('Shut Down')
   // TODO: Implement shutdown sequence
+}
+
+function handleNewFolder(): void {
+  let parentId = getRoot().id
+
+  if (activeWindow.value && activeWindow.value.type === 'finder') {
+    const data = activeWindow.value.data as any
+    if (data?.folderId) {
+      parentId = data.folderId
+    } else if (data?.path) {
+      const node = getNodeByPath(data.path)
+      if (node && node.type === 'folder') {
+        parentId = node.id
+      }
+    }
+  }
+
+  createFolder('untitled folder', parentId)
+}
+
+function handleEmptyTrash(): void {
+  emptyTrash()
 }
 
 // Lifecycle

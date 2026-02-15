@@ -15,13 +15,24 @@ import { useAlert } from "~/composables/useAlert";
 import { useFileSystem } from "~/composables/useFileSystem";
 import { useUser } from "~/composables/useUser";
 import { useSettings } from "~/composables/useSettings";
+import { useWindowManager } from "~/composables/useWindowManager";
 
 const { alertState, hideAlert } = useAlert();
 const { initialize, fetchFilesFromServer } = useFileSystem();
 const { isAuthenticated, init } = useUser();
 const { fetchSettingsFromServer } = useSettings();
+const { activeWindow } = useWindowManager();
 
 const isBooting = ref(true);
+
+const currentAppName = computed(() => {
+  if (activeWindow.value) {
+    // Capitalize first letter
+    const type = activeWindow.value.type;
+    return type.charAt(0).toUpperCase() + type.slice(1);
+  }
+  return 'Finder';
+});
 
 // Initialize on app start
 onMounted(async () => {
@@ -52,7 +63,7 @@ function onBootComplete() {
 
       <template v-else>
         <!-- Menu Bar -->
-        <MenuBar app-name="Finder" />
+        <MenuBar :app-name="currentAppName" />
 
         <!-- Desktop Environment -->
         <Desktop />
