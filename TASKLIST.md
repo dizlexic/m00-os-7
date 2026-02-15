@@ -141,7 +141,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Add clock display on right side
 - [x] `P1` Implement menu highlighting on hover
 - [x] `P1` Add keyboard shortcuts display
-- [ ] `P1` Implement dynamic menu based on active app
+- [x] `P1` Implement dynamic menu based on active app
 - [x] `P2` Add menu separators and disabled items
 - [x] `P2` Implement hierarchical submenus
 
@@ -393,18 +393,18 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 8. Finder Application
 
 ### 8.1 Finder Window
-- [ ] `P0` Create Finder.vue component
-- [ ] `P0` Implement folder content display
-- [ ] `P0` Add navigation (back, forward, up)
-- [ ] `P0` Display current path
-- [ ] `P1` Implement icon view
+- [x] `P0` Create Finder.vue component
+- [x] `P0` Implement folder content display
+- [x] `P0` Add navigation (back, forward, up)
+- [x] `P0` Display current path
+- [x] `P1` Implement icon view
 - [ ] `P1` Implement list view
 - [ ] `P1` Add view toggle button
 - [ ] `P2` Implement column view
 - [ ] `P2` Add sidebar with favorites
 
 ### 8.2 Finder Navigation
-- [ ] `P0` Implement double-click to open folder
+- [x] `P0` Implement double-click to open folder
 - [ ] `P0` Implement double-click to open file
 - [ ] `P0` Add breadcrumb path navigation
 - [ ] `P1` Implement keyboard navigation (arrows)
@@ -413,21 +413,21 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P2` Add bookmarks/favorites
 
 ### 8.3 Finder Operations
-- [ ] `P0` Implement file/folder selection
+- [x] `P0` Implement file/folder selection
 - [ ] `P0` Add "Get Info" dialog
 - [ ] `P1` Implement copy/paste operations
 - [ ] `P1` Implement move operations
-- [ ] `P1` Add "New Folder" creation
+- [x] `P1` Add "New Folder" creation
 - [ ] `P1` Implement rename functionality
 - [ ] `P1` Add delete (move to trash)
 - [ ] `P2` Implement duplicate
 - [ ] `P2` Add "Make Alias" functionality
 
 ### 8.4 Finder Menu Integration
-- [ ] `P0` Implement File menu items
-- [ ] `P0` Implement Edit menu items
+- [x] `P0` Implement File menu items
+- [x] `P0` Implement Edit menu items
 - [ ] `P1` Implement View menu items
-- [ ] `P1` Add Special menu (Empty Trash, etc.)
+- [x] `P1` Add Special menu (Empty Trash, etc.)
 - [ ] `P2` Implement Label menu (color labels)
 - [ ] `P2` Add Window menu
 
@@ -658,7 +658,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P1` Test Window component
 - [ ] `P1` Test Desktop component
 - [ ] `P1` Test MenuBar component
-- [ ] `P2` Test Finder component
+- [x] `P2` Test Finder component
 - [ ] `P2` Test application components
 
 ### 15.3 E2E Tests

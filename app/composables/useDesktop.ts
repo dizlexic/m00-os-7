@@ -319,14 +319,14 @@ export function useDesktop() {
         type: 'hard-drive',
         icon: '/assets/icons/system/hard-drive.png',
         position: { x: window.innerWidth - 100, y: 40 },
-        path: '/'
+        path: 'Macintosh HD'
       },
       {
         name: 'Trash',
         type: 'trash',
         icon: '/assets/icons/system/trash-empty.png',
         position: { x: window.innerWidth - 100, y: window.innerHeight - 120 },
-        path: '/trash'
+        path: 'Macintosh HD/Trash'
       }
     ]
 
