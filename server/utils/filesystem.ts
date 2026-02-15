@@ -8,6 +8,8 @@ export interface FileNode {
   type: string;
   content: string | null;
   owner_id: number | null;
+  size: number;
+  is_system: number;
   permissions: string | null;
   created_at?: string;
   updated_at?: string;
@@ -20,14 +22,16 @@ export function saveFile(file: FileNode, database?: Database): void {
   const db = database || getDb();
 
   const stmt = db.prepare(`
-    INSERT INTO filesystem (id, parent_id, name, type, content, owner_id, permissions, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    INSERT INTO filesystem (id, parent_id, name, type, content, owner_id, size, is_system, permissions, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     ON CONFLICT(id) DO UPDATE SET
       parent_id = excluded.parent_id,
       name = excluded.name,
       type = excluded.type,
       content = excluded.content,
       owner_id = excluded.owner_id,
+      size = excluded.size,
+      is_system = excluded.is_system,
       permissions = excluded.permissions,
       updated_at = CURRENT_TIMESTAMP
   `);
@@ -39,6 +43,8 @@ export function saveFile(file: FileNode, database?: Database): void {
     file.type,
     file.content,
     file.owner_id,
+    file.size || 0,
+    file.is_system || 0,
     file.permissions
   );
 }

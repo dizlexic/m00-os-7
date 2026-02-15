@@ -1,5 +1,6 @@
 import { ref, readonly } from 'vue'
 import type { FileNode, FolderNode, FileSystemState, FileNodeType } from '~/types/filesystem'
+import { useUser } from '~/composables/useUser'
 
 // Default root ID
 const ROOT_ID = 'root'
@@ -25,10 +26,113 @@ const state = ref<FileSystemState>({
 let isInitialized = false
 
 export function useFileSystem() {
+  const { isAuthenticated } = useUser()
+
   const generateId = (): string => {
     return typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
       : Math.random().toString(36).substring(2, 11)
+  }
+
+  const convertFromDb = (dbNode: any): FileNode => {
+    const node: any = {
+      id: dbNode.id,
+      name: dbNode.name,
+      type: dbNode.type,
+      parentId: dbNode.parent_id,
+      createdAt: new Date(dbNode.created_at).getTime(),
+      modifiedAt: new Date(dbNode.updated_at).getTime(),
+      size: dbNode.size || 0,
+      content: dbNode.content,
+      isSystem: dbNode.is_system === 1
+    }
+    if (node.type === 'folder') {
+      node.childrenIds = []
+    }
+    return node
+  }
+
+  const convertToDb = (node: FileNode) => {
+    return {
+      id: node.id,
+      parent_id: node.parentId,
+      name: node.name,
+      type: node.type,
+      content: node.content || null,
+      size: node.size || 0,
+      is_system: node.isSystem ? 1 : 0
+    }
+  }
+
+  const syncNode = async (node: FileNode) => {
+    if (isAuthenticated.value && !node.isSystem) {
+      try {
+        await $fetch('/api/files', {
+          method: 'POST',
+          body: { node: convertToDb(node) }
+        })
+      } catch (e) {
+        console.error('Failed to sync node:', e)
+      }
+    }
+  }
+
+  const removeNodeFromServer = async (id: string) => {
+    if (isAuthenticated.value) {
+      try {
+        const node = state.value.nodes[id]
+        if (node && !node.isSystem) {
+          await $fetch(`/api/files/${id}`, { method: 'DELETE' })
+        }
+      } catch (e) {
+        console.error('Failed to delete node from server:', e)
+      }
+    }
+  }
+
+  const fetchFilesFromServer = async () => {
+    if (!isAuthenticated.value) return
+    try {
+      const response = await $fetch<{ files: any[] }>('/api/files')
+      const files = response.files
+      if (files && files.length > 0) {
+        // We keep system nodes and the root
+        const newNodes: Record<string, FileNode> = {}
+
+        // Preserve system nodes and root
+        Object.values(state.value.nodes).forEach(node => {
+          if (node.isSystem || node.id === ROOT_ID) {
+            newNodes[node.id] = { ...node }
+            if (node.type === 'folder') {
+              (newNodes[node.id] as FolderNode).childrenIds = (node as FolderNode).childrenIds.filter(childId => {
+                const child = state.value.nodes[childId]
+                return child && child.isSystem
+              })
+            }
+          }
+        })
+
+        // Add nodes from server
+        files.forEach(f => {
+          const node = convertFromDb(f)
+          newNodes[node.id] = node
+        })
+
+        // Rebuild childrenIds
+        Object.values(newNodes).forEach(node => {
+          if (node.parentId && newNodes[node.parentId] && newNodes[node.parentId].type === 'folder') {
+            const parent = newNodes[node.parentId] as FolderNode
+            if (!parent.childrenIds.includes(node.id)) {
+              parent.childrenIds.push(node.id)
+            }
+          }
+        })
+
+        state.value.nodes = newNodes
+      }
+    } catch (e) {
+      console.error('Failed to fetch files:', e)
+    }
   }
 
   const createNode = (
@@ -62,7 +166,15 @@ export function useFileSystem() {
     if (parent && parent.type === 'folder') {
       parent.childrenIds.push(id)
       parent.modifiedAt = now
+
+      // Sync parent if not system
+      if (!parent.isSystem) {
+        syncNode(parent)
+      }
     }
+
+    // Sync new node
+    syncNode(newNode)
 
     return newNode
   }
@@ -75,16 +187,16 @@ export function useFileSystem() {
     return createNode(name, 'folder', parentId) as FolderNode
   }
 
-  const initialize = () => {
+  const initialize = async () => {
     if (isInitialized) return
     isInitialized = true
 
     const rootId = state.value.rootId
-    
+
     // System Folder
     const systemFolder = createFolder('System Folder', rootId)
     systemFolder.isSystem = true
-    
+
     createFile('Finder', systemFolder.id, 'Finder System File').isSystem = true
     createFile('System', systemFolder.id, 'System Resources').isSystem = true
     createFolder('Control Panels', systemFolder.id).isSystem = true
@@ -104,6 +216,11 @@ export function useFileSystem() {
     // Trash
     const trashFolder = createFolder('Trash', rootId)
     trashFolder.isSystem = true
+
+    // Fetch from server if authenticated
+    if (isAuthenticated.value) {
+      await fetchFilesFromServer()
+    }
   }
   const getRoot = (): FolderNode => {
     return state.value.nodes[state.value.rootId] as FolderNode
@@ -131,6 +248,11 @@ export function useFileSystem() {
       if (parent) {
         parent.childrenIds = parent.childrenIds.filter(childId => childId !== id)
         parent.modifiedAt = Date.now()
+
+        // Sync parent
+        if (!parent.isSystem) {
+          syncNode(parent)
+        }
       }
     }
 
@@ -140,6 +262,9 @@ export function useFileSystem() {
       [...folder.childrenIds].forEach(childId => deleteNode(childId))
     }
 
+    // Remove from server
+    removeNodeFromServer(id)
+
     delete state.value.nodes[id]
   }
 
@@ -148,6 +273,9 @@ export function useFileSystem() {
     if (!node) return
     node.name = newName
     node.modifiedAt = Date.now()
+
+    // Sync node
+    syncNode(node)
   }
 
   const moveNode = (id: string, newParentId: string): void => {
@@ -164,6 +292,11 @@ export function useFileSystem() {
       if (oldParent) {
         oldParent.childrenIds = oldParent.childrenIds.filter(childId => childId !== id)
         oldParent.modifiedAt = now
+
+        // Sync old parent
+        if (!oldParent.isSystem) {
+          syncNode(oldParent)
+        }
       }
     }
 
@@ -174,6 +307,14 @@ export function useFileSystem() {
       newParent.modifiedAt = now
       node.parentId = newParentId
       node.modifiedAt = now
+
+      // Sync new parent
+      if (!newParent.isSystem) {
+        syncNode(newParent)
+      }
+
+      // Sync node
+      syncNode(node)
     }
   }
 
@@ -208,6 +349,7 @@ export function useFileSystem() {
     deleteNode,
     renameNode,
     moveNode,
-    getNodeByPath
+    getNodeByPath,
+    fetchFilesFromServer
   }
 }
