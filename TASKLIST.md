@@ -79,7 +79,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Generate Scrapbook icon
 - [x] `P2` Generate Solitaire icon
 - [ ] `P2` Generate Tetris icon
-- [ ] `P2` Generate Chat/IM icon
+- [x] `P2` Generate Chat/IM icon
 - [ ] `P3` Generate Browser icon
 - [ ] `P3` Generate Galaga icon
 
@@ -643,45 +643,59 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Add power-ups
 - [ ] `P3` Implement boss enemies
 
+### 10.4 Brickle (Breakout)
+- [x] `P2` Create Brickle.vue component
+- [x] `P2` Implement paddle and ball mechanics
+- [x] `P2` Add brick collision detection
+- [x] `P2` Implement scoring and lives
+- [x] `P2` Add level progression
+- [x] `P2` Create custom game icon
+
+### 10.5 Minesweeper
+- [x] `P2` Create Minesweeper.vue component
+- [x] `P2` Implement grid generation and mine placement
+- [x] `P2` Add cell revealing and flagging logic
+- [x] `P2` Implement win/loss detection and timer
+- [x] `P2` Create custom game icon
+
 ---
 
 ## 11. Chat Application
+- [x] `P1` Add Messenger chat application with WebSocket support
 
 ### 11.1 WebSocket Server
-- [ ] `P2` Set up WebSocket server (Nitro plugin)
-- [ ] `P2` Implement connection handling
-- [ ] `P2` Add user authentication for chat
-- [ ] `P2` Implement message broadcasting
-- [ ] `P2` Add room/channel support
-- [ ] `P3` Implement private messaging
+- [x] `P2` Set up WebSocket server (Nitro plugin)
+- [x] `P2` Implement connection handling
+- [x] `P2` Add user authentication for chat
+- [x] `P2` Implement message broadcasting
+- [x] `P2` Add room/channel support
+- [x] `P3` Implement private messaging
 - [ ] `P3` Add typing indicators
 - [ ] `P3` Implement message history
 
 ### 11.2 Chat Client
-- [ ] `P2` Create websocket.client.ts plugin
-- [ ] `P2` Implement connection management
-- [ ] `P2` Add reconnection logic
-- [ ] `P2` Implement message sending
-- [ ] `P2` Add message receiving
-- [ ] `P3` Implement connection status display
+- [x] `P2` Implement connection management in useChat
+- [x] `P2` Add reconnection logic
+- [x] `P2` Implement message sending
+- [x] `P2` Add message receiving
+- [x] `P3` Implement connection status display
 
 ### 11.3 Chat Window UI
-- [ ] `P2` Create ChatWindow.vue component
-- [ ] `P2` Implement message list display
-- [ ] `P2` Add message input field
-- [ ] `P2` Style like classic AIM/ICQ
-- [ ] `P2` Add timestamp display
+- [x] `P2` Create Messenger.vue and ChatRoom.vue components
+- [x] `P2` Implement message list display
+- [x] `P2` Add message input field
+- [x] `P2` Style like classic AIM/ICQ
+- [x] `P2` Add timestamp display
 - [ ] `P3` Implement emoji support (text-based)
 - [ ] `P3` Add sound notifications
 
 ### 11.4 Buddy List
-- [ ] `P2` Create BuddyList.vue component
-- [ ] `P2` Display online users
-- [ ] `P2` Show online/offline status
-- [ ] `P2` Implement user selection
-- [ ] `P3` Add buddy groups
-- [ ] `P3` Implement buddy search
-- [ ] `P3` Add away messages
+- [x] `P2` Create BuddyList.vue component
+- [x] `P2` Display online users
+- [x] `P2` Show online/offline status
+- [x] `P2` Implement user selection
+- [x] `P3` Add away messages
+- [x] `P3` Implement friend/unfriend and block/unblock
 
 ---
 

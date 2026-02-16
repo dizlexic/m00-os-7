@@ -299,10 +299,12 @@ Add games, chat functionality, and additional applications for entertainment.
 ### Milestones
 
 #### 5.1 Additional Applications
-- [ ] Create NotePad application
-- [ ] Implement Scrapbook
-- [ ] Add About This Macintosh dialog
-- [ ] Create Puzzle game (sliding tiles)
+- [x] Create NotePad application
+- [x] Implement Scrapbook
+- [x] Add About This Macintosh dialog
+- [x] Create Puzzle game (sliding tiles)
+- [x] Create Brickle game (Breakout)
+- [x] Create Minesweeper game
 
 #### 5.2 Eliza (Computer Therapist)
 - [ ] Create Eliza.vue component
