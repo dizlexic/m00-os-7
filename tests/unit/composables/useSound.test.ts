@@ -88,4 +88,14 @@ describe('useSound', () => {
     playSystemSound('beep')
     expect(mockAudio.volume).toBe(0.75) // 75 from mocked settings
   })
+
+  it('should play startup chime', () => {
+    const { playStartupChime } = useSound()
+    playStartupChime()
+
+    expect(global.AudioContext).toHaveBeenCalled()
+    // Should create multiple oscillators for the chord
+    expect(mockAudioContext.createOscillator).toHaveBeenCalled()
+    expect(mockOscillator.start).toHaveBeenCalled()
+  })
 })

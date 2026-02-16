@@ -1,7 +1,11 @@
 import { defineEventHandler, createError, getRouterParam } from 'h3';
 import { deleteUser, getUserById } from '../../utils/users';
+import { requireAdmin, requireUserId } from '../../utils/auth';
 
 export default defineEventHandler(async (event) => {
+  requireAdmin(event);
+  const currentUserId = requireUserId(event);
+
   const idParam = getRouterParam(event, 'id');
   const id = parseInt(idParam || '', 10);
 
@@ -9,6 +13,14 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid user ID',
+    });
+  }
+
+  // Prevent deleting self
+  if (id === currentUserId) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Cannot delete your own account',
     });
   }
 

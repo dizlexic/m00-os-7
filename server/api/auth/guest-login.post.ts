@@ -1,7 +1,16 @@
-import { defineEventHandler, setCookie } from 'h3';
+import { defineEventHandler, setCookie, createError } from 'h3';
 import { registerGuest } from '../../utils/guests';
+import { getSystemSetting } from '../../utils/systemSettings';
 
 export default defineEventHandler(async (event) => {
+  const allowGuest = getSystemSetting('allow_guest_login') !== 'false';
+  if (!allowGuest) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Guest login is disabled'
+    });
+  }
+
   const guest = registerGuest();
 
   // Set a session cookie

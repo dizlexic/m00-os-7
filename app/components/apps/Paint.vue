@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { MAC_PATTERNS, createPatternCanvas, getPatternDataUrl, type Pattern } from '~/utils/paintPatterns'
 
 interface Props {
   isActive?: boolean
@@ -14,11 +15,12 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 const ctx = ref<CanvasRenderingContext2D | null>(null)
 
 // Tools state
-type Tool = 'pencil' | 'eraser' | 'line' | 'rect' | 'oval' | 'bucket'
+type Tool = 'pencil' | 'eraser' | 'line' | 'rect' | 'rect-filled' | 'oval' | 'oval-filled' | 'bucket'
 const currentTool = ref<Tool>('pencil')
 const currentColor = ref('#000000')
 const currentLineWidth = ref(1)
-const currentPattern = ref('solid')
+const currentPatternId = ref('solid')
+const currentPattern = computed(() => MAC_PATTERNS.find(p => p.id === currentPatternId.value) || MAC_PATTERNS[0])
 
 // Drawing state
 const isDrawing = ref(false)
@@ -37,7 +39,9 @@ const tools = [
   { id: 'eraser', icon: '□', name: 'Eraser' },
   { id: 'line', icon: '/', name: 'Line' },
   { id: 'rect', icon: '▭', name: 'Rectangle' },
+  { id: 'rect-filled', icon: '■', name: 'Filled Rectangle' },
   { id: 'oval', icon: '○', name: 'Oval' },
+  { id: 'oval-filled', icon: '●', name: 'Filled Oval' },
   { id: 'bucket', icon: '⧊', name: 'Paint Bucket' }
 ]
 
@@ -113,27 +117,57 @@ function draw(event: MouseEvent) {
       ctx.value.moveTo(startPos.value.x, startPos.value.y)
       ctx.value.lineTo(pos.x, pos.y)
       ctx.value.stroke()
-    } else if (currentTool.value === 'rect') {
+    } else if (currentTool.value === 'rect' || currentTool.value === 'rect-filled') {
       ctx.value.beginPath()
       const x = Math.min(pos.x, startPos.value.x)
       const y = Math.min(pos.y, startPos.value.y)
       const width = Math.abs(pos.x - startPos.value.x)
       const height = Math.abs(pos.y - startPos.value.y)
-      ctx.value.strokeRect(x, y, width, height)
-    } else if (currentTool.value === 'oval') {
+
+      if (currentTool.value === 'rect-filled') {
+        const fillStyle = getFillStyle()
+        ctx.value.fillStyle = fillStyle
+        ctx.value.fillRect(x, y, width, height)
+        // Draw outline too
+        ctx.value.strokeStyle = currentColor.value
+        ctx.value.strokeRect(x, y, width, height)
+      } else {
+        ctx.value.strokeRect(x, y, width, height)
+      }
+    } else if (currentTool.value === 'oval' || currentTool.value === 'oval-filled') {
       ctx.value.beginPath()
       const x = Math.min(pos.x, startPos.value.x)
       const y = Math.min(pos.y, startPos.value.y)
       const width = Math.abs(pos.x - startPos.value.x)
       const height = Math.abs(pos.y - startPos.value.y)
       ctx.value.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, 2 * Math.PI)
-      ctx.value.stroke()
+
+      if (currentTool.value === 'oval-filled') {
+        const fillStyle = getFillStyle()
+        ctx.value.fillStyle = fillStyle
+        ctx.value.fill()
+        // Draw outline too
+        ctx.value.strokeStyle = currentColor.value
+        ctx.value.stroke()
+      } else {
+        ctx.value.stroke()
+      }
     }
   }
 }
 
 function stopDrawing() {
   isDrawing.value = false
+}
+
+function getFillStyle() {
+  if (!ctx.value) return currentColor.value
+  if (currentPatternId.value === 'solid') return currentColor.value
+  if (currentPatternId.value === 'white') return '#FFFFFF'
+
+  const patternCanvas = createPatternCanvas(currentPattern.value.data, currentColor.value)
+  const pattern = ctx.value.createPattern(patternCanvas, 'repeat')
+  return pattern || currentColor.value
 }
 
 function floodFill(startX: number, startY: number, fillColor: string) {
@@ -152,20 +186,33 @@ function floodFill(startX: number, startY: number, fillColor: string) {
   const fillRGB = hexToRgb(fillColor)
   if (!fillRGB) return
 
-  if (targetR === fillRGB.r && targetG === fillRGB.g && targetB === fillRGB.b && targetA === 255) return
-
+  const visited = new Uint8Array(width * height)
+  const patternData = currentPattern.value.data
   const stack = [[startX, startY]]
+
   while (stack.length > 0) {
     const [x, y] = stack.pop()!
-    const offset = (y * width + x) * 4
+    const idx = y * width + x
+    const offset = idx * 4
 
     if (x < 0 || x >= width || y < 0 || y >= height) continue
+    if (visited[idx]) continue
     if (data[offset] !== targetR || data[offset + 1] !== targetG || data[offset + 2] !== targetB || data[offset + 3] !== targetA) continue
 
-    data[offset] = fillRGB.r
-    data[offset + 1] = fillRGB.g
-    data[offset + 2] = fillRGB.b
-    data[offset + 3] = 255
+    visited[idx] = 1
+    const isForeground = patternData[y % 8][x % 8] === 1
+
+    if (isForeground) {
+      data[offset] = fillRGB.r
+      data[offset + 1] = fillRGB.g
+      data[offset + 2] = fillRGB.b
+      data[offset + 3] = 255
+    } else {
+      data[offset] = 255
+      data[offset + 1] = 255
+      data[offset + 2] = 255
+      data[offset + 3] = 255
+    }
 
     stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1])
   }
@@ -230,6 +277,18 @@ watch(() => props.isActive, (active) => {
           :style="{ backgroundColor: color }"
           :class="{ 'paint__color-btn--active': currentColor === color }"
           @click="currentColor = color"
+        ></button>
+      </div>
+
+      <div class="paint__patterns">
+        <button
+          v-for="pattern in MAC_PATTERNS"
+          :key="pattern.id"
+          class="paint__pattern-btn"
+          :class="{ 'paint__pattern-btn--active': currentPatternId === pattern.id }"
+          @click="currentPatternId = pattern.id"
+          :title="pattern.name"
+          :style="{ backgroundImage: `url(${getPatternDataUrl(pattern.data, currentColor)})` }"
         ></button>
       </div>
     </div>
@@ -330,6 +389,33 @@ watch(() => props.isActive, (active) => {
 .paint__color-btn--active {
   outline: 2px solid var(--color-white);
   outline-offset: -4px;
+}
+
+.paint__patterns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding-right: 2px;
+  border-top: 1px solid var(--color-black);
+  padding-top: 4px;
+}
+
+.paint__pattern-btn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--color-black);
+  cursor: pointer;
+  background-repeat: repeat;
+  background-size: 8px 8px;
+  image-rendering: pixelated;
+  background-color: white;
+}
+
+.paint__pattern-btn--active {
+  outline: 2px solid var(--color-black);
+  outline-offset: 1px;
 }
 
 .paint__canvas-container {

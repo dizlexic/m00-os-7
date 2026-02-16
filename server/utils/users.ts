@@ -7,6 +7,7 @@ interface User {
   username: string;
   password_hash: string;
   avatar?: string;
+  role: string;
   created_at: string;
   updated_at: string;
 }
@@ -39,10 +40,10 @@ export function validatePassword(password: string, hash: string): boolean {
 export function createUser(username: string, password_plain: string, database?: Database): number {
   const db = database || getDb();
   const hash = hashPassword(password_plain);
-  
+
   const stmt = db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)');
   const result = stmt.run(username, hash);
-  
+
   return result.lastInsertRowid as number;
 }
 
@@ -65,10 +66,32 @@ export function getUserById(id: number, database?: Database): User | null {
 }
 
 /**
+ * Get all users (ID, username, avatar, and role).
  * Get all users (ID, username, and avatar).
  */
+export function getAllUsers(database?: Database): Pick<User, 'id' | 'username' | 'avatar' | 'role'>[] {
 export function getAllUsers(database?: Database): Pick<User, 'id' | 'username' | 'avatar'>[] {
   const db = database || getDb();
+  const stmt = db.prepare('SELECT id, username, avatar, role FROM users ORDER BY username ASC');
+  return stmt.all() as Pick<User, 'id' | 'username' | 'avatar' | 'role'>[];
+}
+
+/**
+ * Update a user.
+ */
+export function updateUser(id: number, data: Partial<Pick<User, 'username' | 'avatar' | 'role'>>, database?: Database): boolean {
+  const db = database || getDb();
+
+  const fields = Object.keys(data);
+  if (fields.length === 0) return false;
+
+  const sets = fields.map(f => `${f} = ?`).join(', ');
+  const values = Object.values(data);
+
+  const stmt = db.prepare(`UPDATE users SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
+  const result = stmt.run(...values, id);
+
+  return result.changes > 0;
   const stmt = db.prepare('SELECT id, username, avatar FROM users ORDER BY username ASC');
   return stmt.all() as Pick<User, 'id' | 'username' | 'avatar'>[];
 }
@@ -103,7 +126,7 @@ export function updateUser(id: number, data: { username?: string, password_plain
 
   const stmt = db.prepare(`UPDATE users SET ${sets.join(', ')} WHERE id = ?`);
   const result = stmt.run(...params);
-  
+
   return result.changes > 0;
 }
 

@@ -7,23 +7,32 @@
  */
 
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useSound } from '~/composables/useSound'
 
 interface Props {
   /** Boot sequence duration in milliseconds */
   duration?: number
   /** Whether to show the welcome message */
   showWelcome?: boolean
+  /** Whether to show the Sad Mac error screen */
+  hasError?: boolean
+  /** Error code to display with Sad Mac */
+  errorCode?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   duration: 3000,
-  showWelcome: true
+  showWelcome: true,
+  hasError: false,
+  errorCode: '0000000F'
 })
 
 const emit = defineEmits<{
   /** Emitted when boot sequence completes */
   complete: []
 }>()
+
+const { playStartupChime } = useSound()
 
 // Reactive state
 const progress = ref(0)
@@ -49,6 +58,14 @@ const visibleExtensions = computed(() => {
   return extensions.slice(0, Math.min(count, extensions.length))
 })
 
+const loadingMessage = computed(() => {
+  if (props.hasError) return 'System Error'
+  if (progress.value < 20) return 'Initializing...'
+  if (progress.value < 70) return 'Loading Extensions...'
+  if (progress.value < 90) return 'Loading Startup Items...'
+  return 'Starting System...'
+})
+
 // Computed style for progress indicator
 const progressStyle = computed(() => ({
   width: `${progress.value}%`
@@ -56,6 +73,11 @@ const progressStyle = computed(() => ({
 
 // Start the boot sequence
 function startBootSequence(): void {
+  if (props.hasError) {
+    // Play error sound (maybe implement a "death chime" later)
+    return
+  }
+
   const updateInterval = 50 // Update every 50ms
   const progressIncrement = (100 * updateInterval) / props.duration
 
@@ -84,6 +106,7 @@ function completeBootSequence(): void {
 
 // Lifecycle hooks
 onMounted(() => {
+  playStartupChime()
   startBootSequence()
 })
 
@@ -98,30 +121,50 @@ onUnmounted(() => {
 <template>
   <div
     class="boot-screen"
+    :class="{ 'boot-screen--error': hasError }"
     role="alert"
     aria-live="polite"
     aria-label="System boot in progress"
   >
     <div class="boot-screen__content">
-      <!-- Happy Mac Icon -->
+      <!-- Happy/Sad Mac Icon -->
       <img
+        v-if="!hasError"
         data-testid="happy-mac"
         src="/assets/icons/system/happy-mac.png"
         alt="Happy Mac"
         class="boot-screen__icon"
       />
+      <img
+        v-else
+        data-testid="sad-mac"
+        src="/assets/icons/system/sad-mac.png"
+        alt="Sad Mac"
+        class="boot-screen__icon boot-screen__icon--sad"
+      />
 
-      <!-- Welcome Message -->
+      <!-- Welcome Message / Error Code -->
       <p
-        v-if="showWelcome"
+        v-if="!hasError && showWelcome"
         data-testid="welcome-message"
         class="boot-screen__message"
       >
         Welcome to Macintosh
       </p>
+      <p
+        v-if="!hasError"
+        class="boot-screen__loading-text"
+      >
+        {{ loadingMessage }}
+      </p>
+      <div v-else-if="hasError" class="boot-screen__error" data-testid="error-screen">
+        <p class="boot-screen__error-code">{{ errorCode }}</p>
+        <p class="boot-screen__error-code">00000003</p>
+      </div>
 
-      <!-- Progress Bar -->
+      <!-- Progress Bar (only if no error) -->
       <div
+        v-if="!hasError"
         data-testid="progress-bar"
         class="boot-screen__progress-bar"
       >
@@ -132,8 +175,8 @@ onUnmounted(() => {
         />
       </div>
 
-      <!-- Extensions Row -->
-      <div class="boot-screen__extensions">
+      <!-- Extensions Row (only if no error) -->
+      <div v-if="!hasError" class="boot-screen__extensions">
         <transition-group name="fade">
           <img
             v-for="(ext, index) in visibleExtensions"
@@ -159,6 +202,11 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   z-index: var(--z-boot, 9999);
+  transition: background-color 0.3s ease;
+}
+
+.boot-screen--error {
+  background-color: var(--color-black, #000000);
 }
 
 .boot-screen__content {
@@ -175,12 +223,40 @@ onUnmounted(() => {
   image-rendering: crisp-edges;
 }
 
+.boot-screen__icon--sad {
+  filter: invert(1);
+}
+
 .boot-screen__message {
   font-family: var(--font-system, 'Chicago', 'Geneva', sans-serif),serif;
   font-size: var(--font-size-md, 12px);
   color: var(--color-black, #000000);
   margin: 0;
   text-align: center;
+}
+
+.boot-screen__loading-text {
+  font-family: var(--font-system, 'Chicago', 'Geneva', sans-serif),serif;
+  font-size: var(--font-size-sm, 9px);
+  color: var(--color-gray-dark, #666666);
+  margin: 0;
+  text-align: center;
+  height: 12px;
+}
+
+.boot-screen__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.boot-screen__error-code {
+  font-family: var(--font-system, 'Chicago', 'Geneva', sans-serif), serif;
+  font-size: var(--font-size-md, 12px);
+  color: var(--color-white, #FFFFFF);
+  margin: 0;
+  letter-spacing: 1px;
 }
 
 .boot-screen__progress-bar {

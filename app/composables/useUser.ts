@@ -4,6 +4,7 @@ interface User {
   id: number | string;
   username: string;
   avatar?: string;
+  role?: string;
   isGuest?: boolean;
 }
 
@@ -113,6 +114,27 @@ export function useUser() {
     }
   }
 
+  const updateUserProfile = async (id: number | string, data: Partial<Pick<User, 'username' | 'avatar' | 'role'>>): Promise<boolean> => {
+    try {
+      // @ts-ignore
+      await $fetch(`/api/users/${id}`, {
+        method: 'PATCH',
+        body: data
+      })
+      await fetchUsers()
+
+      // If updating current user, update the ref
+      if (currentUser.value && currentUser.value.id === id) {
+        currentUser.value = { ...currentUser.value, ...data }
+      }
+
+      return true
+    } catch (e) {
+      console.error('Failed to update user profile:', e)
+      return false
+    }
+  }
+
   const updateProfile = async (data: { username?: string, password?: string, avatar?: string }): Promise<boolean> => {
     try {
       // @ts-ignore
@@ -120,7 +142,7 @@ export function useUser() {
         method: 'POST',
         body: data
       }) as { user: User }
-      
+
       currentUser.value = response.user
       await fetchUsers()
       return true
@@ -142,6 +164,7 @@ export function useUser() {
     register,
     removeUser,
     updateProfile,
+    updateUserProfile,
     setAuthenticatedUser
   }
 }

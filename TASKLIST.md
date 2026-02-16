@@ -228,9 +228,9 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Show "Welcome to Macintosh" message
 - [x] `P0` Implement loading progress bar
 - [x] `P1` Add extension loading simulation
-- [ ] `P1` Show startup items loading
-- [ ] `P2` Add boot chime sound effect
-- [ ] `P2` Implement "Sad Mac" error screen
+- [x] `P1` Show startup items loading
+- [x] `P2` Add boot chime sound effect
+- [x] `P2` Implement "Sad Mac" error screen
 - [ ] `P3` Add startup key combinations (skip login, etc.)
 
 ### 5.2 Login Screen
@@ -241,6 +241,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Handle login authentication
 - [x] `P1` Show user icons/avatars
 - [ ] `P1` Add "Cancel" to return to user list
+- [x] `P1` Show user icons/avatars
+- [x] `P1` Add "Cancel" to return to user list
 - [ ] `P2` Implement "Forgot Password" flow
 - [ ] `P2` Add login attempt limiting
 - [ ] `P3` Support keyboard navigation
@@ -249,6 +251,10 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Create user registration flow
 - [x] `P0` Implement user data storage
 - [x] `P0` Create user settings storage
+- [x] `P1` Implement user profile editing
+- [x] `P1` Add user avatar/icon selection
+- [x] `P2` Implement user deletion
+- [x] `P2` Add admin user capabilities
 - [x] `P1` Implement user profile editing
 - [x] `P1` Add user avatar/icon selection
 - [x] `P2` Implement user deletion
@@ -298,7 +304,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Create useSound.ts composable
 - [x] `P1` Implement sound effect playback
 - [x] `P1` Add system beep sound
-- [ ] `P2` Add startup chime
+- [x] `P2` Add startup chime
 - [ ] `P2` Add trash empty sound
 - [ ] `P2` Add window open/close sounds
 - [ ] `P3` Implement volume control
@@ -387,9 +393,9 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Create UsersSettings.vue component
 - [x] `P1` Display list of users
 - [x] `P1` Implement user creation
-- [ ] `P2` Add user editing
-- [x] `P2` Implement user deletion
-- [ ] `P2` Add guest mode toggle
+- [x] `P2` Add user editing ✓
+- [x] `P2` Implement user deletion ✓
+- [x] `P2` Add guest mode toggle ✓
 - [ ] `P3` Implement user groups
 
 ### 7.6 Display Panel
@@ -528,10 +534,10 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
   - [x] Oval/ellipse tool (filled and outline)
   - [x] Paint bucket (flood fill)
 - [x] `P1` Implement tool palette UI (classic MacPaint style)
-- [ ] `P1` Add pattern/fill selector:
-  - [ ] Solid black/white fills
-  - [ ] Classic Mac dither patterns
-  - [ ] Custom pattern support
+- [x] `P1` Add pattern/fill selector:
+  - [x] Solid black/white fills
+  - [x] Classic Mac dither patterns
+  - [x] Custom pattern support
 - [x] `P1` Implement line width selector
 - [x] `P1` Add color palette (Mac OS 7 16-color palette)
 - [ ] `P2` Implement selection tools:
@@ -574,21 +580,21 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Implement print preview (mock)
 
 ### 9.8 Eliza (Computer Therapist)
-- [ ] `P2` Create Eliza.vue component
-- [ ] `P2` Implement classic terminal-style chat interface
-- [ ] `P2` Add Eliza conversation engine:
-  - [ ] Implement pattern matching for user input
-  - [ ] Create response templates (Rogerian psychotherapist style)
-  - [ ] Add keyword detection and transformation rules
-  - [ ] Implement reflection (e.g., "I" → "you", "my" → "your")
-- [ ] `P2` Style interface to match classic Mac Eliza:
-  - [ ] Monospaced font display
-  - [ ] Scrolling conversation history
-  - [ ] Input field at bottom
-- [ ] `P2` Add conversation starters and greetings
-- [ ] `P2` Implement "How does that make you feel?" type responses
+- [x] `P2` Create Eliza.vue component
+- [x] `P2` Implement classic terminal-style chat interface
+- [x] `P2` Add Eliza conversation engine:
+  - [x] Implement pattern matching for user input
+  - [x] Create response templates (Rogerian psychotherapist style)
+  - [x] Add keyword detection and transformation rules
+  - [x] Implement reflection (e.g., "I" → "you", "my" → "your")
+- [x] `P2` Style interface to match classic Mac Eliza:
+  - [x] Monospaced font display
+  - [x] Scrolling conversation history
+  - [x] Input field at bottom
+- [x] `P2` Add conversation starters and greetings
+- [x] `P2` Implement "How does that make you feel?" type responses
 - [ ] `P2` Add session persistence (save/load conversations)
-- [ ] `P3` Implement typing delay for realistic response timing
+- [x] `P3` Implement typing delay for realistic response timing
 - [ ] `P3` Add conversation export functionality
 - [ ] `P3` Implement multiple therapist personalities/modes
 - [ ] `P3` Add Easter eggs and special responses

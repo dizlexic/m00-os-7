@@ -107,6 +107,7 @@ const windowStyle = computed(() => ({
 
 // Event handlers
 function handleMouseDown(event: MouseEvent): void {
+  event.stopPropagation()
   // Activate window on any click
   if (!props.window.isActive) {
     activateWindow(props.window.id)
@@ -117,6 +118,7 @@ function handleTitleBarMouseDown(event: MouseEvent): void {
   if (event.button !== 0) return
 
   event.preventDefault()
+  event.stopPropagation()
   isDragging.value = true
 
   dragOffset.value = {

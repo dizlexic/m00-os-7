@@ -40,6 +40,7 @@ export type WindowType =
   | 'help'
   | 'alert'
   | 'imageviewer'
+  | 'eliza'
   | 'generic'
 
 /** Window configuration for creating new windows */
@@ -189,6 +190,7 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   help: { width: 600, height: 500 },
   alert: { width: 350, height: 150 },
   imageviewer: { width: 400, height: 350 },
+  eliza: { width: 450, height: 380 },
   generic: { width: 400, height: 300 }
 }
 

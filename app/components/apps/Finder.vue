@@ -300,6 +300,20 @@ function handleDoubleClick(item: FileNode) {
         resizable: false,
         maximizable: false
       })
+    } else if (item.name === 'Paint') {
+      openWindow({
+        type: 'paint',
+        title: 'Paint',
+        icon: '/assets/icons/apps/paint.png',
+        size: { width: 700, height: 500 }
+      })
+    } else if (item.name === 'Eliza') {
+      openWindow({
+        type: 'eliza',
+        title: 'Eliza',
+        icon: '/assets/icons/apps/eliza.png',
+        size: { width: 450, height: 380 }
+      })
     }
   } else if (item.type === 'file' || item.type === 'markdown' || item.type === 'image') {
     // Track recent doc
