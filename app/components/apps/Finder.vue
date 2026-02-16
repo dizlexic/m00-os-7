@@ -437,7 +437,15 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
         @click.stop="goUp"
         title="Go to parent folder"
       >
-        <img src="/assets/icons/ui/scroll-arrow-up.png" alt="Up" v-if="!isRoot" />
+        <svg
+          v-if="!isRoot"
+          width="8"
+          height="5"
+          viewBox="0 0 8 5"
+          style="display: block; shape-rendering: crispEdges;"
+        >
+          <path d="M4 0 L8 5 L0 5 Z" fill="currentColor" />
+        </svg>
       </button>
       <div class="finder__header-info">
         <span class="finder__header-title">{{ currentFolder?.name }}</span>
@@ -475,7 +483,14 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
           {{ node.name }}
         </span>
         <span v-if="index < pathNodes.length - 1" class="finder__path-separator">
-          <img src="/assets/icons/ui/scroll-arrow-right.png" alt=">" />
+          <svg
+            width="5"
+            height="8"
+            viewBox="0 0 5 8"
+            style="display: block; shape-rendering: crispEdges;"
+          >
+            <path d="M0 0 L5 4 L0 8 Z" fill="currentColor" />
+          </svg>
         </span>
       </template>
     </div>
