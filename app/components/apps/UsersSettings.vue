@@ -9,7 +9,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useUser } from '~/composables/useUser'
 import { useSharedDesktop } from '~/composables/useSharedDesktop'
 
-const { users, currentUser, fetchUsers, register, removeUser } = useUser()
+const { users, currentUser, fetchUsers, register, removeUser, updateProfile } = useUser()
 const {
   settings: stcSettings,
   updateSettings,
@@ -26,6 +26,20 @@ const newPassword = ref('')
 const error = ref('')
 const isLoading = ref(false)
 const sessionName = ref('')
+
+// Profile edit state
+const editUsername = ref(currentUser.value?.username || '')
+const editPassword = ref('')
+const selectedAvatar = ref(currentUser.value?.avatar || '/assets/icons/system/document.png')
+const updateError = ref('')
+const updateSuccess = ref(false)
+
+const availableAvatars = [
+  { id: 'default', path: '/assets/icons/system/document.png' },
+  { id: 'mac', path: '/assets/icons/avatars/avatar-mac.png' },
+  { id: 'floppy', path: '/assets/icons/avatars/avatar-floppy.png' },
+  { id: 'apple', path: '/assets/icons/avatars/avatar-apple.png' },
+]
 
 // Computed
 const userCount = computed(() => users.value.length)
@@ -90,6 +104,31 @@ async function handleDeleteUser(userId: number): Promise<void> {
   }
 }
 
+async function handleUpdateProfile() {
+  updateError.value = ''
+  updateSuccess.value = false
+  isLoading.value = true
+
+  try {
+    const success = await updateProfile({
+      username: editUsername.value !== currentUser.value?.username ? editUsername.value : undefined,
+      password: editPassword.value || undefined,
+      avatar: selectedAvatar.value
+    })
+
+    if (success) {
+      updateSuccess.value = true
+      editPassword.value = ''
+    } else {
+      updateError.value = 'Failed to update profile'
+    }
+  } catch (e) {
+    updateError.value = 'Failed to update profile'
+  } finally {
+    isLoading.value = false
+  }
+}
+
 // Check if user can be deleted (not current user)
 function canDeleteUser(userId: number | string): boolean {
   return currentUser.value?.id !== userId
@@ -98,6 +137,10 @@ function canDeleteUser(userId: number | string): boolean {
 function handleCreateSession() {
   createSession(sessionName.value || undefined)
   sessionName.value = ''
+}
+
+function getUserAvatar(user: any) {
+  return user.avatar || '/assets/icons/system/document.png'
 }
 </script>
 
@@ -119,7 +162,7 @@ function handleCreateSession() {
           class="users-settings__user"
         >
           <div class="users-settings__user-icon">
-            <img src="/assets/icons/system/document.png" alt="" draggable="false" />
+            <img :src="getUserAvatar(user)" alt="" draggable="false" />
           </div>
           <div class="users-settings__user-name">
             {{ user.username }}
@@ -135,6 +178,68 @@ function handleCreateSession() {
             @click="handleDeleteUser(user.id)"
           >
             Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Account Section -->
+    <div v-if="currentUser && !currentUser.isGuest" class="users-settings__section">
+      <h3 class="users-settings__title">My Account</h3>
+
+      <div v-if="updateError" class="users-settings__error">
+        {{ updateError }}
+      </div>
+      <div v-if="updateSuccess" class="users-settings__success">
+        Profile updated successfully!
+      </div>
+
+      <div class="users-settings__form">
+        <div class="users-settings__field">
+          <label>Avatar:</label>
+          <div class="users-settings__avatar-selection">
+            <div
+              v-for="avatar in availableAvatars"
+              :key="avatar.id"
+              class="users-settings__avatar-option"
+              :class="{ 'users-settings__avatar-option--selected': selectedAvatar === avatar.path }"
+              @click="selectedAvatar = avatar.path"
+            >
+              <img :src="avatar.path" alt="" draggable="false" />
+            </div>
+          </div>
+        </div>
+
+        <div class="users-settings__field">
+          <label for="edit-username">Username:</label>
+          <input
+            id="edit-username"
+            v-model="editUsername"
+            type="text"
+            class="mac-input"
+            :disabled="isLoading"
+          />
+        </div>
+
+        <div class="users-settings__field">
+          <label for="edit-password">New Password:</label>
+          <input
+            id="edit-password"
+            v-model="editPassword"
+            type="password"
+            class="mac-input"
+            placeholder="Keep current"
+            :disabled="isLoading"
+          />
+        </div>
+
+        <div class="users-settings__actions">
+          <button
+            class="mac-button"
+            :disabled="isLoading"
+            @click="handleUpdateProfile"
+          >
+            Update Profile
           </button>
         </div>
       </div>
@@ -353,6 +458,16 @@ function handleCreateSession() {
   margin-bottom: var(--spacing-sm);
 }
 
+.users-settings__success {
+  font-family: var(--font-system);
+  font-size: var(--font-size-sm);
+  color: #008800;
+  padding: var(--spacing-sm);
+  background-color: #EEFFEE;
+  border: 1px solid #008800;
+  margin-bottom: var(--spacing-sm);
+}
+
 .users-settings__form {
   display: flex;
   flex-direction: column;
@@ -374,6 +489,39 @@ function handleCreateSession() {
 .users-settings__field label {
   font-family: var(--font-system);
   font-size: var(--font-size-sm);
+}
+
+.users-settings__avatar-selection {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs);
+}
+
+.users-settings__avatar-option {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-gray-medium);
+  padding: 3px;
+  background-color: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.users-settings__avatar-option:hover {
+  background-color: var(--color-gray-light);
+}
+
+.users-settings__avatar-option--selected {
+  border: 2px solid var(--color-highlight);
+  padding: 2px;
+}
+
+.users-settings__avatar-option img {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
 }
 
 .users-settings__stc-status {
