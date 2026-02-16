@@ -1,4 +1,3 @@
-import { describe, it, expect, beforeEach } from 'vitest'
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Minesweeper from '~/components/games/Minesweeper.vue'
@@ -61,7 +60,7 @@ describe('Minesweeper.vue', () => {
     // Reveal a cell
     await wrapper.find('.minesweeper__cell').trigger('mouseup')
     expect(wrapper.findAll('.minesweeper__cell--revealed').length).toBeGreaterThan(0)
-    
+
     // Reset
     await wrapper.find('.minesweeper__reset-button').trigger('click')
     expect(wrapper.findAll('.minesweeper__cell--revealed').length).toBe(0)

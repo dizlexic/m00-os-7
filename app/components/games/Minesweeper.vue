@@ -4,7 +4,9 @@
  *
  * A classic Minesweeper clone for Mac OS 7.
  */
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
+import { useWindowManager } from '~/composables/useWindowManager'
+import { useAlert } from '~/composables/useAlert'
 
 interface Props {
   isActive?: boolean
@@ -49,9 +51,11 @@ const MINES = computed(() => currentDifficulty.value.mines)
 
 const grid = ref<Cell[][]>([])
 const gameState = ref<'idle' | 'playing' | 'won' | 'lost'>('idle')
-const minesLeft = ref(MINES)
+const minesLeft = ref(MINES.value)
 const timer = ref(0)
-let timerInterval: number | null = null
+let timerInterval: any = null
+
+interface HighScore {
   name: string
   time: number
 }
@@ -141,7 +145,7 @@ function initGrid() {
   }
   grid.value = newGrid
   gameState.value = 'idle'
-  minesLeft.value = MINES
+  minesLeft.value = MINES.value
   timer.value = 0
   if (timerInterval) {
     clearInterval(timerInterval)
@@ -151,7 +155,7 @@ function initGrid() {
 
 function startTimer() {
   if (timerInterval) return
-  timerInterval = window.setInterval(() => {
+  timerInterval = setInterval(() => {
     if (timer.value < 999) {
       timer.value++
     }
@@ -405,6 +409,8 @@ onMounted(() => {
   }
 })
 
+onBeforeUnmount(() => {
+  stopTimer()
 })
 
 const faceIcon = computed(() => {
@@ -495,11 +501,15 @@ const faceIcon = computed(() => {
   padding: 2px 4px;
   font-weight: bold;
   line-height: 1;
+  border: 1px solid var(--color-gray-dark);
+  text-shadow: 0 0 2px var(--color-red);
+  min-width: 50px;
+  text-align: right;
 }
 
 .minesweeper__reset-button {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   display: flex;
   align-items: center;
@@ -508,15 +518,19 @@ const faceIcon = computed(() => {
   background-color: var(--color-gray-light);
   border: 2px solid;
   border-color: var(--color-white) var(--color-gray-dark) var(--color-gray-dark) var(--color-white);
+  cursor: pointer;
 }
 
 .minesweeper__reset-button:active {
   border-color: var(--color-gray-dark) var(--color-white) var(--color-white) var(--color-gray-dark);
+  padding-top: 2px;
+  padding-left: 2px;
 }
 
 .minesweeper__grid {
   border: 3px solid;
   border-color: var(--color-gray-dark) var(--color-white) var(--color-white) var(--color-gray-dark);
+  background-color: var(--color-gray-medium);
 }
 
 .minesweeper__row {
@@ -533,6 +547,7 @@ const faceIcon = computed(() => {
   font-family: var(--font-system);
   font-size: 14px;
   font-weight: bold;
+  box-sizing: border-box;
 }
 
 .minesweeper__cell--hidden,
