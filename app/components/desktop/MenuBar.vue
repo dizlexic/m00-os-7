@@ -577,59 +577,55 @@ function handleGetInfo(): void {
 }
 
 function handleKeyDown(event: KeyboardEvent) {
-  // Don't trigger shortcuts if an input is focused
+  // Don't trigger shortcuts if an input is focused, unless it's a textarea and we want to allow some shortcuts
   if (['INPUT', 'TEXTAREA'].includes((event.target as HTMLElement).tagName)) {
-    return
+    // Allow Cmd+A, Cmd+C, Cmd+X, Cmd+V in textareas if they are not handled by the app
+    const isCmd = event.metaKey || event.ctrlKey
+    if (!isCmd) return
+
+    const key = event.key.toLowerCase()
+    if (!['a', 'c', 'x', 'v'].includes(key)) return
   }
 
   const isCmd = event.metaKey || event.ctrlKey
+  if (!isCmd) return
 
-  if (isCmd) {
-    switch (event.key.toLowerCase()) {
-      case 'c':
-        if (canCopy.value) {
+  const key = event.key.toLowerCase()
+
+  // Special case for backspace (Move to Trash)
+  if (key === 'backspace' && canCopy.value) {
+    event.preventDefault()
+    handleDelete()
+    return
+  }
+
+  // Try to find a menu item with this shortcut
+  for (const menu of menus.value) {
+    if (findAndTriggerShortcut(menu.items, key, event)) return
+  }
+
+  // Also check Apple menu
+  if (findAndTriggerShortcut(appleMenuItems, key, event)) return
+}
+
+function findAndTriggerShortcut(items: MenuItem[], key: string, event: KeyboardEvent): boolean {
+  for (const item of items) {
+    if (item.shortcut) {
+      // Extract key from shortcut (e.g., "⌘N" -> "n")
+      const shortcutKey = item.shortcut.replace('⌘', '').toLowerCase()
+      if (shortcutKey === key) {
+        if (!item.disabled && item.action) {
           event.preventDefault()
-          handleCopy()
+          item.action()
+          return true
         }
-        break
-      case 'x':
-        if (canCopy.value) {
-          event.preventDefault()
-          handleCut()
-        }
-        break
-      case 'v':
-        if (canPaste.value) {
-          event.preventDefault()
-          handlePaste()
-        }
-        break
-      case 'n':
-        event.preventDefault()
-        handleNewFolder()
-        break
-      case 'g':
-        event.preventDefault()
-        handleGoToFolder()
-        break
-      case 'i':
-        event.preventDefault()
-        handleGetInfo()
-        break
-      case 'y':
-        if (canPutAway.value) {
-          event.preventDefault()
-          handlePutAway()
-        }
-        break
-      case 'backspace':
-        if (canCopy.value) {
-          event.preventDefault()
-          handleDelete()
-        }
-        break
+      }
+    }
+    if (item.submenu) {
+      if (findAndTriggerShortcut(item.submenu, key, event)) return true
     }
   }
+  return false
 }
 
 // Lifecycle
