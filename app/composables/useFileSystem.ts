@@ -577,6 +577,7 @@ export function useFileSystem() {
     updateFileContent,
     moveNode,
     copyNode,
+    createAlias,
     getNodeByPath,
     fetchFilesFromServer,
     getTrash,

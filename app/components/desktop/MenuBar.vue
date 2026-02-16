@@ -10,6 +10,7 @@ import Clock from '~/components/system/Clock.vue'
 import SharingIndicator from '~/components/stc/SharingIndicator.vue'
 import MenuDropdown from '~/components/desktop/MenuDropdown.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
+import { LABEL_NAMES } from '~/types/filesystem'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
 import { useClipboard } from '~/composables/useClipboard'
@@ -21,11 +22,11 @@ import type { WindowType } from '~/types/window'
 import type { RecentItem } from '~/types/recent'
 import type { MenuItem, Menu } from '~/types/menu'
 
-const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash, getTrash } = useFileSystem()
-const { activeWindow, openWindow, updateWindow } = useWindowManager()
+const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash, getTrash, updateNode, copyNode, createAlias } = useFileSystem()
+const { windowList, activeWindow, openWindow, updateWindow, bringToFront } = useWindowManager()
 const { recentApps, recentDocs } = useRecentItems()
 const { clipboard, copy, cut, paste } = useClipboard()
-const { icons: desktopIcons, cleanUpDesktop } = useDesktop()
+const { icons: desktopIcons, cleanUpDesktop, updateIcon } = useDesktop()
 const { showAlert } = useAlert()
 const { restoreItem, items: trashItems, emptyTrash: confirmEmptyTrash } = useTrash()
 const { logout, currentUser } = useUser()
@@ -244,8 +245,8 @@ const fileMenuItems = computed<MenuItem[]>(() => [
   { id: 'sep2', label: '', isSeparator: true },
   { id: 'get-info', label: 'Get Info', shortcut: '⌘I', action: () => handleGetInfo() },
   { id: 'sep3', label: '', isSeparator: true },
-  { id: 'duplicate', label: 'Duplicate', shortcut: '⌘D', disabled: true },
-  { id: 'make-alias', label: 'Make Alias', shortcut: '⌘M', disabled: true },
+  { id: 'duplicate', label: 'Duplicate', shortcut: '⌘D', action: () => handleDuplicate() },
+  { id: 'make-alias', label: 'Make Alias', shortcut: '⌘M', action: () => handleMakeAlias() },
   { id: 'put-away', label: 'Put Away', shortcut: '⌘Y', disabled: !canPutAway.value, action: () => handlePutAway() },
   { id: 'sep4', label: '', isSeparator: true },
   { id: 'find', label: 'Find...', shortcut: '⌘F' },
@@ -308,6 +309,13 @@ const viewMenuItems = computed<MenuItem[]>(() => {
       action: () => setViewMode('kind')
     },
     {
+      id: 'by-label',
+      label: 'by Label',
+      checked: currentViewMode === 'label',
+      disabled: isDesktop,
+      action: () => setViewMode('label')
+    },
+    {
       id: 'by-date',
       label: 'by Date',
       checked: currentViewMode === 'date',
@@ -322,6 +330,65 @@ const viewMenuItems = computed<MenuItem[]>(() => {
     }
   ]
 })
+
+const labelMenuItems = computed<MenuItem[]>(() => {
+  const isFinder = !activeWindow.value || activeWindow.value.type === 'finder'
+  if (!isFinder) return []
+
+  // Find currently selected item label to show checkmark
+  let currentLabel: number | undefined = undefined
+  if (activeWindow.value && activeWindow.value.type === 'finder') {
+    const selectedId = (activeWindow.value.data as any)?.selectedItemId
+    if (selectedId) {
+      currentLabel = getNode(selectedId)?.label || 0
+    }
+  } else if (!activeWindow.value) {
+    const selected = desktopIcons.value.find(icon => icon.isSelected)
+    if (selected) {
+      currentLabel = selected.label || 0
+    }
+  }
+
+  return LABEL_NAMES.map((name, index) => ({
+    id: `label-${index}`,
+    label: name,
+    checked: currentLabel === index,
+    action: () => handleSetLabel(index)
+  }))
+})
+
+const windowMenuItems = computed<MenuItem[]>(() => {
+  return windowList.value.map(win => ({
+    id: `window-${win.id}`,
+    label: win.title,
+    checked: win.isActive,
+    action: () => bringToFront(win.id)
+  }))
+})
+
+function handleSetLabel(label: number) {
+  if (activeWindow.value && activeWindow.value.type === 'finder') {
+    const selectedId = (activeWindow.value.data as any)?.selectedItemId
+    if (selectedId) {
+      updateNode(selectedId, { label })
+    }
+  } else if (!activeWindow.value) {
+    const selectedIcons = desktopIcons.value.filter(icon => icon.isSelected)
+
+    selectedIcons.forEach(icon => {
+      // Update desktop icon state
+      updateIcon(icon.id, { label })
+
+      // If it has a path, it's likely a file/folder, update filesystem too
+      if (icon.path) {
+        const node = getNodeByPath(icon.path)
+        if (node) {
+          updateNode(node.id, { label })
+        }
+      }
+    })
+  }
+}
 
 function setViewMode(mode: string): void {
   if (activeWindow.value && activeWindow.value.type === 'finder') {
@@ -380,7 +447,9 @@ const menus = computed<Menu[]>(() => {
       { id: 'file', label: 'File', items: fileMenuItems.value },
       { id: 'edit', label: 'Edit', items: editMenuItems.value },
       { id: 'view', label: 'View', items: viewMenuItems.value },
+      { id: 'label', label: 'Label', items: labelMenuItems.value },
       { id: 'special', label: 'Special', items: specialMenuItems.value },
+      { id: 'window', label: 'Window', items: windowMenuItems.value },
       { id: 'help', label: 'Help', items: helpMenuItems }
     ]
   }
@@ -389,6 +458,7 @@ const menus = computed<Menu[]>(() => {
   return [
     { id: 'file', label: 'File', items: fileMenuItems.value },
     { id: 'edit', label: 'Edit', items: editMenuItems.value },
+    { id: 'window', label: 'Window', items: windowMenuItems.value },
     { id: 'help', label: 'Help', items: helpMenuItems }
   ]
 })
@@ -681,6 +751,50 @@ function handleGetInfo(): void {
         })
       }
     }
+  }
+}
+
+function handleDuplicate(): void {
+  if (activeWindow.value && activeWindow.value.type === 'finder') {
+    const selectedId = (activeWindow.value.data as any)?.selectedItemId
+    if (selectedId) {
+      const node = getNode(selectedId)
+      if (node && node.parentId) {
+        copyNode(selectedId, node.parentId)
+      }
+    }
+  } else if (!activeWindow.value) {
+    const selectedIcons = desktopIcons.value.filter(icon => icon.isSelected && icon.type !== 'hard-drive' && icon.type !== 'trash')
+    selectedIcons.forEach(icon => {
+      if (icon.path) {
+        const node = getNodeByPath(icon.path)
+        if (node && node.parentId) {
+          copyNode(node.id, node.parentId)
+        }
+      }
+    })
+  }
+}
+
+function handleMakeAlias(): void {
+  if (activeWindow.value && activeWindow.value.type === 'finder') {
+    const selectedId = (activeWindow.value.data as any)?.selectedItemId
+    if (selectedId) {
+      const node = getNode(selectedId)
+      if (node && node.parentId) {
+        createAlias(selectedId, node.parentId)
+      }
+    }
+  } else if (!activeWindow.value) {
+    const selectedIcons = desktopIcons.value.filter(icon => icon.isSelected && icon.type !== 'hard-drive' && icon.type !== 'trash')
+    selectedIcons.forEach(icon => {
+      if (icon.path) {
+        const node = getNodeByPath(icon.path)
+        if (node && node.parentId) {
+          createAlias(node.id, node.parentId)
+        }
+      }
+    })
   }
 }
 
