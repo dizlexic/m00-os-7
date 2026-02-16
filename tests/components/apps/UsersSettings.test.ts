@@ -250,4 +250,61 @@ describe('UsersSettings.vue', () => {
       expect(wrapper.text()).toContain('No users')
     })
   })
+
+  describe('User Editing', () => {
+    it('switches to detail view when a user is clicked', async () => {
+      const wrapper = mount(UsersSettings)
+      await flushPromises()
+
+      const userItem = wrapper.findAll('.users-settings__user').find(item => item.text().includes('testuser'))
+      await userItem?.trigger('click')
+
+      expect(wrapper.text()).toContain('User: testuser')
+      expect(wrapper.find('input#edit-username').exists()).toBe(true)
+      expect(wrapper.find('select#edit-role').exists()).toBe(true)
+      expect(wrapper.find('.avatar-grid').exists()).toBe(true)
+    })
+
+    it('updates user profile when Save Changes is clicked', async () => {
+      const mockUpdateUserProfile = vi.fn().mockResolvedValue(true)
+      vi.mocked(useUser).mockReturnValue({
+        ...vi.mocked(useUser)(),
+        updateUserProfile: mockUpdateUserProfile
+      })
+
+      const wrapper = mount(UsersSettings)
+      await flushPromises()
+
+      const userItem = wrapper.findAll('.users-settings__user').find(item => item.text().includes('testuser'))
+      await userItem?.trigger('click')
+
+      await wrapper.find('input#edit-username').setValue('testuser-updated')
+      await wrapper.find('select#edit-role').setValue('admin')
+
+      const saveButton = wrapper.findAll('button.mac-button').find(btn => btn.text() === 'Save Changes')
+      await saveButton?.trigger('click')
+      await flushPromises()
+
+      expect(mockUpdateUserProfile).toHaveBeenCalledWith(2, expect.objectContaining({
+        username: 'testuser-updated',
+        role: 'admin'
+      }))
+      // Should be back to list view
+      expect(wrapper.text()).toContain('Users')
+    })
+
+    it('returns to list view when Back to List is clicked', async () => {
+      const wrapper = mount(UsersSettings)
+      await flushPromises()
+
+      await wrapper.find('.users-settings__user').trigger('click')
+      expect(wrapper.text()).toContain('User:')
+
+      const backButton = wrapper.findAll('button.mac-button').find(btn => btn.text().includes('Back to List'))
+      await backButton?.trigger('click')
+
+      expect(wrapper.text()).toContain('Users')
+      expect(wrapper.find('input#edit-username').exists()).toBe(false)
+    })
+  })
 })

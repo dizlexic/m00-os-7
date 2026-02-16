@@ -249,10 +249,10 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Create user registration flow
 - [x] `P0` Implement user data storage
 - [x] `P0` Create user settings storage
-- [ ] `P1` Implement user profile editing
-- [ ] `P1` Add user avatar/icon selection
-- [ ] `P2` Implement user deletion
-- [ ] `P2` Add admin user capabilities
+- [x] `P1` Implement user profile editing
+- [x] `P1` Add user avatar/icon selection
+- [x] `P2` Implement user deletion
+- [x] `P2` Add admin user capabilities
 - [ ] `P3` Implement user data export/import
 
 ### 5.4 Multiuser Experience

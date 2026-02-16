@@ -6,6 +6,8 @@ interface User {
   id: number;
   username: string;
   password_hash: string;
+  avatar?: string;
+  role: string;
   created_at: string;
   updated_at: string;
 }
@@ -64,12 +66,30 @@ export function getUserById(id: number, database?: Database): User | null {
 }
 
 /**
- * Get all users (ID and username only).
+ * Get all users (ID, username, avatar, and role).
  */
-export function getAllUsers(database?: Database): Pick<User, 'id' | 'username'>[] {
+export function getAllUsers(database?: Database): Pick<User, 'id' | 'username' | 'avatar' | 'role'>[] {
   const db = database || getDb();
-  const stmt = db.prepare('SELECT id, username FROM users ORDER BY username ASC');
-  return stmt.all() as Pick<User, 'id' | 'username'>[];
+  const stmt = db.prepare('SELECT id, username, avatar, role FROM users ORDER BY username ASC');
+  return stmt.all() as Pick<User, 'id' | 'username' | 'avatar' | 'role'>[];
+}
+
+/**
+ * Update a user.
+ */
+export function updateUser(id: number, data: Partial<Pick<User, 'username' | 'avatar' | 'role'>>, database?: Database): boolean {
+  const db = database || getDb();
+  
+  const fields = Object.keys(data);
+  if (fields.length === 0) return false;
+  
+  const sets = fields.map(f => `${f} = ?`).join(', ');
+  const values = Object.values(data);
+  
+  const stmt = db.prepare(`UPDATE users SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
+  const result = stmt.run(...values, id);
+  
+  return result.changes > 0;
 }
 
 /**
