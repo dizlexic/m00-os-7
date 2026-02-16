@@ -454,8 +454,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Implement Edit menu items
 - [x] `P1` Implement View menu items
 - [x] `P1` Add Special menu (Empty Trash, etc.)
-- [ ] `P2` Implement Label menu (color labels)
-- [ ] `P2` Add Window menu
+- [x] `P2` Implement Label menu (color labels)
+- [x] `P2` Add Window menu
 
 ---
 
@@ -605,14 +605,14 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 10. Games
 
 ### 10.1 Solitaire (Klondike)
-- [ ] `P2` Create Solitaire.vue component
-- [ ] `P2` Generate card deck graphics (PIL)
-- [ ] `P2` Implement card rendering
-- [ ] `P2` Create tableau layout
-- [ ] `P2` Implement card dragging
-- [ ] `P2` Add foundation piles
-- [ ] `P2` Implement stock/waste pile
-- [ ] `P2` Add win detection
+- [x] `P2` Create Solitaire.vue component
+- [x] `P2` Generate card deck graphics (PIL)
+- [x] `P2` Implement card rendering
+- [x] `P2` Create tableau layout
+- [x] `P2` Implement card dragging
+- [x] `P2` Add foundation piles
+- [x] `P2` Implement stock/waste pile
+- [x] `P2` Add win detection
 - [ ] `P3` Implement undo functionality
 - [ ] `P3` Add scoring system
 - [ ] `P3` Implement game statistics
@@ -862,6 +862,16 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P1` Implement HTTPS enforcement
 - [ ] `P2` Add security audit logging
 - [ ] `P3` Implement intrusion detection
+
+---
+
+## 19. Application Context Menus
+
+### 19.1 Context Menu Implementation
+- [ ] `P2` Implement context menus for each specific application
+- [ ] `P2` Add "Quit" option to all application context menus
+- [ ] `P2` Add "Save" and "Save As" options for Paint and SimpleText
+- [ ] `P2` Add "New Game" option for game applications (Puzzle, Solitaire, etc.)
 
 ---
 
