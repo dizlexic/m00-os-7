@@ -373,8 +373,8 @@ Final polish, comprehensive testing, accessibility improvements, and production 
 ### Milestones
 
 #### 6.1 Accessibility
-- [ ] Implement keyboard navigation
-- [ ] Add ARIA labels
+- [x] Implement keyboard navigation
+- [x] Add ARIA labels
 - [ ] Create high contrast mode
 - [ ] Add reduced motion option
 - [ ] Implement font size scaling

@@ -637,9 +637,10 @@ describe('useWindowManager', () => {
 
 #### Step 3: Run the Test (Expect Failure)
 ```bash
-npm run test:watch
+npm run test
 ```
 Verify the test fails for the right reason - this confirms the test is valid.
+Note: Avoid using `npx vitest` or `npm run test:watch` as they may hang in some environments. Use `npx vitest run` or `npm run test` instead.
 
 #### Step 4: Write Minimal Implementation
 ```typescript
@@ -1180,7 +1181,7 @@ npm run preview       # Preview production build
 
 # Testing
 npm run test          # Run unit tests (single run)
-npm run test:watch    # Run unit tests (watch mode)
+npm run test:watch    # Alias for npm run test (non-watch)
 npm run test:e2e      # Run E2E tests
 npm run test:coverage # Run with coverage
 

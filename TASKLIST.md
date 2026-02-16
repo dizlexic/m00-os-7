@@ -738,14 +738,14 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 
 ### 14.1 Keyboard Navigation
 - [x] `P1` Implement focus management
-- [ ] `P1` Add keyboard shortcuts for common actions
+- [x] `P1` Add keyboard shortcuts for common actions
 - [x] `P1` Implement tab navigation
 - [x] `P2` Add arrow key navigation in lists
 - [x] `P2` Implement escape to close dialogs/menus
 
 ### 14.2 Screen Reader Support
-- [ ] `P1` Add ARIA labels to interactive elements
-- [ ] `P1` Implement proper heading structure
+- [x] `P1` Add ARIA labels to interactive elements
+- [x] `P1` Implement proper heading structure
 - [ ] `P2` Add live regions for dynamic content
 - [ ] `P2` Implement skip links
 
