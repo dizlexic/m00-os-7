@@ -28,6 +28,7 @@ export type WindowType =
   | 'memory-settings'
   | 'monitors-settings'
   | 'mouse-settings'
+  | 'users-settings'
   | 'stc-settings'
   | 'startup-disk-settings'
   | 'get-info'
@@ -173,6 +174,7 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   'memory-settings': { width: 400, height: 350 },
   'monitors-settings': { width: 400, height: 350 },
   'mouse-settings': { width: 400, height: 350 },
+  'users-settings': { width: 400, height: 400 },
   'stc-settings': { width: 450, height: 400 },
   'startup-disk-settings': { width: 400, height: 350 },
   'get-info': { width: 300, height: 400 },
