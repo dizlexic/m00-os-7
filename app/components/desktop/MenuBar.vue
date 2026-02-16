@@ -62,138 +62,139 @@ const appleMenuItems = computed<MenuItem[]>(() => [
   },
   { id: 'sep1', label: '', isSeparator: true },
   {
-    id: 'calculator',
-    label: 'Calculator',
-    action: () => openWindow({
-      type: 'calculator',
-      title: 'Calculator',
-      icon: '/assets/icons/apps/calculator.png',
-      size: { width: 182, height: 281 },
-      resizable: false,
-      maximizable: false
-    })
-  },
-  {
-    id: 'notepad',
-    label: 'Note Pad',
-    action: () => openWindow({
-      type: 'notepad',
-      title: 'Note Pad',
-      icon: '/assets/icons/apps/notepad.png',
-      size: { width: 300, height: 400 },
-      resizable: true,
-      maximizable: false
-    })
-  },
-  {
-    id: 'scrapbook',
-    label: 'Scrapbook',
-    action: () => openWindow({
-      type: 'scrapbook',
-      title: 'Scrapbook',
-      icon: '/assets/icons/apps/scrapbook.png',
-      size: { width: 350, height: 400 },
-      resizable: true,
-      maximizable: false
-    })
-  },
-  {
-    id: 'puzzle',
-    label: 'Puzzle',
-    action: () => openWindow({
-      type: 'puzzle',
-      title: 'Puzzle',
-      icon: '/assets/icons/apps/puzzle.png',
-      size: { width: 200, height: 240 },
-      resizable: false,
-      maximizable: false
-    })
-  },
-  {
-    id: 'brickle',
-    label: 'Brickle',
-    action: () => openWindow({
-      type: 'brickle',
-      title: 'Brickle',
-      icon: '/assets/icons/apps/brickle.png',
-      size: { width: 400, height: 450 },
-      resizable: false,
-      maximizable: false
-    })
-  },
-  {
-    id: 'minesweeper',
-    label: 'Minesweeper',
-    action: () => openWindow({
-      type: 'minesweeper',
-      title: 'Minesweeper',
-      icon: '/assets/icons/apps/minesweeper.png',
-      size: { width: 240, height: 320 },
-      resizable: false,
-      maximizable: false
-    })
-  },
-  {
-    id: 'solitaire',
-    label: 'Solitaire',
-    action: () => openWindow({
-      type: 'solitaire',
-      title: 'Solitaire',
-      icon: '/assets/icons/apps/solitaire.png',
-      size: { width: 400, height: 450 },
-      resizable: true,
-      maximizable: true
-    })
-  },
-  {
-    id: 'tetris',
-    label: 'Tetris',
-    action: () => openWindow({
-      type: 'tetris',
-      title: 'Tetris',
-      icon: '/assets/icons/apps/tetris.png',
-      size: { width: 350, height: 500 },
-      resizable: false,
-      maximizable: false
-    })
-  },
-  {
-    id: 'messenger',
-    label: 'Messenger',
-    action: () => openWindow({
-      type: 'messenger',
-      title: 'Messenger',
-      icon: '/assets/icons/apps/chat.png',
-      size: { width: 450, height: 400 },
-      resizable: true,
-      maximizable: true,
-      collapsible: true
-    })
-  },
-  {
-    id: 'paint',
-    label: 'Paint',
-    action: () => openWindow({
-      type: 'paint',
-      title: 'Paint',
-      icon: '/assets/icons/apps/paint.png',
-      size: { width: 700, height: 500 }
-    })
-  },
-  {
-    id: 'eliza',
-    label: 'Eliza',
-    action: () => openWindow({
-      type: 'eliza',
-      title: 'Eliza',
-      icon: '/assets/icons/apps/eliza.png',
-      size: { width: 450, height: 380 }
-    })
-  },
-  {
-    id: 'network',
-    label: 'Network',
-    action: () => handleControlPanel('Network', 'network-settings')
+    id: 'applications',
+    label: 'Applications',
+    submenu: [
+      {
+        id: 'calculator',
+        label: 'Calculator',
+        action: () => openWindow({
+          type: 'calculator',
+          title: 'Calculator',
+          icon: '/assets/icons/apps/calculator.png',
+          size: { width: 182, height: 281 },
+          resizable: false,
+          maximizable: false
+        })
+      },
+      {
+        id: 'notepad',
+        label: 'Note Pad',
+        action: () => openWindow({
+          type: 'notepad',
+          title: 'Note Pad',
+          icon: '/assets/icons/apps/notepad.png',
+          size: { width: 300, height: 400 },
+          resizable: true,
+          maximizable: false
+        })
+      },
+      {
+        id: 'scrapbook',
+        label: 'Scrapbook',
+        action: () => openWindow({
+          type: 'scrapbook',
+          title: 'Scrapbook',
+          icon: '/assets/icons/apps/scrapbook.png',
+          size: { width: 350, height: 400 },
+          resizable: true,
+          maximizable: false
+        })
+      },
+      {
+        id: 'puzzle',
+        label: 'Puzzle',
+        action: () => openWindow({
+          type: 'puzzle',
+          title: 'Puzzle',
+          icon: '/assets/icons/apps/puzzle.png',
+          size: { width: 200, height: 240 },
+          resizable: false,
+          maximizable: false
+        })
+      },
+      {
+        id: 'brickle',
+        label: 'Brickle',
+        action: () => openWindow({
+          type: 'brickle',
+          title: 'Brickle',
+          icon: '/assets/icons/apps/brickle.png',
+          size: { width: 400, height: 450 },
+          resizable: false,
+          maximizable: false
+        })
+      },
+      {
+        id: 'minesweeper',
+        label: 'Minesweeper',
+        action: () => openWindow({
+          type: 'minesweeper',
+          title: 'Minesweeper',
+          icon: '/assets/icons/apps/minesweeper.png',
+          size: { width: 240, height: 320 },
+          resizable: false,
+          maximizable: false
+        })
+      },
+      {
+        id: 'solitaire',
+        label: 'Solitaire',
+        action: () => openWindow({
+          type: 'solitaire',
+          title: 'Solitaire',
+          icon: '/assets/icons/apps/solitaire.png',
+          size: { width: 400, height: 450 },
+          resizable: true,
+          maximizable: true
+        })
+      },
+      {
+        id: 'tetris',
+        label: 'Tetris',
+        action: () => openWindow({
+          type: 'tetris',
+          title: 'Tetris',
+          icon: '/assets/icons/apps/tetris.png',
+          size: { width: 350, height: 500 },
+          resizable: false,
+          maximizable: false
+        })
+      },
+      {
+        id: 'messenger',
+        label: 'Messenger',
+        action: () => openWindow({
+          type: 'messenger',
+          title: 'Messenger',
+          icon: '/assets/icons/apps/chat.png',
+          size: { width: 450, height: 400 },
+          resizable: true,
+          maximizable: true,
+          collapsible: true
+        })
+      },
+      {
+        id: 'paint',
+        label: 'Paint',
+        action: () => openWindow({
+          type: 'paint',
+          title: 'Paint',
+          icon: '/assets/icons/apps/paint.png',
+          size: { width: 700, height: 500 }
+        })
+      },
+      {
+        id: 'eliza',
+        label: 'Eliza',
+        action: () => openWindow({
+          type: 'eliza',
+          title: 'Eliza',
+          icon: '/assets/icons/apps/eliza.png',
+          size: { width: 450, height: 380 }
+        })
+      }
+    ]
   },
   {
     id: 'control-panels',
