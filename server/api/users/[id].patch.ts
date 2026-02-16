@@ -1,7 +1,11 @@
 import { defineEventHandler, readBody, createError } from 'h3';
 import { updateUser, getUserById } from '../../utils/users';
+import { requireUserId } from '../../utils/auth';
 
 export default defineEventHandler(async (event) => {
+  const currentUserId = requireUserId(event);
+  const currentUser = getUserById(currentUserId);
+  
   const id = event.context.params?.id;
   if (!id) {
     throw createError({
@@ -10,11 +14,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const userId = parseInt(id);
-  if (isNaN(userId)) {
+  const targetUserId = parseInt(id);
+  if (isNaN(targetUserId)) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid user ID'
+    });
+  }
+
+  // Permission check: Only admin or self can update
+  if (!currentUser || (currentUser.role !== 'admin' && currentUserId !== targetUserId)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Forbidden: You do not have permission to update this user'
     });
   }
 
@@ -26,6 +38,10 @@ export default defineEventHandler(async (event) => {
   
   for (const field of allowedFields) {
     if (body[field] !== undefined) {
+      // Only admin can update role
+      if (field === 'role' && currentUser.role !== 'admin') {
+        continue;
+      }
       updateData[field] = body[field];
     }
   }
@@ -37,7 +53,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const success = updateUser(userId, updateData);
+  const success = updateUser(targetUserId, updateData);
   
   if (!success) {
     throw createError({
@@ -46,7 +62,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const updatedUser = getUserById(userId);
+  const updatedUser = getUserById(targetUserId);
   if (updatedUser) {
     const { password_hash, ...userWithoutPassword } = updatedUser;
     return {
