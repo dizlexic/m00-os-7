@@ -366,11 +366,11 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Implement custom sound upload
 
 ### 7.5 Users & Groups Panel
-- [ ] `P1` Create UsersSettings.vue component
-- [ ] `P1` Display list of users
-- [ ] `P1` Implement user creation
+- [x] `P1` Create UsersSettings.vue component
+- [x] `P1` Display list of users
+- [x] `P1` Implement user creation
 - [ ] `P2` Add user editing
-- [ ] `P2` Implement user deletion
+- [x] `P2` Implement user deletion
 - [ ] `P2` Add guest mode toggle
 - [ ] `P3` Implement user groups
 
