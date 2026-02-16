@@ -219,9 +219,9 @@ function connect(): void {
     ws.onopen = () => {
       console.log('[STC] WebSocket connected')
       // Send connect message with user info
-      const { user } = useUser()
+      const { currentUser } = useUser()
       sendMessage('connect', {
-        username: user.value?.username || 'Guest',
+        username: currentUser.value?.username || 'Guest',
         cursor: settings.value.cursor
       })
     }
