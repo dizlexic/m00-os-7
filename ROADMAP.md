@@ -235,6 +235,19 @@ Implement user accounts, authentication, boot sequence, and data persistence.
 - [ ] Save desktop icon positions
 - [ ] Persist window states
 
+#### 4.7 Multiuser Experience
+- [ ] Generate unique guest usernames for guest login
+  - [ ] Create friendly/memorable name generator
+  - [ ] Ensure uniqueness across active sessions
+- [ ] Isolate user connections until after login
+  - [ ] Prevent multiuser connections during boot/login screens
+  - [ ] Initialize connections only after successful authentication
+- [ ] Implement "Share the Computer" mode toggle
+  - [ ] Add sharing toggle in Control Panels
+  - [ ] Enable/disable shared desktop mode post-login
+  - [ ] Show connection status when sharing is active
+- [ ] Add user presence indicators for shared sessions
+
 ### Deliverables
 - ✅ Complete boot sequence
 - ✅ User login/registration
