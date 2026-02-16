@@ -273,6 +273,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P2` Implement user presence list when sharing is active
 - [ ] `P3` Add permissions for shared session (view-only vs interactive)
 
+### 5.5 Alert Dialogs
 - [x] `P0` Create AlertDialog.vue component
 - [x] `P0` Implement modal overlay
 - [x] `P0` Add icon display (stop, caution, note)
@@ -283,7 +284,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P2` Implement dialog stacking
 - [ ] `P2` Add dialog animations
 
-### 5.5 Clock Component
+### 5.6 Clock Component
 - [x] `P0` Create Clock.vue component
 - [x] `P0` Display current time in menu bar
 - [x] `P0` Update time every minute
@@ -293,7 +294,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P2` Show day of week option
 - [ ] `P2` Add alarm functionality
 
-### 5.6 Sound System
+### 5.7 Sound System
 - [x] `P1` Create useSound.ts composable
 - [x] `P1` Implement sound effect playback
 - [x] `P1` Add system beep sound

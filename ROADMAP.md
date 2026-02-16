@@ -251,8 +251,9 @@ Implement user accounts, authentication, boot sequence, and data persistence.
 ### Deliverables
 - ✅ Complete boot sequence
 - ✅ User login/registration
-- ✅ Guest mode support
+- ✅ Guest mode support with unique usernames
 - ✅ Persistent user data
+- ✅ "Share the Computer" collaborative mode
 
 ---
 
