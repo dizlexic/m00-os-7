@@ -29,6 +29,7 @@ import NetworkSettings from '~/components/apps/NetworkSettings.vue'
 import MouseSettings from '~/components/apps/MouseSettings.vue'
 import UsersSettings from '~/components/apps/UsersSettings.vue'
 import MonitorsSettings from '~/components/apps/MonitorsSettings.vue'
+import LabelsSettings from '~/components/apps/LabelsSettings.vue'
 import AboutMac from '~/components/apps/AboutMac.vue'
 import ArticleViewer from '~/components/apps/ArticleViewer.vue'
 import ImageViewer from '~/components/apps/ImageViewer.vue'
@@ -470,6 +471,10 @@ onUnmounted(() => {
 
       <MonitorsSettings
         v-else-if="win.type === 'monitors-settings'"
+      />
+
+      <LabelsSettings
+        v-else-if="win.type === 'labels-settings'"
       />
 
       <AboutMac
