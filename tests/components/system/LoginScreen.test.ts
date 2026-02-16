@@ -14,13 +14,20 @@ vi.mock('~/composables/useFileSystem', () => ({
 }))
 
 // Mock the useSettings composable
+const mockSystemSettings = ref({
+  allowGuestLogin: true
+})
+
 vi.mock('~/composables/useSettings', () => ({
   useSettings: () => ({
-    fetchSettingsFromServer: vi.fn().mockResolvedValue(undefined)
+    fetchSettingsFromServer: vi.fn().mockResolvedValue(undefined),
+    fetchSystemSettings: vi.fn().mockResolvedValue(undefined),
+    systemSettings: mockSystemSettings
   })
 }))
 
 import { useUser } from '~/composables/useUser'
+import { useSettings } from '~/composables/useSettings'
 
 // Store mock functions for assertions
 const mockLogin = vi.fn().mockResolvedValue(true)
@@ -64,7 +71,7 @@ describe('LoginScreen.vue', () => {
     })
     const wrapper = mount(LoginScreen)
     await flushPromises()
-    
+
     expect(wrapper.find('.user-list').exists()).toBe(true)
     expect(wrapper.text()).toContain('Alice')
     expect(wrapper.text()).toContain('Bob')
@@ -77,9 +84,9 @@ describe('LoginScreen.vue', () => {
     })
     const wrapper = mount(LoginScreen)
     await flushPromises()
-    
+
     await wrapper.find('.user-item').trigger('click')
-    
+
     expect(wrapper.text()).toContain('Password for Alice:')
     expect(wrapper.find('input#password').exists()).toBe(true)
   })
@@ -94,6 +101,7 @@ describe('LoginScreen.vue', () => {
 
   it('shows guest message when guest mode is selected', async () => {
     const wrapper = mount(LoginScreen)
+    await flushPromises()
 
     // Click Guest mode button
     const guestButton = wrapper.findAll('.mode-btn').find(btn => btn.text() === 'Guest')
@@ -103,6 +111,19 @@ describe('LoginScreen.vue', () => {
     // Username and password inputs should be hidden in guest mode
     expect(wrapper.find('input#username').exists()).toBe(false)
     expect(wrapper.find('input#password').exists()).toBe(false)
+  })
+
+  it('hides guest button when allowGuestLogin is false', async () => {
+    mockSystemSettings.value.allowGuestLogin = false
+
+    const wrapper = mount(LoginScreen)
+    await flushPromises()
+
+    const guestButton = wrapper.findAll('.mode-btn').find(btn => btn.text() === 'Guest')
+    expect(guestButton).toBeUndefined()
+
+    // Reset for other tests
+    mockSystemSettings.value.allowGuestLogin = true
   })
 
   it('calls login with username and password on button click', async () => {

@@ -6,7 +6,7 @@ import { useSettings } from '~/composables/useSettings'
 
 const { login, loginAsGuest, register, setAuthenticatedUser, fetchUsers, users } = useUser()
 const { fetchFilesFromServer } = useFileSystem()
-const { fetchSettingsFromServer } = useSettings()
+const { fetchSettingsFromServer, fetchSystemSettings, systemSettings } = useSettings()
 
 // Login mode: 'login' for existing user, 'guest' for guest, 'new' for registration
 const loginMode = ref<'login' | 'guest' | 'new'>('login')
@@ -20,7 +20,10 @@ const generatedGuestUser = ref<any>(null)
 const selectedUser = ref<any>(null)
 
 onMounted(async () => {
-  await fetchUsers()
+  await Promise.all([
+    fetchUsers(),
+    fetchSystemSettings()
+  ])
 })
 
 async function handleLogin() {
@@ -159,6 +162,7 @@ function clearForm() {
               Login
             </button>
             <button
+              v-if="systemSettings.allowGuestLogin"
               class="mac-button mode-btn"
               :class="{ 'mode-btn--selected': loginMode === 'guest' }"
               @click="selectMode('guest')"
