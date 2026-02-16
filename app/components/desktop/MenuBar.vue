@@ -954,6 +954,9 @@ onUnmounted(() => {
     <div
       class="menu-bar__item menu-bar__item--apple"
       :class="{ 'menu-bar__item--active': activeMenuId === 'apple' }"
+      role="menuitem"
+      aria-haspopup="true"
+      aria-label="Apple menu"
       @click="handleMenuClick('apple')"
       @mouseenter="handleMenuHover('apple')"
     >
@@ -971,6 +974,9 @@ onUnmounted(() => {
     <div
       class="menu-bar__item menu-bar__app-name"
       :class="{ 'menu-bar__item--active': activeMenuId === 'app' }"
+      role="menuitem"
+      aria-haspopup="true"
+      :aria-label="`Application menu: ${appName}`"
       @click="handleMenuClick('app')"
       @mouseenter="handleMenuHover('app')"
     >
@@ -990,6 +996,9 @@ onUnmounted(() => {
       :key="menu.id"
       class="menu-bar__item"
       :class="{ 'menu-bar__item--active': activeMenuId === menu.id }"
+      role="menuitem"
+      aria-haspopup="true"
+      :aria-label="`${menu.label} menu`"
       @click="handleMenuClick(menu.id)"
       @mouseenter="handleMenuHover(menu.id)"
     >
