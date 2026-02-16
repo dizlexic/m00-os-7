@@ -51,6 +51,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
   {
     id: 'chooser',
     label: 'Chooser',
+    icon: '/assets/icons/apps/chooser.png',
     action: () => openWindow({
       type: 'chooser',
       title: 'Chooser',
@@ -64,10 +65,12 @@ const appleMenuItems = computed<MenuItem[]>(() => [
   {
     id: 'applications',
     label: 'Applications',
+    icon: '/assets/icons/system/application.png',
     submenu: [
       {
         id: 'calculator',
         label: 'Calculator',
+        icon: '/assets/icons/apps/calculator.png',
         action: () => openWindow({
           type: 'calculator',
           title: 'Calculator',
@@ -80,6 +83,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'notepad',
         label: 'Note Pad',
+        icon: '/assets/icons/apps/notepad.png',
         action: () => openWindow({
           type: 'notepad',
           title: 'Note Pad',
@@ -92,6 +96,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'scrapbook',
         label: 'Scrapbook',
+        icon: '/assets/icons/apps/scrapbook.png',
         action: () => openWindow({
           type: 'scrapbook',
           title: 'Scrapbook',
@@ -104,6 +109,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'puzzle',
         label: 'Puzzle',
+        icon: '/assets/icons/apps/puzzle.png',
         action: () => openWindow({
           type: 'puzzle',
           title: 'Puzzle',
@@ -116,6 +122,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'brickle',
         label: 'Brickle',
+        icon: '/assets/icons/apps/brickle.png',
         action: () => openWindow({
           type: 'brickle',
           title: 'Brickle',
@@ -128,6 +135,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'minesweeper',
         label: 'Minesweeper',
+        icon: '/assets/icons/apps/minesweeper.png',
         action: () => openWindow({
           type: 'minesweeper',
           title: 'Minesweeper',
@@ -140,6 +148,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'solitaire',
         label: 'Solitaire',
+        icon: '/assets/icons/apps/solitaire.png',
         action: () => openWindow({
           type: 'solitaire',
           title: 'Solitaire',
@@ -152,6 +161,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'tetris',
         label: 'Tetris',
+        icon: '/assets/icons/apps/tetris.png',
         action: () => openWindow({
           type: 'tetris',
           title: 'Tetris',
@@ -164,6 +174,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'messenger',
         label: 'Messenger',
+        icon: '/assets/icons/apps/chat.png',
         action: () => openWindow({
           type: 'messenger',
           title: 'Messenger',
@@ -177,6 +188,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'paint',
         label: 'Paint',
+        icon: '/assets/icons/apps/paint.png',
         action: () => openWindow({
           type: 'paint',
           title: 'Paint',
@@ -187,6 +199,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       {
         id: 'eliza',
         label: 'Eliza',
+        icon: '/assets/icons/apps/eliza.png',
         action: () => openWindow({
           type: 'eliza',
           title: 'Eliza',
@@ -199,19 +212,20 @@ const appleMenuItems = computed<MenuItem[]>(() => [
   {
     id: 'control-panels',
     label: 'Control Panels',
+    icon: '/assets/icons/system/preferences.png',
     action: () => handleControlPanels(),
     submenu: [
-      { id: 'cp-network', label: 'Network', action: () => handleControlPanel('Network', 'network-settings') },
-      { id: 'cp-apple-menu', label: 'Apple Menu Options', action: () => handleControlPanel('Apple Menu Options', 'apple-menu-settings') },
-      { id: 'cp-color', label: 'Color', action: () => handleControlPanel('Color', 'color-settings') },
-      { id: 'cp-date-time', label: 'Date & Time', action: () => handleControlPanel('Date & Time', 'date-time-settings') },
-      { id: 'cp-desktop-patterns', label: 'Desktop Patterns', action: () => handleControlPanel('Desktop Patterns', 'desktop-patterns-settings') },
-      { id: 'cp-extensions', label: 'Extensions Manager', action: () => handleControlPanel('Extensions Manager', 'extensions-settings') },
-      { id: 'cp-memory', label: 'Memory', action: () => handleControlPanel('Memory', 'memory-settings') },
-      { id: 'cp-monitors', label: 'Monitors', action: () => handleControlPanel('Monitors', 'monitors-settings') },
-      { id: 'cp-mouse', label: 'Mouse', action: () => handleControlPanel('Mouse', 'mouse-settings') },
-      { id: 'cp-sound', label: 'Sound', action: () => handleControlPanel('Sound', 'sound-settings') },
-      { id: 'cp-startup-disk', label: 'Startup Disk', action: () => handleControlPanel('Startup Disk', 'startup-disk-settings') }
+      { id: 'cp-network', label: 'Network', icon: '/assets/icons/system/cp-network.png', action: () => handleControlPanel('Network', 'network-settings', '/assets/icons/system/cp-network.png') },
+      { id: 'cp-apple-menu', label: 'Apple Menu Options', icon: '/assets/icons/system/cp-apple-menu.png', action: () => handleControlPanel('Apple Menu Options', 'apple-menu-settings', '/assets/icons/system/cp-apple-menu.png') },
+      { id: 'cp-color', label: 'Color', icon: '/assets/icons/system/cp-color.png', action: () => handleControlPanel('Color', 'color-settings', '/assets/icons/system/cp-color.png') },
+      { id: 'cp-date-time', label: 'Date & Time', icon: '/assets/icons/system/cp-date-time.png', action: () => handleControlPanel('Date & Time', 'date-time-settings', '/assets/icons/system/cp-date-time.png') },
+      { id: 'cp-desktop-patterns', label: 'Desktop Patterns', icon: '/assets/icons/system/cp-desktop-patterns.png', action: () => handleControlPanel('Desktop Patterns', 'desktop-patterns-settings', '/assets/icons/system/cp-desktop-patterns.png') },
+      { id: 'cp-extensions', label: 'Extensions Manager', icon: '/assets/icons/system/cp-extensions.png', action: () => handleControlPanel('Extensions Manager', 'extensions-settings', '/assets/icons/system/cp-extensions.png') },
+      { id: 'cp-memory', label: 'Memory', icon: '/assets/icons/system/cp-memory.png', action: () => handleControlPanel('Memory', 'memory-settings', '/assets/icons/system/cp-memory.png') },
+      { id: 'cp-monitors', label: 'Monitors', icon: '/assets/icons/system/cp-monitors.png', action: () => handleControlPanel('Monitors', 'monitors-settings', '/assets/icons/system/cp-monitors.png') },
+      { id: 'cp-mouse', label: 'Mouse', icon: '/assets/icons/system/cp-mouse.png', action: () => handleControlPanel('Mouse', 'mouse-settings', '/assets/icons/system/cp-mouse.png') },
+      { id: 'cp-sound', label: 'Sound', icon: '/assets/icons/system/cp-sound.png', action: () => handleControlPanel('Sound', 'sound-settings', '/assets/icons/system/cp-sound.png') },
+      { id: 'cp-startup-disk', label: 'Startup Disk', icon: '/assets/icons/system/cp-startup-disk.png', action: () => handleControlPanel('Startup Disk', 'startup-disk-settings', '/assets/icons/system/cp-startup-disk.png') }
     ]
   },
   { id: 'sep2', label: '', isSeparator: true },
@@ -222,6 +236,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
     submenu: recentApps.value.map(app => ({
       id: `recent-app-${app.id}`,
       label: app.name,
+      icon: app.icon,
       action: () => handleOpenRecentApp(app)
     }))
   },
@@ -232,6 +247,7 @@ const appleMenuItems = computed<MenuItem[]>(() => [
     submenu: recentDocs.value.map(doc => ({
       id: `recent-doc-${doc.id}`,
       label: doc.name,
+      icon: doc.icon,
       action: () => handleOpenRecentDoc(doc)
     }))
   },
