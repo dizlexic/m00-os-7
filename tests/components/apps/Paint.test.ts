@@ -14,6 +14,18 @@ const mockCtx = {
   stroke: vi.fn(),
   fill: vi.fn(),
   putImageData: vi.fn(),
+  getImageData: vi.fn(() => ({
+    data: new Uint8ClampedArray(600 * 400 * 4),
+    width: 600,
+    height: 400
+  })),
+  setLineDash: vi.fn(),
+  save: vi.fn(),
+  restore: vi.fn(),
+  clip: vi.fn(),
+  closePath: vi.fn(),
+  translate: vi.fn(),
+  strokeRect: vi.fn(),
   getContext: vi.fn(() => mockCtx),
   lineCap: 'round',
   lineJoin: 'round',
@@ -115,5 +127,54 @@ describe('Paint.vue', () => {
     expect(mockWindowManager.updateWindow).toHaveBeenCalledWith('win-1', expect.objectContaining({
       menus: expect.any(Array)
     }))
+  })
+
+  it('allows rectangular selection', async () => {
+    const wrapper = mount(Paint, {
+      props: { isActive: true }
+    })
+
+    // Select Marquee tool
+    await wrapper.find('button[title="Marquee"]').trigger('click')
+
+    const canvas = wrapper.find('canvas')
+
+    // Mock getBoundingClientRect
+    // @ts-ignore
+    canvas.element.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0, width: 600, height: 400 }))
+
+    // Start selection
+    await canvas.trigger('mousedown', { clientX: 100, clientY: 100 })
+    // Move to size selection
+    await canvas.trigger('mousemove', { clientX: 200, clientY: 200 })
+    // Finalize
+    await canvas.trigger('mouseup')
+
+    expect(mockCtx.getImageData).toHaveBeenCalled()
+    expect(mockCtx.strokeRect).toHaveBeenCalled()
+  })
+
+  it('performs undo operation', async () => {
+    const wrapper = mount(Paint, {
+      props: { isActive: true }
+    })
+
+    // Perform a drawing action
+    const canvas = wrapper.find('canvas')
+    // Mock getBoundingClientRect
+    // @ts-ignore
+    canvas.element.getBoundingClientRect = vi.fn(() => ({ left: 0, top: 0, width: 600, height: 400 }))
+
+    await canvas.trigger('mousedown', { clientX: 50, clientY: 50 })
+    await canvas.trigger('mouseup')
+
+    // Clear mocks before undo
+    mockCtx.putImageData.mockClear()
+
+    // Call undo directly
+    // @ts-ignore
+    wrapper.vm.undo()
+
+    expect(mockCtx.putImageData).toHaveBeenCalled()
   })
 })
