@@ -299,6 +299,108 @@ def generate_preferences_icon():
     img = add_shadow(img)
     save_icon(img, 'preferences', 'icons/system')
 
+def generate_control_panel_icons():
+    """Generate unique icons for each control panel."""
+    print('Generating control panel icons...')
+
+    # Network
+    img, draw = create_icon()
+    draw.rectangle([4, 6, 14, 14], fill=COLORS['white'], outline=COLORS['black'])
+    draw.rectangle([18, 16, 28, 24], fill=COLORS['white'], outline=COLORS['black'])
+    draw.line([(14, 10), (16, 10), (16, 20), (18, 20)], fill=COLORS['black'])
+    img = add_shadow(img)
+    save_icon(img, 'cp-network', 'icons/system')
+
+    # Apple Menu Options
+    img, draw = create_icon()
+    draw.ellipse([6, 6, 16, 16], fill=COLORS['black'])
+    draw.line([(18, 8), (28, 8)], fill=COLORS['black'])
+    draw.line([(18, 12), (28, 12)], fill=COLORS['black'])
+    draw.line([(18, 16), (28, 16)], fill=COLORS['black'])
+    img = add_shadow(img)
+    save_icon(img, 'cp-apple-menu', 'icons/system')
+
+    # Color
+    img, draw = create_icon()
+    colors_to_use = [
+        COLORS['red'], COLORS['green'], COLORS['blue'],
+        COLORS['yellow'], COLORS['magenta'], COLORS['cyan'],
+        COLORS['black'], COLORS['gray_medium'], COLORS['white']
+    ]
+    for i in range(3):
+        for j in range(3):
+            draw.rectangle([6 + i*7, 6 + j*7, 12 + i*7, 12 + j*7], fill=colors_to_use[i*3+j], outline=COLORS['black'])
+    img = add_shadow(img)
+    save_icon(img, 'cp-color', 'icons/system')
+
+    # Date & Time
+    img, draw = create_icon()
+    draw.ellipse([4, 4, 27, 27], fill=COLORS['white'], outline=COLORS['black'])
+    draw.line([(16, 16), (16, 8)], fill=COLORS['black'], width=2)
+    draw.line([(16, 16), (22, 16)], fill=COLORS['black'], width=1)
+    img = add_shadow(img)
+    save_icon(img, 'cp-date-time', 'icons/system')
+
+    # Desktop Patterns
+    img, draw = create_icon()
+    for x in range(4, 28, 4):
+        for y in range(4, 28, 4):
+            fill = COLORS['black'] if (x+y) % 8 == 0 else COLORS['white']
+            draw.rectangle([x, y, x+3, y+3], fill=fill, outline=COLORS['gray_light'])
+    img = add_shadow(img)
+    save_icon(img, 'cp-desktop-patterns', 'icons/system')
+
+    # Extensions Manager
+    img, draw = create_icon()
+    draw.rectangle([8, 8, 24, 24], fill=COLORS['blue'], outline=COLORS['black'])
+    draw.ellipse([14, 4, 18, 12], fill=COLORS['blue'], outline=COLORS['black'])
+    draw.ellipse([20, 14, 28, 18], fill=COLORS['blue'], outline=COLORS['black'])
+    img = add_shadow(img)
+    save_icon(img, 'cp-extensions', 'icons/system')
+
+    # Memory
+    img, draw = create_icon()
+    draw.rectangle([4, 12, 28, 20], fill=COLORS['green'], outline=COLORS['black'])
+    for i in range(4):
+        draw.rectangle([6 + i*6, 14, 10 + i*6, 18], fill=COLORS['black'])
+    draw.line([(4, 20), (28, 20)], fill=COLORS['yellow'], width=2)
+    img = add_shadow(img)
+    save_icon(img, 'cp-memory', 'icons/system')
+
+    # Monitors
+    img, draw = create_icon()
+    draw.rectangle([4, 4, 28, 22], fill=COLORS['gray_light'], outline=COLORS['black'])
+    draw.rectangle([6, 6, 26, 20], fill=COLORS['white'], outline=COLORS['black'])
+    draw.rectangle([12, 22, 20, 26], fill=COLORS['gray_medium'], outline=COLORS['black'])
+    draw.rectangle([8, 26, 24, 28], fill=COLORS['gray_light'], outline=COLORS['black'])
+    img = add_shadow(img)
+    save_icon(img, 'cp-monitors', 'icons/system')
+
+    # Mouse
+    img, draw = create_icon()
+    draw.rectangle([10, 6, 22, 26], fill=COLORS['white'], outline=COLORS['black'])
+    draw.line([(10, 14), (22, 14)], fill=COLORS['black'])
+    draw.line([(16, 2), (16, 6)], fill=COLORS['black'])
+    img = add_shadow(img)
+    save_icon(img, 'cp-mouse', 'icons/system')
+
+    # Sound
+    img, draw = create_icon()
+    draw.polygon([(10, 10), (16, 10), (22, 4), (22, 28), (16, 22), (10, 22)], fill=COLORS['gray_light'], outline=COLORS['black'])
+    draw.arc([18, 10, 28, 22], 270, 90, fill=COLORS['black'])
+    img = add_shadow(img)
+    save_icon(img, 'cp-sound', 'icons/system')
+
+    # Startup Disk
+    img, draw = create_icon()
+    draw.rectangle([6, 6, 26, 26], fill=COLORS['gray_light'], outline=COLORS['black'])
+    draw.rectangle([8, 8, 24, 12], fill=COLORS['white'], outline=COLORS['black'])
+    draw.polygon([(16, 14), (18, 20), (24, 20), (19, 24), (21, 30), (16, 26), (11, 30), (13, 24), (8, 20), (14, 20)], fill=COLORS['yellow'], outline=COLORS['black'])
+    img = add_shadow(img)
+    save_icon(img, 'cp-startup-disk', 'icons/system')
+
+    print('Control panel icons complete!')
+
 def generate_solitaire_icon():
     """Generate Solitaire game icon."""
     img, draw = create_icon()
@@ -1042,6 +1144,7 @@ def generate_system_icons():
     generate_alert_note_icon()
     generate_sharing_icon()
     generate_preferences_icon()
+    generate_control_panel_icons()
     print('System icons complete!')
 
 def generate_app_icons():
