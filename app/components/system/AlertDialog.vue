@@ -136,6 +136,32 @@ function handleKeydown(event: KeyboardEvent): void {
     } else {
       emit('close', cancelButton.value?.value || 'ok')
     }
+  } else if (event.key === 'Tab') {
+    handleTabKey(event)
+  }
+}
+
+function handleTabKey(event: KeyboardEvent): void {
+  if (!dialogRef.value) return
+
+  const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  const focusableElements = dialogRef.value.querySelectorAll(focusableSelectors)
+
+  if (focusableElements.length === 0) return
+
+  const firstElement = focusableElements[0] as HTMLElement
+  const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
+
+  if (event.shiftKey) {
+    if (document.activeElement === firstElement) {
+      lastElement.focus()
+      event.preventDefault()
+    }
+  } else {
+    if (document.activeElement === lastElement) {
+      firstElement.focus()
+      event.preventDefault()
+    }
   }
 }
 
