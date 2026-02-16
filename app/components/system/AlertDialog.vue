@@ -29,7 +29,7 @@ interface Props {
   /** Type of alert - determines icon (stop, caution, note) */
   type?: AlertType
   /** Array of button configurations */
-  buttons?: AlertButton[]
+  buttons?: readonly AlertButton[]
   /** Whether clicking the overlay dismisses the dialog */
   dismissible?: boolean
   /** Whether to show an input field (prompt variant) */

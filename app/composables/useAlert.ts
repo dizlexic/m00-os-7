@@ -12,7 +12,7 @@ interface AlertState {
   message: string
   title?: string
   type: AlertType
-  buttons: AlertButton[]
+  buttons: readonly AlertButton[]
   showInput?: boolean
   defaultValue?: string
   inputPlaceholder?: string
@@ -34,7 +34,7 @@ export function useAlert() {
     message: string
     title?: string
     type?: AlertType
-    buttons?: AlertButton[]
+    buttons?: readonly AlertButton[]
     showInput?: boolean
     defaultValue?: string
     inputPlaceholder?: string
@@ -64,9 +64,30 @@ export function useAlert() {
     }
   }
 
+  /**
+   * Shows a confirmation dialog
+   */
+  function showConfirm(message: string, title: string = 'Confirm'): Promise<boolean> {
+    return new Promise((resolve) => {
+      showAlert({
+        message,
+        title,
+        type: 'caution',
+        buttons: [
+          { label: 'Cancel', value: 'cancel' },
+          { label: 'OK', value: 'ok', isDefault: true }
+        ],
+        onClose: (value) => {
+          resolve(value === 'ok')
+        }
+      })
+    })
+  }
+
   return {
     alertState: readonly(state),
     showAlert,
-    hideAlert
+    hideAlert,
+    showConfirm
   }
 }
