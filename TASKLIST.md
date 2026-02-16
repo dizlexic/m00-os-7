@@ -518,7 +518,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P3` Implement move counter
 
 ### 9.7 Paint (MacPaint-style Drawing Application)
-- [x] `P1` Create Paint.vue component
+- [~] `P1` Create Paint.vue component
 - [x] `P1` Implement canvas-based drawing area
 - [x] `P1` Add basic drawing tools:
   - [x] Pencil/freehand drawing tool
@@ -534,27 +534,27 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
   - [x] Custom pattern support
 - [x] `P1` Implement line width selector
 - [x] `P1` Add color palette (Mac OS 7 16-color palette)
-- [ ] `P2` Implement selection tools:
-  - [ ] Rectangular selection (marquee)
-  - [ ] Lasso (freeform selection)
-  - [ ] Selection move/copy/paste
-- [ ] `P2` Add text tool with font selection
-- [ ] `P2` Implement spray can/airbrush tool
-- [ ] `P2` Add shape tools:
-  - [ ] Rounded rectangle
+- [x] `P2` Implement selection tools:
+  - [x] Rectangular selection (marquee)
+  - [x] Lasso (freeform selection)
+  - [x] Selection move/copy/paste
+- [x] `P2` Add text tool with font selection
+- [x] `P2` Implement spray can/airbrush tool
+- [x] `P2` Add shape tools:
+  - [x] Rounded rectangle
   - [ ] Polygon tool
   - [ ] Arc tool
-- [ ] `P2` Implement undo/redo functionality
+- [x] `P2` Implement undo/redo functionality
 - [ ] `P2` Add zoom/magnification tool
 - [x] `P2` Implement file operations:
   - [x] New document (with size selection)
   - [x] Open image file
   - [x] Save as PNG/BMP
   - [x] Export options
-- [ ] `P2` Add Edit menu integration:
-  - [ ] Cut, Copy, Paste
-  - [ ] Clear selection
-  - [ ] Select All
+- [x] `P2` Add Edit menu integration:
+  - [x] Cut, Copy, Paste
+  - [x] Clear selection
+  - [x] Select All
   - [ ] Invert selection
 - [ ] `P2` Implement canvas resize/crop
 - [ ] `P3` Add advanced tools:
