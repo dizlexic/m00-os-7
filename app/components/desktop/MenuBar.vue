@@ -46,6 +46,18 @@ const appleMenuItems = computed<MenuItem[]>(() => [
   { id: 'about', label: 'About This Macintosh', action: () => handleAbout() },
   { id: 'sep1', label: '', isSeparator: true },
   {
+    id: 'calculator',
+    label: 'Calculator',
+    action: () => openWindow({
+      type: 'calculator',
+      title: 'Calculator',
+      icon: '/assets/icons/apps/calculator.png',
+      size: { width: 182, height: 281 },
+      resizable: false,
+      maximizable: false
+    })
+  },
+  {
     id: 'notepad',
     label: 'Note Pad',
     action: () => openWindow({
@@ -79,6 +91,26 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       size: { width: 200, height: 240 },
       resizable: false,
       maximizable: false
+    })
+  },
+  {
+    id: 'paint',
+    label: 'Paint',
+    action: () => openWindow({
+      type: 'paint',
+      title: 'Paint',
+      icon: '/assets/icons/apps/paint.png',
+      size: { width: 700, height: 500 }
+    })
+  },
+  {
+    id: 'eliza',
+    label: 'Eliza',
+    action: () => openWindow({
+      type: 'eliza',
+      title: 'Eliza',
+      icon: '/assets/icons/apps/eliza.png',
+      size: { width: 450, height: 380 }
     })
   },
   {
