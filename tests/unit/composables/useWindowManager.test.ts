@@ -637,7 +637,7 @@ describe('useWindowManager', () => {
 
       const window = getWindow(windowId)
       expect(window?.position.x).toBeGreaterThanOrEqual(0)
-      expect(window?.position.y).toBeGreaterThanOrEqual(TITLE_BAR_HEIGHT + 20)
+      expect(window?.position.y).toBeGreaterThanOrEqual(0)
     })
 
     it('should do nothing for non-existent window', () => {

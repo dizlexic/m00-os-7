@@ -223,6 +223,9 @@ export const DEFAULT_MAX_SIZE: Size = {
 /** Window title bar height */
 export const TITLE_BAR_HEIGHT = 20
 
+/** Menu bar height */
+export const MENU_BAR_HEIGHT = 20
+
 /** Cascade offset for new windows */
 export const CASCADE_OFFSET: Position = {
   x: 20,

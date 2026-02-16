@@ -22,7 +22,8 @@ import {
   CASCADE_OFFSET,
   INITIAL_WINDOW_POSITION,
   MAX_WINDOWS,
-  TITLE_BAR_HEIGHT
+  TITLE_BAR_HEIGHT,
+  MENU_BAR_HEIGHT
 } from '~/types/window'
 
 /** Generate unique window ID */
@@ -331,10 +332,10 @@ export function useWindowManager() {
 
       // Maximize
       window.state = 'maximized'
-      window.position = { x: 0, y: TITLE_BAR_HEIGHT + 20 } // Below menu bar
+      window.position = { x: 0, y: 0 } // Right below menu bar (relative to desktop)
       window.size = {
         width: window.maxSize.width === 9999 ? globalThis.innerWidth || 1024 : window.maxSize.width,
-        height: window.maxSize.height === 9999 ? (globalThis.innerHeight || 768) - TITLE_BAR_HEIGHT - 20 : window.maxSize.height
+        height: window.maxSize.height === 9999 ? (globalThis.innerHeight || 768) - MENU_BAR_HEIGHT : window.maxSize.height
       }
     }
 
@@ -390,7 +391,7 @@ export function useWindowManager() {
 
     window.position = {
       x: Math.max(0, Math.min(position.x, maxX)),
-      y: Math.max(TITLE_BAR_HEIGHT + 20, Math.min(position.y, maxY))
+      y: Math.max(0, Math.min(position.y, maxY))
     }
     saveWindowsState()
   }
@@ -429,8 +430,8 @@ export function useWindowManager() {
     if (visibleWindows.length === 0) return
 
     const screenWidth = globalThis.innerWidth || 1024
-    const screenHeight = (globalThis.innerHeight || 768) - TITLE_BAR_HEIGHT - 20
-    const startY = TITLE_BAR_HEIGHT + 20
+    const screenHeight = (globalThis.innerHeight || 768) - MENU_BAR_HEIGHT
+    const startY = 0
 
     const cols = Math.ceil(Math.sqrt(visibleWindows.length))
     const rows = Math.ceil(visibleWindows.length / cols)
