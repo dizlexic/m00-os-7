@@ -79,6 +79,13 @@ vi.mock('~/composables/useUser', () => ({
   })
 }))
 
+vi.mock('~/composables/useSettings', () => ({
+  useSettings: () => ({
+    settings: ref({ menuBlinking: false }),
+    updateSetting: vi.fn()
+  })
+}))
+
 vi.mock('~/composables/useSharedDesktop', () => ({
   useSharedDesktop: () => ({
     settings: ref({ showRemoteCursors: false, showCursorLabels: false }),
