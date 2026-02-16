@@ -61,9 +61,13 @@ const tools = [
   { id: 'select-lasso', icon: '➰', name: 'Lasso' },
   { id: 'pencil', icon: '✎', name: 'Pencil' },
   { id: 'eraser', icon: '□', name: 'Eraser' },
+  { id: 'spray', icon: '⁑', name: 'Spray Can' },
+  { id: 'text', icon: 'A', name: 'Text Tool' },
   { id: 'line', icon: '/', name: 'Line' },
   { id: 'rect', icon: '▭', name: 'Rectangle' },
   { id: 'rect-filled', icon: '■', name: 'Filled Rectangle' },
+  { id: 'round-rect', icon: '▢', name: 'Rounded Rectangle' },
+  { id: 'round-rect-filled', icon: '▰', name: 'Filled Rounded Rect' },
   { id: 'oval', icon: '○', name: 'Oval' },
   { id: 'oval-filled', icon: '●', name: 'Filled Oval' },
   { id: 'bucket', icon: '⧊', name: 'Paint Bucket' }
@@ -194,6 +198,12 @@ function startDrawing(event: MouseEvent) {
   } else if (currentTool.value === 'bucket') {
     floodFill(Math.round(pos.x), Math.round(pos.y), currentColor.value)
     isDrawing.value = false
+  } else if (currentTool.value === 'text') {
+    drawText(pos.x, pos.y)
+    isDrawing.value = false
+  }
+}
+
 function isInsideRect(pos: { x: number, y: number }, rect: { x: number, y: number, width: number, height: number }) {
   return pos.x >= rect.x && pos.x <= rect.x + rect.width &&
          pos.y >= rect.y && pos.y <= rect.y + rect.height
@@ -255,6 +265,8 @@ function draw(event: MouseEvent) {
     ctx.value.strokeStyle = '#FFFFFF'
     ctx.value.lineTo(pos.x, pos.y)
     ctx.value.stroke()
+  } else if (currentTool.value === 'spray') {
+    drawSpray(pos.x, pos.y)
   } else if (currentTool.value === 'select-rect') {
     ctx.value.putImageData(snapshot.value, 0, 0)
     const x = Math.min(pos.x, startPos.value.x)
@@ -302,6 +314,23 @@ function draw(event: MouseEvent) {
         ctx.value.strokeRect(x, y, width, height)
       } else {
         ctx.value.strokeRect(x, y, width, height)
+      }
+    } else if (currentTool.value === 'round-rect' || currentTool.value === 'round-rect-filled') {
+      const x = Math.min(pos.x, startPos.value.x)
+      const y = Math.min(pos.y, startPos.value.y)
+      const width = Math.abs(pos.x - startPos.value.x)
+      const height = Math.abs(pos.y - startPos.value.y)
+      const radius = Math.min(width, height) * 0.2 // Adaptive radius
+
+      drawRoundedRectPath(x, y, width, height, radius)
+      if (currentTool.value === 'round-rect-filled') {
+        const fillStyle = getFillStyle()
+        ctx.value.fillStyle = fillStyle
+        ctx.value.fill()
+        ctx.value.strokeStyle = currentColor.value
+        ctx.value.stroke()
+      } else {
+        ctx.value.stroke()
       }
     } else if (currentTool.value === 'oval' || currentTool.value === 'oval-filled') {
       ctx.value.beginPath()
@@ -418,6 +447,43 @@ function drawSelectionMarquee() {
   ctx.value.setLineDash([])
 }
 
+function drawSpray(x: number, y: number) {
+  if (!ctx.value) return
+  const radius = currentLineWidth.value * 10
+  const density = 20
+  ctx.value.fillStyle = currentColor.value
+
+  for (let i = 0; i < density; i++) {
+    const angle = Math.random() * Math.PI * 2
+    const dist = Math.random() * radius
+    const px = x + Math.cos(angle) * dist
+    const py = y + Math.sin(angle) * dist
+    ctx.value.fillRect(px, py, 1, 1)
+  }
+}
+
+function drawText(x: number, y: number) {
+  const text = prompt('Enter text:')
+  if (text && ctx.value) {
+    ctx.value.font = `${currentLineWidth.value * 12}px Chicago, Geneva, sans-serif`
+    ctx.value.fillStyle = currentColor.value
+    ctx.value.fillText(text, x, y)
+    saveToHistory()
+  }
+}
+
+function drawRoundedRectPath(x: number, y: number, w: number, h: number, r: number) {
+  if (!ctx.value) return
+  ctx.value.beginPath()
+  ctx.value.moveTo(x + r, y)
+  ctx.value.arcTo(x + w, y, x + w, y + h, r)
+  ctx.value.arcTo(x + w, y + h, x, y + h, r)
+  ctx.value.arcTo(x, y + h, x, y, r)
+  ctx.value.arcTo(x, y, x + w, y, r)
+  ctx.value.closePath()
+}
+
+function cutSelection() {
   if (selectionActive.value && selectionSnapshot.value) {
     clipboard.value = selectionSnapshot.value
     selectionActive.value = false
