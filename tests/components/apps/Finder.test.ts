@@ -49,7 +49,9 @@ vi.mock('~/composables/useFileSystem', () => ({
 vi.mock('~/composables/useWindowManager', () => ({
   useWindowManager: () => ({
     openWindow: vi.fn(),
-    updateWindow: vi.fn()
+    updateWindow: vi.fn(),
+    getWindow: vi.fn(() => ({ id: 'win-1', data: {} })),
+    activeWindow: { value: null }
   })
 }))
 
