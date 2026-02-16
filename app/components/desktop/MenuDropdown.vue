@@ -67,6 +67,9 @@ function handleSubItemClick(item: MenuItem): void {
       @click.stop="handleItemClick(item)"
     >
       <template v-if="!item.isSeparator">
+        <div v-if="hasAnyIcon" class="menu-dropdown__icon-container">
+          <img v-if="item.icon" :src="item.icon" class="menu-dropdown__icon" alt="" />
+        </div>
         <span class="menu-dropdown__check">{{ item.checked ? '✓' : '' }}</span>
         <span class="menu-dropdown__label">{{ item.label }}</span>
 
