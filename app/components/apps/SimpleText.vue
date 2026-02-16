@@ -2,6 +2,7 @@
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
+import { useAlert } from '~/composables/useAlert'
 import type { Menu } from '~/types/menu'
 
 interface Props {
@@ -15,6 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const { getNode, updateFileContent } = useFileSystem()
 const { updateWindow } = useWindowManager()
+const { showAlert } = useAlert()
 
 const content = ref('')
 const fileName = ref('Untitled')
@@ -24,6 +26,9 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null)
 // Font settings
 const currentFont = ref('var(--font-system)')
 const currentFontSize = ref('var(--font-size-md)')
+const isBold = ref(false)
+const isItalic = ref(false)
+const isUnderline = ref(false)
 
 // Font and Size options
 const fonts = [
@@ -95,10 +100,25 @@ const menus = computed<Menu[]>(() => [
     }))
   },
   {
+    id: 'style',
+    label: 'Style',
+    items: [
+      { id: 'plain', label: 'Plain Text', shortcut: '⌘T', action: () => { isBold.value = false; isItalic.value = false; isUnderline.value = false; } },
+      { id: 'sep1', label: '', isSeparator: true },
+      { id: 'bold', label: 'Bold', shortcut: '⌘B', action: () => isBold.value = !isBold.value, checked: isBold.value },
+      { id: 'italic', label: 'Italic', shortcut: '⌘I', action: () => isItalic.value = !isItalic.value, checked: isItalic.value },
+      { id: 'underline', label: 'Underline', shortcut: '⌘U', action: () => isUnderline.value = !isUnderline.value, checked: isUnderline.value }
+    ]
+  },
+  {
     id: 'help',
     label: 'Help',
     items: [
-      { id: 'about-simpletext', label: 'About SimpleText...', action: () => console.log('About SimpleText') }
+      { id: 'about-simpletext', label: 'About SimpleText...', action: () => showAlert({
+        title: 'About SimpleText',
+        message: 'SimpleText 1.0\n\nA simple text editor for Mac OS 7.\n© 2026 Apple Macintosh',
+        type: 'note'
+      }) }
     ]
   }
 ])
@@ -312,6 +332,24 @@ function handleKeyDown(event: KeyboardEvent) {
     event.preventDefault()
     toggleFindReplace()
   }
+  if ((event.metaKey || event.ctrlKey) && event.key === 'b') {
+    event.preventDefault()
+    isBold.value = !isBold.value
+  }
+  if ((event.metaKey || event.ctrlKey) && event.key === 'i') {
+    event.preventDefault()
+    isItalic.value = !isItalic.value
+  }
+  if ((event.metaKey || event.ctrlKey) && event.key === 'u') {
+    event.preventDefault()
+    isUnderline.value = !isUnderline.value
+  }
+  if ((event.metaKey || event.ctrlKey) && event.key === 't') {
+    event.preventDefault()
+    isBold.value = false
+    isItalic.value = false
+    isUnderline.value = false
+  }
 }
 
 watch(content, (newVal, oldVal) => {
@@ -340,6 +378,18 @@ function setFontSize(size: string) {
   currentFontSize.value = size
 }
 
+function toggleBold() {
+  isBold.value = !isBold.value
+}
+
+function toggleItalic() {
+  isItalic.value = !isItalic.value
+}
+
+function toggleUnderline() {
+  isUnderline.value = !isUnderline.value
+}
+
 defineExpose({
   selectAll,
   copyText,
@@ -348,7 +398,10 @@ defineExpose({
   saveFile,
   toggleFindReplace,
   setFont,
-  setFontSize
+  setFontSize,
+  toggleBold,
+  toggleItalic,
+  toggleUnderline
 })
 </script>
 
@@ -374,7 +427,13 @@ defineExpose({
       ref="textareaRef"
       v-model="content"
       class="simple-text__editor"
-      :style="{ fontFamily: currentFont, fontSize: currentFontSize }"
+      :style="{
+        fontFamily: currentFont,
+        fontSize: currentFontSize,
+        fontWeight: isBold ? 'bold' : 'normal',
+        fontStyle: isItalic ? 'italic' : 'normal',
+        textDecoration: isUnderline ? 'underline' : 'none'
+      }"
       spellcheck="false"
     ></textarea>
   </div>

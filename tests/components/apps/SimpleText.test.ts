@@ -66,12 +66,12 @@ describe('SimpleText.vue', () => {
         isActive: true
       }
     })
-    
+
     await nextTick()
-    
+
     const textarea = wrapper.find('textarea')
     await textarea.setValue('Updated Content')
-    
+
     // Simulate Cmd+S
     const event = new KeyboardEvent('keydown', {
       key: 's',
@@ -79,7 +79,7 @@ describe('SimpleText.vue', () => {
       bubbles: true
     })
     window.dispatchEvent(event)
-    
+
     expect(mockFileSystem.updateFileContent).toHaveBeenCalledWith('file-1', 'Updated Content')
     wrapper.unmount()
   })
@@ -92,12 +92,12 @@ describe('SimpleText.vue', () => {
         isActive: false
       }
     })
-    
+
     await nextTick()
-    
+
     const textarea = wrapper.find('textarea')
     await textarea.setValue('Updated Content')
-    
+
     // Simulate Cmd+S
     const event = new KeyboardEvent('keydown', {
       key: 's',
@@ -105,7 +105,7 @@ describe('SimpleText.vue', () => {
       bubbles: true
     })
     window.dispatchEvent(event)
-    
+
     expect(mockFileSystem.updateFileContent).not.toHaveBeenCalled()
     wrapper.unmount()
   })
@@ -122,10 +122,10 @@ describe('SimpleText.vue', () => {
       await nextTick()
 
       const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
-      
+
       // Call selectAll method
       wrapper.vm.selectAll()
-      
+
       expect(textarea.selectionStart).toBe(0)
       expect(textarea.selectionEnd).toBe(textarea.value.length)
       wrapper.unmount()
@@ -142,7 +142,7 @@ describe('SimpleText.vue', () => {
       await nextTick()
 
       const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
-      
+
       // Simulate Cmd+A
       const event = new KeyboardEvent('keydown', {
         key: 'a',
@@ -150,9 +150,9 @@ describe('SimpleText.vue', () => {
         bubbles: true
       })
       window.dispatchEvent(event)
-      
+
       await nextTick()
-      
+
       expect(textarea.selectionStart).toBe(0)
       expect(textarea.selectionEnd).toBe(textarea.value.length)
       wrapper.unmount()
@@ -171,7 +171,7 @@ describe('SimpleText.vue', () => {
       const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
       const initialSelectionStart = textarea.selectionStart
       const initialSelectionEnd = textarea.selectionEnd
-      
+
       // Simulate Cmd+A
       const event = new KeyboardEvent('keydown', {
         key: 'a',
@@ -179,9 +179,9 @@ describe('SimpleText.vue', () => {
         bubbles: true
       })
       window.dispatchEvent(event)
-      
+
       await nextTick()
-      
+
       // Selection should not change when inactive
       expect(textarea.selectionStart).toBe(initialSelectionStart)
       expect(textarea.selectionEnd).toBe(initialSelectionEnd)
@@ -218,13 +218,13 @@ describe('SimpleText.vue', () => {
       await nextTick()
 
       const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
-      
+
       // Select "Hello" from "Hello World"
       textarea.setSelectionRange(0, 5)
-      
+
       // Call copy method
       await wrapper.vm.copyText()
-      
+
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith('Hello')
       wrapper.unmount()
     })
@@ -240,13 +240,13 @@ describe('SimpleText.vue', () => {
       await nextTick()
 
       const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
-      
+
       // Select "Hello" from "Hello World"
       textarea.setSelectionRange(0, 5)
-      
+
       // Call cut method
       await wrapper.vm.cutText()
-      
+
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith('Hello')
       expect(textarea.value).toBe(' World')
       wrapper.unmount()
@@ -263,13 +263,13 @@ describe('SimpleText.vue', () => {
       await nextTick()
 
       const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
-      
+
       // Position cursor at the end
       textarea.setSelectionRange(11, 11)
-      
+
       // Call paste method
       await wrapper.vm.pasteText()
-      
+
       expect(navigator.clipboard.readText).toHaveBeenCalled()
       expect(textarea.value).toBe('Hello WorldPasted Text')
       wrapper.unmount()
@@ -286,13 +286,13 @@ describe('SimpleText.vue', () => {
       await nextTick()
 
       const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
-      
+
       // Select "World" from "Hello World"
       textarea.setSelectionRange(6, 11)
-      
+
       // Call paste method
       await wrapper.vm.pasteText()
-      
+
       expect(textarea.value).toBe('Hello Pasted Text')
       wrapper.unmount()
     })
@@ -308,15 +308,103 @@ describe('SimpleText.vue', () => {
       await nextTick()
 
       const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
-      
+
       // No selection initially
       textarea.setSelectionRange(0, 0)
       expect(wrapper.vm.hasSelection()).toBe(false)
-      
+
       // Select some text
       textarea.setSelectionRange(0, 5)
       expect(wrapper.vm.hasSelection()).toBe(true)
-      
+
+      wrapper.unmount()
+    })
+  })
+
+  describe('Text Formatting', () => {
+    it('should toggle bold when toggleBold method is called', async () => {
+      const wrapper = mount(SimpleText, {
+        props: { isActive: true }
+      })
+
+      const textarea = wrapper.find('textarea')
+      expect(textarea.element.style.fontWeight).toBe('normal')
+
+      wrapper.vm.toggleBold()
+      await nextTick()
+      expect(textarea.element.style.fontWeight).toBe('bold')
+
+      wrapper.vm.toggleBold()
+      await nextTick()
+      expect(textarea.element.style.fontWeight).toBe('normal')
+      wrapper.unmount()
+    })
+
+    it('should toggle italic when toggleItalic method is called', async () => {
+      const wrapper = mount(SimpleText, {
+        props: { isActive: true }
+      })
+
+      const textarea = wrapper.find('textarea')
+      expect(textarea.element.style.fontStyle).toBe('normal')
+
+      wrapper.vm.toggleItalic()
+      await nextTick()
+      expect(textarea.element.style.fontStyle).toBe('italic')
+
+      wrapper.vm.toggleItalic()
+      await nextTick()
+      expect(textarea.element.style.fontStyle).toBe('normal')
+      wrapper.unmount()
+    })
+
+    it('should toggle underline when toggleUnderline method is called', async () => {
+      const wrapper = mount(SimpleText, {
+        props: { isActive: true }
+      })
+
+      const textarea = wrapper.find('textarea')
+      expect(textarea.element.style.textDecoration).toBe('none')
+
+      wrapper.vm.toggleUnderline()
+      await nextTick()
+      expect(textarea.element.style.textDecoration).toBe('underline')
+
+      wrapper.vm.toggleUnderline()
+      await nextTick()
+      expect(textarea.element.style.textDecoration).toBe('none')
+      wrapper.unmount()
+    })
+
+    it('should toggle formatting on shortcuts when active', async () => {
+      const wrapper = mount(SimpleText, {
+        props: { isActive: true }
+      })
+
+      const textarea = wrapper.find('textarea')
+
+      // Bold shortcut Cmd+B
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', metaKey: true }))
+      await nextTick()
+      expect(textarea.element.style.fontWeight).toBe('bold')
+
+      // Italic shortcut Cmd+I
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'i', metaKey: true }))
+      await nextTick()
+      expect(textarea.element.style.fontStyle).toBe('italic')
+
+      // Underline shortcut Cmd+U
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'u', metaKey: true }))
+      await nextTick()
+      expect(textarea.element.style.textDecoration).toBe('underline')
+
+      // Plain shortcut Cmd+T
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 't', metaKey: true }))
+      await nextTick()
+      expect(textarea.element.style.fontWeight).toBe('normal')
+      expect(textarea.element.style.fontStyle).toBe('normal')
+      expect(textarea.element.style.textDecoration).toBe('none')
+
       wrapper.unmount()
     })
   })

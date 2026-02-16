@@ -301,7 +301,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Implement sound effect playback
 - [x] `P1` Add system beep sound
 - [x] `P2` Add startup chime
-- [ ] `P2` Add trash empty sound
+- [x] `P2` Add trash empty sound
 - [ ] `P2` Add window open/close sounds
 - [ ] `P3` Implement volume control
 - [ ] `P3` Add sound on/off toggle
@@ -467,7 +467,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Add copy/cut/paste
 - [x] `P1` Implement find/replace
 - [x] `P1` Add font selection
-- [ ] `P2` Implement text formatting (bold, italic)
+- [x] `P2` Implement text formatting (bold, italic)
 - [ ] `P2` Add print preview (mock)
 - [ ] `P2` Implement word wrap toggle
 - [ ] `P3` Add spell check (mock)
@@ -481,7 +481,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Implement decimal point
 - [x] `P1` Add percentage calculation
 - [x] `P1` Implement memory functions (M+, M-, MR, MC)
-- [ ] `P2` Add square root function
+- [x] `P2` Add square root function
 - [x] `P2` Implement keyboard input
 - [ ] `P3` Add scientific mode
 
