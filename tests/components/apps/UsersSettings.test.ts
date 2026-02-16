@@ -15,6 +15,30 @@ vi.mock('~/composables/useAlert', () => ({
   })
 }))
 
+// Mock the useSettings composable
+vi.mock('~/composables/useSettings', () => ({
+  useSettings: () => ({
+    fetchSystemSettings: vi.fn().mockResolvedValue(undefined),
+    updateSystemSetting: vi.fn().mockResolvedValue(undefined),
+    systemSettings: ref({
+      allowGuestLogin: true
+    })
+  })
+}))
+
+// Mock the useSharedDesktop composable
+vi.mock('~/composables/useSharedDesktop', () => ({
+  useSharedDesktop: () => ({
+    settings: ref({ enabled: false }),
+    updateSettings: vi.fn(),
+    isConnected: ref(false),
+    connectionState: ref('disconnected'),
+    currentSession: ref(null),
+    createSession: vi.fn(),
+    leaveSession: vi.fn()
+  })
+}))
+
 import { useUser } from '~/composables/useUser'
 import { useAlert } from '~/composables/useAlert'
 

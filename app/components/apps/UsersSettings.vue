@@ -9,9 +9,11 @@ import { ref, computed, onMounted } from 'vue'
 import { useUser } from '~/composables/useUser'
 import { useSharedDesktop } from '~/composables/useSharedDesktop'
 import { useAlert } from '~/composables/useAlert'
+import { useSettings } from '~/composables/useSettings'
 
 const { users, currentUser, fetchUsers, register, removeUser, updateUserProfile } = useUser()
 const { showConfirm } = useAlert()
+const { fetchSystemSettings, updateSystemSetting, systemSettings } = useSettings()
 const {
   settings: stcSettings,
   updateSettings,
@@ -43,6 +45,11 @@ const stcEnabled = computed({
   set: (val) => updateSettings({ enabled: val })
 })
 
+const allowGuestLogin = computed({
+  get: () => systemSettings.value.allowGuestLogin,
+  set: (val) => updateSystemSetting('allowGuestLogin', val)
+})
+
 const availableAvatars = [
   '/assets/icons/system/preferences.png',
   '/assets/icons/system/finder.png',
@@ -53,9 +60,12 @@ const availableAvatars = [
   '/assets/icons/system/help.png'
 ]
 
-// Fetch users on mount
+// Fetch users and settings on mount
 onMounted(async () => {
-  await fetchUsers()
+  await Promise.all([
+    fetchUsers(),
+    fetchSystemSettings()
+  ])
 })
 
 // Create user
@@ -254,6 +264,19 @@ function handleCreateSession() {
               Create User
             </button>
           </div>
+        </div>
+      </div>
+
+      <div class="users-settings__section">
+        <h3 class="users-settings__title">Guest Access</h3>
+        <div class="users-settings__field users-settings__field--row">
+          <label for="allow-guest" class="cursor-pointer">Allow guests to log in to this computer:</label>
+          <input
+            id="allow-guest"
+            v-model="allowGuestLogin"
+            type="checkbox"
+            class="mac-checkbox"
+          />
         </div>
       </div>
 
