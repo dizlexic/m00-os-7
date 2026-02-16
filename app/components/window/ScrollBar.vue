@@ -231,14 +231,17 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   cursor: default;
+  color: var(--color-black);
 }
 
 .scrollbar__arrow:active {
   background-color: var(--color-black);
+  color: var(--color-white);
 }
 
-.scrollbar__arrow:active img {
-  filter: invert(1);
+.scrollbar__arrow-svg {
+  display: block;
+  shape-rendering: crispEdges;
 }
 
 .scrollbar__arrow--start {
@@ -291,9 +294,4 @@ onUnmounted(() => {
   background-color: var(--color-white);
 }
 
-.scrollbar__arrow img {
-  width: 16px;
-  height: 16px;
-  image-rendering: pixelated;
-}
 </style>
