@@ -51,6 +51,77 @@ const gameState = ref<'idle' | 'playing' | 'won' | 'lost'>('idle')
 const minesLeft = ref(MINES)
 const timer = ref(0)
 let timerInterval: number | null = null
+  name: string
+  time: number
+}
+
+const bestTimes = ref<Record<string, HighScore>>({
+  beginner: { name: 'Anonymous', time: 999 },
+  intermediate: { name: 'Anonymous', time: 999 },
+  expert: { name: 'Anonymous', time: 999 }
+})
+
+function loadHighScores() {
+  const saved = localStorage.getItem('minesweeper-highscores')
+  if (saved) {
+    try {
+      bestTimes.value = { ...bestTimes.value, ...JSON.parse(saved) }
+    } catch (e) {
+      console.error('Failed to load high scores', e)
+    }
+  }
+}
+
+function saveHighScores() {
+  localStorage.setItem('minesweeper-highscores', JSON.stringify(bestTimes.value))
+}
+
+function checkHighScore() {
+  const currentBest = bestTimes.value[currentDifficultyKey.value]
+  if (timer.value < currentBest.time) {
+    showAlert({
+      title: 'New Record!',
+      message: `You have the fastest time for ${currentDifficulty.value.name} level. Please enter your name:`,
+      showInput: true,
+      defaultValue: 'Anonymous',
+      buttons: [{ label: 'OK', value: 'ok', isDefault: true }],
+      onClose: (value, name) => {
+        bestTimes.value[currentDifficultyKey.value] = {
+          name: name || 'Anonymous',
+          time: timer.value
+        }
+        saveHighScores()
+        showBestTimes()
+      }
+    })
+  }
+}
+
+function showBestTimes() {
+  const message = Object.entries(DIFFICULTIES).map(([key, diff]) => {
+    const score = bestTimes.value[key]
+    return `${diff.name}: ${score.time} seconds (${score.name})`
+  }).join('\n')
+
+  showAlert({
+    title: 'Best Times',
+    message,
+    buttons: [
+      { label: 'Reset Scores', value: 'reset' },
+      { label: 'OK', value: 'ok', isDefault: true }
+    ],
+    onClose: (value) => {
+      if (value === 'reset') {
+        bestTimes.value = {
+          beginner: { name: 'Anonymous', time: 999 },
+          intermediate: { name: 'Anonymous', time: 999 },
+          expert: { name: 'Anonymous', time: 999 }
+        }
+        saveHighScores()
+      }
+    }
+  })
+}
 
 function initGrid() {
   const rows = ROWS.value
@@ -221,6 +292,7 @@ function checkWin() {
       }
     }
     minesLeft.value = 0
+    checkHighScore()
   }
 }
 
@@ -274,6 +346,7 @@ function changeDifficulty(key: string) {
 }
 
 initGrid()
+loadHighScores()
 
 onMounted(() => {
   // initGrid already called in setup

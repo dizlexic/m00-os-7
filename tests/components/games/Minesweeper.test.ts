@@ -65,4 +65,17 @@ describe('Minesweeper.vue', () => {
       expect(cellsExpert.length).toBe(480) // 16x30
     })
 
+    it('loads high scores from localStorage', () => {
+      const mockScores = {
+        beginner: { name: 'Test User', time: 10 }
+      }
+      localStorage.setItem('minesweeper-highscores', JSON.stringify(mockScores))
+
+      const wrapper = mount(Minesweeper) as any
+      expect(wrapper.vm.bestTimes.beginner.name).toBe('Test User')
+      expect(wrapper.vm.bestTimes.beginner.time).toBe(10)
+
+      localStorage.removeItem('minesweeper-highscores')
+    })
+  })
 })
