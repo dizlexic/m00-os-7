@@ -256,19 +256,19 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Implement user data export/import
 
 ### 5.4 Multiuser Experience
-- [ ] `P1` Generate unique guest usernames for guest login
-  - [ ] Create guest name generator with friendly/memorable names
-  - [ ] Ensure uniqueness across active sessions
-  - [ ] Display generated name on login confirmation
-- [ ] `P1` Isolate user connections until after login
-  - [ ] Prevent WebSocket connections during boot sequence
-  - [ ] Prevent WebSocket connections during login screen
-  - [ ] Initialize multiuser connections only after successful authentication
-- [ ] `P1` Implement "Share the Computer" mode toggle
-  - [ ] Add toggle in Control Panels (Users & Groups or Sharing)
-  - [ ] Allow users to enable/disable shared desktop mode post-login
-  - [ ] Show connection status indicator when sharing is enabled
-  - [ ] Implement real-time cursor/activity sharing when enabled
+- [x] `P1` Generate unique guest usernames for guest login
+  - [x] Create guest name generator with friendly/memorable names
+  - [x] Ensure uniqueness across active sessions
+  - [x] Display generated name on login confirmation
+- [x] `P1` Isolate user connections until after login
+  - [x] Prevent WebSocket connections during boot sequence
+  - [x] Prevent WebSocket connections during login screen
+  - [x] Initialize multiuser connections only after successful authentication
+- [x] `P1` Implement "Share the Computer" mode toggle
+  - [x] Add toggle in Control Panels (Users & Groups or Sharing)
+  - [x] Allow users to enable/disable shared desktop mode post-login
+  - [x] Show connection status indicator when sharing is enabled
+  - [x] Implement real-time cursor/activity sharing when enabled
 - [ ] `P2` Add visual indicator for shared session status
 - [ ] `P2` Implement user presence list when sharing is active
 - [ ] `P3` Add permissions for shared session (view-only vs interactive)
