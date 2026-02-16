@@ -23,19 +23,23 @@ const { isAuthenticated, init, user } = useUser();
 const { fetchSettingsFromServer, resetSettings, settings } = useSettings();
 const { activeWindow, restoreWindows, closeAllWindows } = useWindowManager();
 
+const url = useRequestURL()
+
 useSeoMeta({
   title: 'm00-os-7 - Mac OS 7 Web Clone',
   ogTitle: 'm00-os-7 - Mac OS 7 Web Clone',
   description: 'A faithful recreation of Apple Macintosh System 7 as a web application',
   ogDescription: 'A faithful recreation of Apple Macintosh System 7 as a web application',
-  ogImage: '/og-image.png',
+  ogImage: `${url.origin}/og-image.png`,
+  ogImageWidth: 2730,
+  ogImageHeight: 1506,
   ogType: 'website',
   ogLocale: 'en_US',
   ogSiteName: 'm00-os-7',
   twitterCard: 'summary_large_image',
   twitterTitle: 'm00-os-7 - Mac OS 7 Web Clone',
   twitterDescription: 'A faithful recreation of Apple Macintosh System 7 as a web application',
-  twitterImage: '/og-image.png',
+  twitterImage: `${url.origin}/og-image.png`,
 })
 
 const isBooting = ref(true);
