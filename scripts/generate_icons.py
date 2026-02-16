@@ -895,6 +895,56 @@ def generate_alert_note_icon():
     img = add_shadow(img)
     save_icon(img, 'alert-note', 'icons/system')
 
+def generate_sharing_icon():
+    """Generate sharing/multiuser icon (two heads)."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Person 1 (back, gray)
+    # Head
+    draw.ellipse([14, 4, 26, 16], fill=COLORS['gray_medium'], outline=COLORS['black'])
+    # Body
+    draw.polygon([(10, 24), (30, 24), (28, 16), (12, 16)], fill=COLORS['gray_medium'], outline=COLORS['black'])
+
+    # Person 2 (front, white)
+    # Head
+    draw.ellipse([6, 8, 18, 20], fill=COLORS['white'], outline=COLORS['black'])
+    # Body
+    draw.polygon([(2, 28), (22, 28), (20, 20), (4, 20)], fill=COLORS['white'], outline=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'sharing', 'icons/system')
+
+def generate_avatar_icons():
+    """Generate a set of simple avatar icons."""
+    print('Generating avatar icons...')
+    # Avatar 1: Classic Mac
+    img, draw = create_icon()
+    # Screen
+    draw.rectangle([6, 6, 26, 22], fill=COLORS['white'], outline=COLORS['black'], width=2)
+    # Smile
+    draw.line([(12, 16), (14, 18), (18, 18), (20, 16)], fill=COLORS['black'], width=1)
+    # Eyes
+    draw.point([(12, 12), (20, 12)], fill=COLORS['black'])
+    # Case base
+    draw.polygon([(4, 22), (28, 22), (30, 28), (2, 28)], fill=COLORS['gray_light'], outline=COLORS['black'])
+    save_icon(img, 'avatar-mac', 'icons/avatars')
+
+    # Avatar 2: Floppy
+    img, draw = create_icon()
+    draw.rectangle([4, 4, 28, 28], fill=COLORS['blue'], outline=COLORS['black'])
+    draw.rectangle([8, 4, 24, 14], fill=COLORS['white'], outline=COLORS['black'])
+    draw.rectangle([10, 18, 22, 28], fill=COLORS['gray_light'], outline=COLORS['black'])
+    save_icon(img, 'avatar-floppy', 'icons/avatars')
+
+    # Avatar 3: Apple
+    img, draw = create_icon()
+    draw.ellipse([8, 10, 24, 26], fill=COLORS['red'], outline=COLORS['black'])
+    draw.polygon([(16, 6), (20, 2), (22, 6)], fill=COLORS['green'], outline=COLORS['black'])
+    save_icon(img, 'avatar-apple', 'icons/avatars')
+
+    print('Avatar icons complete!')
+
 
 # ============================================
 # Main Generation Functions
@@ -916,6 +966,7 @@ def generate_system_icons():
     generate_alert_stop_icon()
     generate_alert_caution_icon()
     generate_alert_note_icon()
+    generate_sharing_icon()
     generate_preferences_icon()
     print('System icons complete!')
 
@@ -1006,6 +1057,16 @@ def generate_small_system_icons():
     draw_trash_base(draw, size=size, is_full=True)
     save_icon(img, 'trash-full-16', 'icons/system')
 
+    # Sharing
+    img, draw = create_icon(size=size)
+    # Person 1 (back)
+    draw.ellipse([6, 2, 12, 8], fill=COLORS['gray_medium'], outline=COLORS['black'])
+    draw.polygon([(4, 12), (14, 12), (12, 8), (6, 8)], fill=COLORS['gray_medium'], outline=COLORS['black'])
+    # Person 2 (front)
+    draw.ellipse([2, 5, 8, 11], fill=COLORS['white'], outline=COLORS['black'])
+    draw.polygon([(0, 15), (10, 15), (8, 11), (2, 11)], fill=COLORS['white'], outline=COLORS['black'])
+    save_icon(img, 'sharing-16', 'icons/system')
+
     print('Small system icons complete!')
 
 def generate_miscellaneous_graphics():
@@ -1026,6 +1087,7 @@ def generate_all_icons():
     generate_system_icons()
     generate_small_system_icons()
     generate_app_icons()
+    generate_avatar_icons()
     generate_ui_icons()
     generate_miscellaneous_graphics()
     print('\nAll icons generated successfully!')
