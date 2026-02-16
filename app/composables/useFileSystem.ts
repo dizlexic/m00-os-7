@@ -274,6 +274,29 @@ export function useFileSystem() {
       .filter(Boolean) as FileNode[]
   }
 
+  const getUniqueName = (name: string, parentId: string): string => {
+    const existingChildren = getChildren(parentId)
+    if (!existingChildren.some(c => c.name === name)) {
+      return name
+    }
+
+    let counter = 1
+    let newName = `${name} copy`
+
+    if (name.endsWith(' alias')) {
+      newName = `${name} 2`
+      while (existingChildren.some(c => c.name === newName)) {
+        newName = `${name} ${++counter}`
+      }
+      return newName
+    }
+
+    while (existingChildren.some(c => c.name === newName)) {
+      newName = `${name} copy ${++counter}`
+    }
+    return newName
+  }
+
   const deleteNode = (id: string): void => {
     const node = state.value.nodes[id]
     if (!node || node.isSystem) return
@@ -395,6 +418,9 @@ export function useFileSystem() {
     const newId = generateId()
     const now = Date.now()
 
+    // Determine unique name if copying to same folder or if name exists
+    const newName = getUniqueName(sourceNode.name, newParentId)
+
     // Create copy without isSystem flag
     const { isSystem, ...rest } = sourceNode
 
@@ -403,6 +429,7 @@ export function useFileSystem() {
       const folderNode: FolderNode = {
         ...(rest as FolderNode),
         id: newId,
+        name: newName,
         parentId: newParentId,
         childrenIds: [],
         createdAt: now,
@@ -420,6 +447,7 @@ export function useFileSystem() {
       newNode = {
         ...rest,
         id: newId,
+        name: newName,
         parentId: newParentId,
         createdAt: now,
         modifiedAt: now,
@@ -443,6 +471,46 @@ export function useFileSystem() {
     // Sync new node
     syncNode(newNode)
 
+    return newId
+  }
+
+  const createAlias = (targetId: string, parentId: string): string | undefined => {
+    const target = state.value.nodes[targetId]
+    if (!target) return undefined
+
+    const name = getUniqueName(`${target.name} alias`, parentId)
+    const newId = generateId()
+    const now = Date.now()
+
+    const aliasNode: FileNode = {
+      id: newId,
+      name,
+      type: 'alias',
+      parentId,
+      createdAt: now,
+      modifiedAt: now,
+      size: 0,
+      icon: target.icon, // Use same icon
+      metadata: {
+        targetId
+      }
+    }
+
+    state.value.nodes[newId] = aliasNode
+
+    // Add to parent
+    const parent = state.value.nodes[parentId] as FolderNode
+    if (parent && parent.type === 'folder') {
+      parent.childrenIds.push(newId)
+      parent.modifiedAt = now
+
+      // Sync parent
+      if (!parent.isSystem) {
+        syncNode(parent)
+      }
+    }
+
+    syncNode(aliasNode)
     return newId
   }
 
