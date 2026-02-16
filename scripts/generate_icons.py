@@ -317,6 +317,200 @@ def generate_solitaire_icon():
     img = add_shadow(img)
     save_icon(img, 'solitaire', 'icons/apps')
 
+def generate_puzzle_icon():
+    """Generate Puzzle (sliding tile) game icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Puzzle frame
+    draw.rectangle([3, 3, w - 4, h - 4], fill=COLORS['gray_light'], outline=COLORS['black'])
+
+    # 3x3 grid of tiles (with one missing)
+    tile_size = 7
+    start_x = 5
+    start_y = 5
+    tile_num = 1
+    for row in range(3):
+        for col in range(3):
+            if row == 2 and col == 2:
+                # Empty space (bottom-right)
+                continue
+            x = start_x + col * (tile_size + 1)
+            y = start_y + row * (tile_size + 1)
+            draw.rectangle([x, y, x + tile_size, y + tile_size], fill=COLORS['white'], outline=COLORS['black'])
+            # Draw number
+            draw.text((x + 2, y + 1), str(tile_num), fill=COLORS['black'])
+            tile_num += 1
+
+    img = add_shadow(img)
+    save_icon(img, 'puzzle', 'icons/apps')
+
+def generate_paint_icon():
+    """Generate Paint (MacPaint-style) application icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Canvas/paper background
+    draw.rectangle([4, 4, w - 5, h - 5], fill=COLORS['white'], outline=COLORS['black'])
+
+    # Paint brush
+    # Brush handle
+    draw.rectangle([6, 20, 10, 28], fill=COLORS['folder_yellow'], outline=COLORS['black'])
+    # Brush bristles
+    draw.rectangle([5, 16, 11, 20], fill=COLORS['gray_dark'], outline=COLORS['black'])
+
+    # Paint stroke (colorful)
+    draw.arc([12, 8, 26, 22], 0, 180, fill=COLORS['blue'], width=3)
+    draw.line([(14, 12), (24, 18)], fill=COLORS['red'], width=2)
+
+    # Color palette dots
+    draw.ellipse([20, 22, 24, 26], fill=COLORS['red'], outline=COLORS['black'])
+    draw.ellipse([24, 20, 28, 24], fill=COLORS['blue'], outline=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'paint', 'icons/apps')
+
+def generate_eliza_icon():
+    """Generate Eliza (computer therapist) application icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Computer/terminal shape
+    draw.rectangle([4, 4, w - 5, h - 8], fill=COLORS['gray_light'], outline=COLORS['black'])
+
+    # Screen
+    draw.rectangle([6, 6, w - 7, h - 12], fill=COLORS['black'], outline=COLORS['black'])
+
+    # Text lines on screen (conversation)
+    draw.line([(8, 9), (16, 9)], fill=COLORS['green'])
+    draw.line([(8, 13), (20, 13)], fill=COLORS['white'])
+    draw.line([(8, 17), (14, 17)], fill=COLORS['green'])
+
+    # Base/stand
+    draw.rectangle([10, h - 7, w - 11, h - 4], fill=COLORS['gray_medium'], outline=COLORS['black'])
+
+    # Speech bubble hint
+    draw.ellipse([w - 12, 2, w - 4, 8], fill=COLORS['white'], outline=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'eliza', 'icons/apps')
+
+def generate_tetris_icon():
+    """Generate Tetris game icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Game field background
+    draw.rectangle([4, 2, w - 5, h - 3], fill=COLORS['black'], outline=COLORS['gray_dark'])
+
+    # Tetris blocks (various tetrominoes)
+    block_size = 5
+
+    # L-piece (orange/yellow)
+    draw.rectangle([6, 4, 6 + block_size, 4 + block_size], fill=COLORS['yellow'], outline=COLORS['black'])
+    draw.rectangle([6, 10, 6 + block_size, 10 + block_size], fill=COLORS['yellow'], outline=COLORS['black'])
+    draw.rectangle([6, 16, 6 + block_size, 16 + block_size], fill=COLORS['yellow'], outline=COLORS['black'])
+    draw.rectangle([12, 16, 12 + block_size, 16 + block_size], fill=COLORS['yellow'], outline=COLORS['black'])
+
+    # T-piece (magenta)
+    draw.rectangle([14, 4, 14 + block_size, 4 + block_size], fill=COLORS['magenta'], outline=COLORS['black'])
+    draw.rectangle([20, 4, 20 + block_size, 4 + block_size], fill=COLORS['magenta'], outline=COLORS['black'])
+    draw.rectangle([14, 10, 14 + block_size, 10 + block_size], fill=COLORS['magenta'], outline=COLORS['black'])
+
+    # Square piece (cyan) at bottom
+    draw.rectangle([18, 22, 18 + block_size, 22 + block_size], fill=COLORS['cyan'], outline=COLORS['black'])
+    draw.rectangle([24, 22, 24 + block_size, 22 + block_size], fill=COLORS['cyan'], outline=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'tetris', 'icons/apps')
+
+def generate_chat_icon():
+    """Generate Chat/IM application icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Speech bubble 1 (left, larger)
+    draw.ellipse([2, 4, 20, 18], fill=COLORS['white'], outline=COLORS['black'])
+    # Bubble tail
+    draw.polygon([(6, 16), (4, 22), (12, 16)], fill=COLORS['white'], outline=COLORS['black'])
+    draw.line([(7, 16), (11, 16)], fill=COLORS['white'])
+
+    # Text lines in bubble
+    draw.line([(6, 9), (16, 9)], fill=COLORS['gray_dark'])
+    draw.line([(6, 13), (14, 13)], fill=COLORS['gray_dark'])
+
+    # Speech bubble 2 (right, smaller, overlapping)
+    draw.ellipse([14, 12, 30, 24], fill=COLORS['cyan'], outline=COLORS['black'])
+    # Bubble tail
+    draw.polygon([(24, 22), (26, 28), (20, 22)], fill=COLORS['cyan'], outline=COLORS['black'])
+    draw.line([(21, 22), (23, 22)], fill=COLORS['cyan'])
+
+    # Text line in bubble 2
+    draw.line([(18, 17), (26, 17)], fill=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'chat', 'icons/apps')
+
+def generate_browser_icon():
+    """Generate Browser application icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Globe shape
+    draw.ellipse([4, 4, w - 5, h - 5], fill=COLORS['blue'], outline=COLORS['black'])
+
+    # Latitude lines
+    draw.arc([4, 10, w - 5, 22], 0, 180, fill=COLORS['white'])
+    draw.arc([4, 4, w - 5, 16], 180, 360, fill=COLORS['white'])
+
+    # Longitude line (vertical)
+    draw.line([(w // 2, 5), (w // 2, h - 6)], fill=COLORS['white'])
+
+    # Equator
+    draw.line([(5, h // 2), (w - 6, h // 2)], fill=COLORS['white'])
+
+    # Curved longitude lines
+    draw.arc([8, 4, 18, h - 5], 90, 270, fill=COLORS['white'])
+    draw.arc([14, 4, 24, h - 5], 270, 90, fill=COLORS['white'])
+
+    img = add_shadow(img)
+    save_icon(img, 'browser', 'icons/apps')
+
+def generate_galaga_icon():
+    """Generate Galaga (space shooter) game icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Space background
+    draw.rectangle([3, 3, w - 4, h - 4], fill=COLORS['black'], outline=COLORS['gray_dark'])
+
+    # Stars
+    draw.point((8, 6), fill=COLORS['white'])
+    draw.point((20, 8), fill=COLORS['white'])
+    draw.point((12, 12), fill=COLORS['white'])
+    draw.point((24, 16), fill=COLORS['white'])
+    draw.point((6, 18), fill=COLORS['white'])
+
+    # Player ship (bottom)
+    draw.polygon([(16, 22), (12, 28), (20, 28)], fill=COLORS['cyan'], outline=COLORS['white'])
+
+    # Enemy aliens (top)
+    # Alien 1
+    draw.rectangle([8, 6, 14, 10], fill=COLORS['red'], outline=COLORS['yellow'])
+    draw.point((9, 8), fill=COLORS['white'])
+    draw.point((12, 8), fill=COLORS['white'])
+
+    # Alien 2
+    draw.rectangle([18, 6, 24, 10], fill=COLORS['green'], outline=COLORS['yellow'])
+    draw.point((19, 8), fill=COLORS['white'])
+    draw.point((22, 8), fill=COLORS['white'])
+
+    # Laser shot
+    draw.line([(16, 14), (16, 20)], fill=COLORS['yellow'], width=1)
+
+    img = add_shadow(img)
+    save_icon(img, 'galaga', 'icons/apps')
+
 
 # ============================================
 # UI Elements
@@ -733,6 +927,13 @@ def generate_app_icons():
     generate_notepad_icon()
     generate_scrapbook_icon()
     generate_solitaire_icon()
+    generate_puzzle_icon()
+    generate_paint_icon()
+    generate_eliza_icon()
+    generate_tetris_icon()
+    generate_chat_icon()
+    generate_browser_icon()
+    generate_galaga_icon()
     print('Application icons complete!')
 
 def generate_progress_bar_elements():
