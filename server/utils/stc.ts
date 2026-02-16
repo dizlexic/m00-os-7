@@ -208,7 +208,7 @@ export function leaveSession(peerId: string): { session: STCSession; user: Remot
 /**
  * Get a session by ID
  */
-export function getSession(sessionId: string): STCSession | undefined {
+export function getSTCSession(sessionId: string): STCSession | undefined {
   return sessions.get(sessionId)
 }
 

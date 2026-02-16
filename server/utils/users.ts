@@ -67,10 +67,8 @@ export function getUserById(id: number, database?: Database): User | null {
 
 /**
  * Get all users (ID, username, avatar, and role).
- * Get all users (ID, username, and avatar).
  */
 export function getAllUsers(database?: Database): Pick<User, 'id' | 'username' | 'avatar' | 'role'>[] {
-export function getAllUsers(database?: Database): Pick<User, 'id' | 'username' | 'avatar'>[] {
   const db = database || getDb();
   const stmt = db.prepare('SELECT id, username, avatar, role FROM users ORDER BY username ASC');
   return stmt.all() as Pick<User, 'id' | 'username' | 'avatar' | 'role'>[];
@@ -79,27 +77,7 @@ export function getAllUsers(database?: Database): Pick<User, 'id' | 'username' |
 /**
  * Update a user.
  */
-export function updateUser(id: number, data: Partial<Pick<User, 'username' | 'avatar' | 'role'>>, database?: Database): boolean {
-  const db = database || getDb();
-
-  const fields = Object.keys(data);
-  if (fields.length === 0) return false;
-
-  const sets = fields.map(f => `${f} = ?`).join(', ');
-  const values = Object.values(data);
-
-  const stmt = db.prepare(`UPDATE users SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`);
-  const result = stmt.run(...values, id);
-
-  return result.changes > 0;
-  const stmt = db.prepare('SELECT id, username, avatar FROM users ORDER BY username ASC');
-  return stmt.all() as Pick<User, 'id' | 'username' | 'avatar'>[];
-}
-
-/**
- * Update a user.
- */
-export function updateUser(id: number, data: { username?: string, password_plain?: string, avatar?: string }, database?: Database): boolean {
+export function updateUser(id: number, data: { username?: string, password_plain?: string, avatar?: string, role?: string }, database?: Database): boolean {
   const db = database || getDb();
   const sets: string[] = [];
   const params: any[] = [];
@@ -117,6 +95,11 @@ export function updateUser(id: number, data: { username?: string, password_plain
   if (data.avatar !== undefined) {
     sets.push('avatar = ?');
     params.push(data.avatar);
+  }
+
+  if (data.role) {
+    sets.push('role = ?');
+    params.push(data.role);
   }
 
   if (sets.length === 0) return false;

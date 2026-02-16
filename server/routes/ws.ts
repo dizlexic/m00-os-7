@@ -13,7 +13,6 @@ import {
   createSession,
   joinSession,
   leaveSession,
-  getSession,
   getAllSessions,
   updateUserPosition,
   updateUserCursor,
