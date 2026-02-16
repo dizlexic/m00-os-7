@@ -5,15 +5,18 @@ import MenuBar from '~/components/desktop/MenuBar.vue'
 
 // Mock composables
 const mockWindowManager = {
+  windowList: ref([]),
   activeWindow: ref(null),
   openWindow: vi.fn(),
   updateWindow: vi.fn(),
-  getWindow: vi.fn()
+  getWindow: vi.fn(),
+  bringToFront: vi.fn()
 }
 
 const mockDesktop = {
   icons: ref([]),
-  cleanUpDesktop: vi.fn()
+  cleanUpDesktop: vi.fn(),
+  updateIcon: vi.fn()
 }
 
 vi.mock('~/composables/useWindowManager', () => ({
@@ -32,7 +35,10 @@ vi.mock('~/composables/useFileSystem', () => ({
     emptyTrash: vi.fn(),
     getNode: vi.fn(),
     moveToTrash: vi.fn(),
-    getTrash: vi.fn()
+    getTrash: vi.fn(),
+    updateNode: vi.fn(),
+    copyNode: vi.fn(),
+    createAlias: vi.fn()
   })
 }))
 

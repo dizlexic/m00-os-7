@@ -17,8 +17,10 @@ describe('MenuBar Context-Specific Menus', () => {
     mockActiveWindow.value = null
     ;(windowManager.useWindowManager as any).mockReturnValue({
       activeWindow: mockActiveWindow,
+      windowList: ref([]),
       openWindow: vi.fn(),
-      updateWindow: vi.fn()
+      updateWindow: vi.fn(),
+      bringToFront: vi.fn()
     })
   })
 
