@@ -383,6 +383,7 @@ export function useSharedDesktop() {
   })
 
   // Watch for authentication changes
+  const { isAuthenticated } = useUser()
   watch(isAuthenticated, (val) => {
     if (val && settings.value.enabled) {
       connect()
