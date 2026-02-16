@@ -134,12 +134,16 @@ function clearForm() {
 
 <template>
   <div class="login-screen flex items-center justify-center">
-    <div class="login-dialog mac-window-shadow">
+    <div
+      class="login-dialog mac-window-shadow"
+      role="dialog"
+      aria-labelledby="login-welcome"
+    >
       <div class="login-header flex flex-col items-center gap-md">
         <div class="mac-os-logo">
           <div class="logo-text">Mac OS 7</div>
         </div>
-        <h1 class="welcome-text">Welcome to Macintosh</h1>
+        <h1 id="login-welcome" class="welcome-text">Welcome to Macintosh</h1>
       </div>
 
       <div class="login-content flex flex-col gap-lg">
@@ -174,13 +178,19 @@ function clearForm() {
 
         <!-- User selection list (shown for login mode if users exist and no user selected) -->
         <div v-if="loginMode === 'login' && !selectedUser && users && users.length > 0" class="user-list-container flex flex-col gap-xs">
-          <label class="login-label">Select User:</label>
-          <div class="user-list mac-inset-panel">
+          <label class="login-label" id="user-list-label">Select User:</label>
+          <div
+            class="user-list mac-inset-panel"
+            role="listbox"
+            aria-labelledby="user-list-label"
+          >
             <div
               v-for="user in users"
               :key="user.id"
               class="user-item"
               tabindex="0"
+              role="option"
+              :aria-selected="selectedUser?.id === user.id"
               @click="selectUser(user)"
               @keydown.enter.prevent="selectUser(user)"
               @keydown.space.prevent="selectUser(user)"
