@@ -14,6 +14,8 @@ export interface Settings {
   timezone: string;
   daylightSaving: boolean;
   appData?: Record<string, any>;
+  fontSize: 'small' | 'standard' | 'large';
+  menuBlinking: boolean;
 }
 
 export interface SystemSettings {
@@ -31,7 +33,9 @@ const defaultSettings: Settings = {
   showDayOfWeek: false,
   dateFormat: 'MM/DD/YYYY',
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  daylightSaving: false
+  daylightSaving: false,
+  fontSize: 'standard',
+  menuBlinking: true
 }
 
 const settings = ref<Settings>({ ...defaultSettings })
