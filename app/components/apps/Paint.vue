@@ -931,7 +931,7 @@ watch(() => props.fileId, () => {
 }
 
 .paint__toolbar {
-  width: 64px;
+  width: 56px;
   display: flex;
   flex-direction: column;
   padding: 4px;
@@ -948,15 +948,15 @@ watch(() => props.fileId, () => {
 }
 
 .paint__tool-btn {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border: 1px solid var(--color-black);
   background-color: var(--color-white);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .paint__tool-btn--active {
@@ -974,7 +974,7 @@ watch(() => props.fileId, () => {
 }
 
 .paint__weight-btn {
-  height: 16px;
+  height: 14px;
   border: 1px solid transparent;
   background: none;
   cursor: pointer;
@@ -995,8 +995,8 @@ watch(() => props.fileId, () => {
 }
 
 .paint__color-btn {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border: 1px solid var(--color-black);
   cursor: pointer;
 }
@@ -1018,8 +1018,8 @@ watch(() => props.fileId, () => {
 }
 
 .paint__pattern-btn {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border: 1px solid var(--color-black);
   cursor: pointer;
   background-repeat: repeat;
