@@ -15,6 +15,7 @@ const { getNode, updateFileContent } = useFileSystem()
 const content = ref('')
 const fileName = ref('Untitled')
 const isDirty = ref(false)
+const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
 function loadFile() {
   if (props.fileId) {
@@ -38,6 +39,75 @@ function saveFile() {
   } else {
     // TODO: Implement "Save As" for new files
     console.warn('Save As not implemented yet')
+  }
+}
+
+
+/**
+ * Check if there is any text selected
+ */
+function hasSelection(): boolean {
+  if (!textareaRef.value) return false
+  return textareaRef.value.selectionStart !== textareaRef.value.selectionEnd
+}
+
+/**
+ * Get the currently selected text
+ */
+function getSelectedText(): string {
+  if (!textareaRef.value) return ''
+  const start = textareaRef.value.selectionStart
+  const end = textareaRef.value.selectionEnd
+  return textareaRef.value.value.substring(start, end)
+}
+
+/**
+ * Copy selected text to clipboard
+ */
+async function copyText(): Promise<void> {
+  const selectedText = getSelectedText()
+  if (selectedText) {
+    await navigator.clipboard.writeText(selectedText)
+  }
+}
+
+/**
+ * Cut selected text to clipboard
+ */
+async function cutText(): Promise<void> {
+  if (!textareaRef.value) return
+  const selectedText = getSelectedText()
+  if (selectedText) {
+    await navigator.clipboard.writeText(selectedText)
+    const start = textareaRef.value.selectionStart
+    const end = textareaRef.value.selectionEnd
+    const before = textareaRef.value.value.substring(0, start)
+    const after = textareaRef.value.value.substring(end)
+    content.value = before + after
+    // Update the textarea value directly for immediate effect
+    textareaRef.value.value = content.value
+    textareaRef.value.setSelectionRange(start, start)
+  }
+}
+
+/**
+ * Paste text from clipboard at cursor position
+ */
+async function pasteText(): Promise<void> {
+  if (!textareaRef.value) return
+  try {
+    const clipboardText = await navigator.clipboard.readText()
+    const start = textareaRef.value.selectionStart
+    const end = textareaRef.value.selectionEnd
+    const before = textareaRef.value.value.substring(0, start)
+    const after = textareaRef.value.value.substring(end)
+    content.value = before + clipboardText + after
+    // Update the textarea value directly for immediate effect
+    textareaRef.value.value = content.value
+    const newCursorPos = start + clipboardText.length
+    textareaRef.value.setSelectionRange(newCursorPos, newCursorPos)
+  } catch (error) {
+    console.warn('Failed to read from clipboard:', error)
   }
 }
 
@@ -65,11 +135,22 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
 })
+
+// Expose methods for external use (e.g., menu bar integration)
+defineExpose({
+  selectAll,
+  hasSelection,
+  copyText,
+  cutText,
+  pasteText,
+  saveFile
+})
 </script>
 
 <template>
   <div class="simple-text">
     <textarea
+      ref="textareaRef"
       v-model="content"
       class="simple-text__editor"
       spellcheck="false"

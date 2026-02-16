@@ -109,4 +109,136 @@ describe('SimpleText.vue', () => {
     expect(mockFileSystem.updateFileContent).not.toHaveBeenCalled()
     wrapper.unmount()
   })
+
+  describe('Clipboard Operations', () => {
+    const mockWriteText = vi.fn().mockResolvedValue(undefined)
+    const mockReadText = vi.fn().mockResolvedValue('Pasted Text')
+
+    beforeEach(() => {
+      // Mock clipboard API using defineProperty
+      mockWriteText.mockClear()
+      mockReadText.mockClear()
+      Object.defineProperty(navigator, 'clipboard', {
+        value: {
+          writeText: mockWriteText,
+          readText: mockReadText
+        },
+        writable: true,
+        configurable: true
+      })
+    })
+
+    it('should expose copy method that copies selected text', async () => {
+      const wrapper = mount(SimpleText, {
+        props: {
+          fileId: 'file-1',
+          isActive: true
+        }
+      })
+
+      await nextTick()
+
+      const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+      
+      // Select "Hello" from "Hello World"
+      textarea.setSelectionRange(0, 5)
+      
+      // Call copy method
+      await wrapper.vm.copyText()
+      
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('Hello')
+      wrapper.unmount()
+    })
+
+    it('should expose cut method that cuts selected text', async () => {
+      const wrapper = mount(SimpleText, {
+        props: {
+          fileId: 'file-1',
+          isActive: true
+        }
+      })
+
+      await nextTick()
+
+      const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+      
+      // Select "Hello" from "Hello World"
+      textarea.setSelectionRange(0, 5)
+      
+      // Call cut method
+      await wrapper.vm.cutText()
+      
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('Hello')
+      expect(textarea.value).toBe(' World')
+      wrapper.unmount()
+    })
+
+    it('should expose paste method that pastes text at cursor', async () => {
+      const wrapper = mount(SimpleText, {
+        props: {
+          fileId: 'file-1',
+          isActive: true
+        }
+      })
+
+      await nextTick()
+
+      const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+      
+      // Position cursor at the end
+      textarea.setSelectionRange(11, 11)
+      
+      // Call paste method
+      await wrapper.vm.pasteText()
+      
+      expect(navigator.clipboard.readText).toHaveBeenCalled()
+      expect(textarea.value).toBe('Hello WorldPasted Text')
+      wrapper.unmount()
+    })
+
+    it('should replace selected text when pasting', async () => {
+      const wrapper = mount(SimpleText, {
+        props: {
+          fileId: 'file-1',
+          isActive: true
+        }
+      })
+
+      await nextTick()
+
+      const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+      
+      // Select "World" from "Hello World"
+      textarea.setSelectionRange(6, 11)
+      
+      // Call paste method
+      await wrapper.vm.pasteText()
+      
+      expect(textarea.value).toBe('Hello Pasted Text')
+      wrapper.unmount()
+    })
+
+    it('should handle hasSelection method correctly', async () => {
+      const wrapper = mount(SimpleText, {
+        props: {
+          fileId: 'file-1',
+          isActive: true
+        }
+      })
+
+      await nextTick()
+
+      const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+      
+      // No selection initially
+      textarea.setSelectionRange(0, 0)
+      expect(wrapper.vm.hasSelection()).toBe(false)
+      
+      // Select some text
+      textarea.setSelectionRange(0, 5)
+      expect(wrapper.vm.hasSelection()).toBe(true)
+      
+      wrapper.unmount()
+    })
+  })
 })
