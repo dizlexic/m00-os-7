@@ -7,17 +7,32 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { useUser } from '~/composables/useUser'
+import { useSharedDesktop } from '~/composables/useSharedDesktop'
 
 const { users, currentUser, fetchUsers, register, removeUser } = useUser()
+const {
+  settings: stcSettings,
+  updateSettings,
+  isConnected,
+  connectionState,
+  currentSession,
+  createSession,
+  leaveSession
+} = useSharedDesktop()
 
 // Form state
 const newUsername = ref('')
 const newPassword = ref('')
 const error = ref('')
 const isLoading = ref(false)
+const sessionName = ref('')
 
 // Computed
 const userCount = computed(() => users.value.length)
+const stcEnabled = computed({
+  get: () => stcSettings.value.enabled,
+  set: (val) => updateSettings({ enabled: val })
+})
 
 // Fetch users on mount
 onMounted(async () => {
@@ -76,8 +91,13 @@ async function handleDeleteUser(userId: number): Promise<void> {
 }
 
 // Check if user can be deleted (not current user)
-function canDeleteUser(userId: number): boolean {
+function canDeleteUser(userId: number | string): boolean {
   return currentUser.value?.id !== userId
+}
+
+function handleCreateSession() {
+  createSession(sessionName.value || undefined)
+  sessionName.value = ''
 }
 </script>
 
@@ -163,6 +183,54 @@ function canDeleteUser(userId: number): boolean {
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Share the Computer Section -->
+    <div class="users-settings__section">
+      <h3 class="users-settings__title">Share the Computer</h3>
+
+      <div class="users-settings__stc-status mb-md">
+        Status: <span :class="`status--${connectionState}`">{{ connectionState }}</span>
+      </div>
+
+      <div class="users-settings__field users-settings__field--row">
+        <label for="stc-enabled" class="cursor-pointer">Enable Sharing:</label>
+        <input
+          id="stc-enabled"
+          v-model="stcEnabled"
+          type="checkbox"
+          class="mac-checkbox"
+        />
+      </div>
+
+      <template v-if="stcEnabled && isConnected">
+        <div v-if="!currentSession" class="users-settings__session-controls mt-md">
+          <div class="users-settings__field">
+            <label for="session-name">Session Name:</label>
+            <input
+              id="session-name"
+              v-model="sessionName"
+              type="text"
+              class="mac-input"
+              placeholder="My Shared Desktop"
+              @keyup.enter="handleCreateSession"
+            />
+          </div>
+          <div class="users-settings__actions">
+            <button class="mac-button" @click="handleCreateSession">
+              Start Session
+            </button>
+          </div>
+        </div>
+        <div v-else class="users-settings__session-info mt-md">
+          <p class="mb-sm">Active Session: <strong>{{ currentSession.name }}</strong></p>
+          <div class="users-settings__actions">
+            <button class="mac-button" @click="leaveSession">
+              Stop Session
+            </button>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -297,10 +365,33 @@ function canDeleteUser(userId: number): boolean {
   gap: var(--spacing-xs);
 }
 
+.users-settings__field--row {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
 .users-settings__field label {
   font-family: var(--font-system);
   font-size: var(--font-size-sm);
 }
+
+.users-settings__stc-status {
+  font-family: var(--font-system);
+  font-size: var(--font-size-sm);
+}
+
+.status--connected { color: #008800; font-weight: bold; }
+.status--connecting { color: #888800; }
+.status--reconnecting { color: #888800; }
+.status--error { color: #CC0000; }
+.status--disconnected { color: var(--color-gray-dark); }
+
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.cursor-pointer { cursor: pointer; }
 
 .users-settings__field input {
   font-family: var(--font-system);
