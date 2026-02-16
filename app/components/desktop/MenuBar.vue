@@ -775,11 +775,11 @@ function handleControlPanels(): void {
   })
 }
 
-function handleControlPanel(title: string, type: string): void {
+function handleControlPanel(title: string, type: string, icon: string = '/assets/icons/system/preferences.png'): void {
   openWindow({
     type: type as WindowType,
     title,
-    icon: '/assets/icons/system/preferences.png',
+    icon,
     size: { width: 400, height: 350 },
     resizable: false,
     maximizable: false
