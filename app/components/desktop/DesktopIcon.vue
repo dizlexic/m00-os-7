@@ -277,6 +277,8 @@ function handleContextMenu(event: MouseEvent): void {
     }"
     :style="iconStyle"
     tabindex="0"
+    role="button"
+    :aria-label="icon.name"
     @mousedown="handleMouseDown"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
