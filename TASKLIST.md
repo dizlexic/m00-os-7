@@ -387,9 +387,9 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Create UsersSettings.vue component
 - [x] `P1` Display list of users
 - [x] `P1` Implement user creation
-- [ ] `P2` Add user editing
-- [x] `P2` Implement user deletion
-- [ ] `P2` Add guest mode toggle
+- [x] `P2` Add user editing ✓
+- [x] `P2` Implement user deletion ✓
+- [x] `P2` Add guest mode toggle ✓
 - [ ] `P3` Implement user groups
 
 ### 7.6 Display Panel

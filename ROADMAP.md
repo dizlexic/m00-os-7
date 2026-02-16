@@ -10,7 +10,7 @@ The development is organized into 6 major phases, progressing from core infrastr
 Phase 1: Foundation        [████████████████████] 100% → v0.1.0
 Phase 2: Core Desktop      [████████████████████] 100% → v0.2.0
 Phase 3: Applications      [████████████░░░░░░░░]  60% → v0.3.0
-Phase 4: User System       [██████████░░░░░░░░░░]  50% → v0.4.0
+Phase 4: User System       [████████████░░░░░░░░]  60% → v0.4.0
 Phase 5: Entertainment     [░░░░░░░░░░░░░░░░░░░░]   0% → v0.5.0
 Phase 6: Polish & Launch   [░░░░░░░░░░░░░░░░░░░░]   0% → v1.0.0
 ```
@@ -214,11 +214,12 @@ Implement user accounts, authentication, boot sequence, and data persistence.
 ### Milestones
 
 #### 4.1 Database Setup
-- [ ] Choose and configure database (SQLite)
-- [ ] Create user schema
-- [ ] Create settings schema
-- [ ] Create filesystem schema
-- [ ] Implement migrations system
+- [x] Choose and configure database (SQLite)
+- [x] Create user schema
+- [x] Create settings schema
+- [x] Create filesystem schema
+- [x] Implement migrations system
+- [x] Create system_settings schema
 
 #### 4.2 Authentication System
 - [ ] Implement secure password hashing
@@ -236,17 +237,17 @@ Implement user accounts, authentication, boot sequence, and data persistence.
 - [ ] Create Sad Mac error screen
 
 #### 4.4 Login System
-- [ ] Create LoginScreen component
-- [ ] Display user selection
-- [ ] Implement password input
-- [ ] Add Guest mode option
-- [ ] Handle authentication flow
+- [x] Create LoginScreen component
+- [x] Display user selection
+- [x] Implement password input
+- [x] Add Guest mode option
+- [x] Handle authentication flow
 
 #### 4.5 User Management
-- [ ] Create user registration flow
-- [ ] Implement user profile editing
-- [ ] Add user avatar selection
-- [ ] Create Users & Groups control panel
+- [x] Create user registration flow
+- [x] Implement user profile editing
+- [x] Add user avatar selection
+- [x] Create Users & Groups control panel
 
 #### 4.6 Data Persistence
 - [ ] Save user settings to database
@@ -255,17 +256,16 @@ Implement user accounts, authentication, boot sequence, and data persistence.
 - [ ] Persist window states
 
 #### 4.7 Multiuser Experience
-- [ ] Generate unique guest usernames for guest login
-  - [ ] Create friendly/memorable name generator
-  - [ ] Ensure uniqueness across active sessions
-- [ ] Isolate user connections until after login
-  - [ ] Prevent multiuser connections during boot/login screens
-  - [ ] Initialize connections only after successful authentication
-- [ ] Implement "Share the Computer" mode toggle
-  - [ ] Add sharing toggle in Control Panels
-  - [ ] Enable/disable shared desktop mode post-login
-  - [ ] Show connection status when sharing is active
-- [ ] Add user presence indicators for shared sessions
+- [x] Generate unique guest usernames for guest login
+- [x] Ensure uniqueness across active sessions
+- [x] Isolate user connections until after login
+- [x] Prevent multiuser connections during boot/login screens
+- [x] Initialize connections only after successful authentication
+- [x] Implement "Share the Computer" mode toggle
+- [x] Add sharing toggle in Control Panels
+- [x] Enable/disable shared desktop mode post-login
+- [x] Show connection status when sharing is active
+- [x] Add user presence indicators for shared sessions
 
 ### Deliverables
 - ✅ Complete boot sequence
