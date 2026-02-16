@@ -258,13 +258,32 @@ const helpMenuItems: MenuItem[] = [
   { id: 'macos-help', label: 'Mac OS Help', action: () => handleHelp() }
 ]
 
-const menus = computed<Menu[]>(() => [
-  { id: 'file', label: 'File', items: fileMenuItems.value },
-  { id: 'edit', label: 'Edit', items: editMenuItems.value },
-  { id: 'view', label: 'View', items: viewMenuItems },
-  { id: 'special', label: 'Special', items: specialMenuItems.value },
-  { id: 'help', label: 'Help', items: helpMenuItems }
-])
+const menus = computed<Menu[]>(() => {
+  // If active window has custom menus, use them
+  if (activeWindow.value && activeWindow.value.menus && activeWindow.value.menus.length > 0) {
+    return activeWindow.value.menus
+  }
+
+  // Determine if we should show Finder menus
+  const isFinder = !activeWindow.value || activeWindow.value.type === 'finder'
+
+  if (isFinder) {
+    return [
+      { id: 'file', label: 'File', items: fileMenuItems.value },
+      { id: 'edit', label: 'Edit', items: editMenuItems.value },
+      { id: 'view', label: 'View', items: viewMenuItems },
+      { id: 'special', label: 'Special', items: specialMenuItems.value },
+      { id: 'help', label: 'Help', items: helpMenuItems }
+    ]
+  }
+
+  // Standard menus for other apps that don't specify custom menus
+  return [
+    { id: 'file', label: 'File', items: fileMenuItems.value },
+    { id: 'edit', label: 'Edit', items: editMenuItems.value },
+    { id: 'help', label: 'Help', items: helpMenuItems }
+  ]
+})
 
 // Menu handlers
 function handleMenuClick(menuId: string): void {

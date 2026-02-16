@@ -99,6 +99,7 @@ export function useWindowManager() {
       collapsible: config.collapsible ?? true,
       data: config.data,
       icon: config.icon,
+      menus: config.menus,
       createdAt: Date.now()
     }
 
