@@ -57,6 +57,12 @@ const controlPanels: ControlPanelItem[] = [
     type: 'mouse-settings'
   },
   {
+    id: 'labels',
+    name: 'Labels',
+    icon: '/assets/icons/system/preferences.png',
+    type: 'labels-settings'
+  },
+  {
     id: 'users',
     name: 'Users & Groups',
     icon: '/assets/icons/system/preferences.png',

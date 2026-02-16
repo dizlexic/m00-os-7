@@ -34,6 +34,7 @@ export type WindowType =
   | 'mouse-settings'
   | 'users-settings'
   | 'network-settings'
+  | 'labels-settings'
   | 'startup-disk-settings'
   | 'get-info'
   | 'about'
@@ -195,6 +196,7 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   'mouse-settings': { width: 400, height: 350 },
   'users-settings': { width: 400, height: 400 },
   'network-settings': { width: 450, height: 400 },
+  'labels-settings': { width: 300, height: 350 },
   'startup-disk-settings': { width: 400, height: 350 },
   'get-info': { width: 300, height: 400 },
   about: { width: 400, height: 250 },
