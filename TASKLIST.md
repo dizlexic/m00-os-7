@@ -393,10 +393,10 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Implement user groups
 
 ### 7.6 Display Panel
-- [ ] `P1` Create DisplaySettings.vue component
-- [ ] `P1` Implement color depth selection (mock)
-- [ ] `P2` Add monitor arrangement (mock)
-- [ ] `P2` Implement screen resolution display
+- [x] `P1` Create DisplaySettings.vue component
+- [x] `P1` Implement color depth selection (mock)
+- [x] `P2` Add monitor arrangement (mock)
+- [x] `P2` Implement screen resolution display
 - [ ] `P3` Add color calibration (mock)
 
 ### 7.7 Settings Persistence
@@ -461,10 +461,10 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Add file open functionality
 - [x] `P0` Implement basic text editing
 - [x] `P0` Add file save functionality
-- [ ] `P1` Implement text selection
-- [ ] `P1` Add copy/cut/paste
-- [ ] `P1` Implement find/replace
-- [ ] `P1` Add font selection
+- [x] `P1` Implement text selection
+- [x] `P1` Add copy/cut/paste
+- [x] `P1` Implement find/replace
+- [x] `P1` Add font selection
 - [ ] `P2` Implement text formatting (bold, italic)
 - [ ] `P2` Add print preview (mock)
 - [ ] `P2` Implement word wrap toggle
@@ -478,9 +478,9 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Add equals and clear buttons
 - [x] `P1` Implement decimal point
 - [x] `P1` Add percentage calculation
-- [ ] `P1` Implement memory functions (M+, M-, MR, MC)
+- [x] `P1` Implement memory functions (M+, M-, MR, MC)
 - [ ] `P2` Add square root function
-- [ ] `P2` Implement keyboard input
+- [x] `P2` Implement keyboard input
 - [ ] `P3` Add scientific mode
 
 ### 9.3 Note Pad
@@ -493,11 +493,11 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Add note search
 
 ### 9.4 Scrapbook
-- [ ] `P2` Create Scrapbook.vue component
-- [ ] `P2` Implement item storage (text, images)
-- [ ] `P2` Add item navigation
-- [ ] `P2` Implement paste from clipboard
-- [ ] `P3` Add item deletion
+- [x] `P2` Create Scrapbook.vue component
+- [x] `P2` Implement item storage (text, images)
+- [x] `P2` Add item navigation
+- [x] `P2` Implement paste from clipboard
+- [x] `P3` Add item deletion
 - [ ] `P3` Implement item reordering
 
 ### 9.5 About This Macintosh
@@ -510,12 +510,89 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P2` Add credits/acknowledgments
 
 ### 9.6 Puzzle (Sliding Tile Game)
-- [ ] `P2` Create Puzzle.vue component
-- [ ] `P2` Implement 4x4 tile grid
-- [ ] `P2` Add tile sliding mechanics
-- [ ] `P2` Implement win detection
-- [ ] `P3` Add shuffle functionality
-- [ ] `P3` Implement move counter
+- [x] `P2` Create Puzzle.vue component
+- [x] `P2` Implement 4x4 tile grid
+- [x] `P2` Add tile sliding mechanics
+- [x] `P2` Implement win detection
+- [x] `P3` Add shuffle functionality
+- [x] `P3` Implement move counter
+
+### 9.7 Paint (MacPaint-style Drawing Application)
+- [x] `P1` Create Paint.vue component
+- [x] `P1` Implement canvas-based drawing area
+- [x] `P1` Add basic drawing tools:
+  - [x] Pencil/freehand drawing tool
+  - [x] Eraser tool
+  - [x] Line tool
+  - [x] Rectangle tool (filled and outline)
+  - [x] Oval/ellipse tool (filled and outline)
+  - [x] Paint bucket (flood fill)
+- [x] `P1` Implement tool palette UI (classic MacPaint style)
+- [ ] `P1` Add pattern/fill selector:
+  - [ ] Solid black/white fills
+  - [ ] Classic Mac dither patterns
+  - [ ] Custom pattern support
+- [x] `P1` Implement line width selector
+- [x] `P1` Add color palette (Mac OS 7 16-color palette)
+- [ ] `P2` Implement selection tools:
+  - [ ] Rectangular selection (marquee)
+  - [ ] Lasso (freeform selection)
+  - [ ] Selection move/copy/paste
+- [ ] `P2` Add text tool with font selection
+- [ ] `P2` Implement spray can/airbrush tool
+- [ ] `P2` Add shape tools:
+  - [ ] Rounded rectangle
+  - [ ] Polygon tool
+  - [ ] Arc tool
+- [ ] `P2` Implement undo/redo functionality
+- [ ] `P2` Add zoom/magnification tool
+- [ ] `P2` Implement file operations:
+  - [ ] New document (with size selection)
+  - [ ] Open image file
+  - [ ] Save as PNG/BMP
+  - [ ] Export options
+- [ ] `P2` Add Edit menu integration:
+  - [ ] Cut, Copy, Paste
+  - [ ] Clear selection
+  - [ ] Select All
+  - [ ] Invert selection
+- [ ] `P2` Implement canvas resize/crop
+- [ ] `P3` Add advanced tools:
+  - [ ] Gradient fill tool
+  - [ ] Eyedropper/color picker
+  - [ ] Stamp/clone tool
+- [ ] `P3` Implement image transformations:
+  - [ ] Flip horizontal/vertical
+  - [ ] Rotate 90°/180°
+  - [ ] Invert colors
+  - [ ] Trace edges
+- [ ] `P3` Add brush customization:
+  - [ ] Custom brush shapes
+  - [ ] Brush size presets
+- [ ] `P3` Implement FatBits mode (pixel-level editing)
+- [ ] `P3` Add keyboard shortcuts for tools
+- [ ] `P3` Implement print preview (mock)
+
+### 9.8 Eliza (Computer Therapist)
+- [ ] `P2` Create Eliza.vue component
+- [ ] `P2` Implement classic terminal-style chat interface
+- [ ] `P2` Add Eliza conversation engine:
+  - [ ] Implement pattern matching for user input
+  - [ ] Create response templates (Rogerian psychotherapist style)
+  - [ ] Add keyword detection and transformation rules
+  - [ ] Implement reflection (e.g., "I" → "you", "my" → "your")
+- [ ] `P2` Style interface to match classic Mac Eliza:
+  - [ ] Monospaced font display
+  - [ ] Scrolling conversation history
+  - [ ] Input field at bottom
+- [ ] `P2` Add conversation starters and greetings
+- [ ] `P2` Implement "How does that make you feel?" type responses
+- [ ] `P2` Add session persistence (save/load conversations)
+- [ ] `P3` Implement typing delay for realistic response timing
+- [ ] `P3` Add conversation export functionality
+- [ ] `P3` Implement multiple therapist personalities/modes
+- [ ] `P3` Add Easter eggs and special responses
+- [ ] `P3` Integrate with menu bar (File, Edit menus)
 
 ---
 

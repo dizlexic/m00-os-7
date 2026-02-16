@@ -175,11 +175,30 @@ Implement the essential applications: Finder, SimpleText, Calculator, and Contro
 - [ ] Create Sound settings panel
 - [ ] Implement settings persistence
 
+#### 3.6 Paint Application (MacPaint-style)
+- [ ] Generate Paint application icon (PIL)
+- [ ] Create Paint.vue component with canvas
+- [ ] Implement tool palette UI (classic MacPaint layout)
+- [ ] Add core drawing tools:
+  - [ ] Pencil/freehand drawing
+  - [ ] Eraser
+  - [ ] Line tool
+  - [ ] Rectangle and oval (filled/outline)
+  - [ ] Paint bucket (flood fill)
+- [ ] Implement pattern/fill selector with classic Mac patterns
+- [ ] Add Mac OS 7 16-color palette
+- [ ] Implement line width selector
+- [ ] Add selection tools (marquee, lasso)
+- [ ] Implement undo/redo functionality
+- [ ] Add file operations (new, open, save)
+- [ ] Integrate with menu bar (File, Edit, Tools menus)
+
 ### Deliverables
 - ✅ Working Finder with file management
 - ✅ Functional text editor
 - ✅ Classic calculator
 - ✅ System preferences
+- ✅ MacPaint-style drawing application
 
 ---
 
@@ -274,7 +293,19 @@ Add games, chat functionality, and additional applications for entertainment.
 - [ ] Add About This Macintosh dialog
 - [ ] Create Puzzle game (sliding tiles)
 
-#### 5.2 Solitaire Game
+#### 5.2 Eliza (Computer Therapist)
+- [ ] Create Eliza.vue component
+- [ ] Implement classic terminal-style chat interface
+- [ ] Build Eliza conversation engine:
+  - [ ] Pattern matching for user input
+  - [ ] Rogerian psychotherapist response templates
+  - [ ] Keyword detection and transformation rules
+  - [ ] Pronoun reflection (I→you, my→your)
+- [ ] Style to match classic Mac Eliza appearance
+- [ ] Add conversation persistence (save/load)
+- [ ] Integrate with menu bar
+
+#### 5.3 Solitaire Game
 - [ ] Generate card deck graphics
 - [ ] Create Solitaire component
 - [ ] Implement card rendering
@@ -283,7 +314,7 @@ Add games, chat functionality, and additional applications for entertainment.
 - [ ] Implement game rules
 - [ ] Add win detection
 
-#### 5.3 Tetris Game
+#### 5.4 Tetris Game
 - [ ] Create Tetris component
 - [ ] Implement game board
 - [ ] Create tetromino shapes
@@ -292,7 +323,7 @@ Add games, chat functionality, and additional applications for entertainment.
 - [ ] Add scoring system
 - [ ] Implement level progression
 
-#### 5.4 Chat System
+#### 5.5 Chat System
 - [ ] Set up WebSocket server
 - [ ] Create chat client plugin
 - [ ] Implement ChatWindow component
@@ -301,7 +332,7 @@ Add games, chat functionality, and additional applications for entertainment.
 - [ ] Add message history
 - [ ] Implement typing indicators
 
-#### 5.5 Content System
+#### 5.6 Content System
 - [ ] Set up @nuxt/content
 - [ ] Create article structure
 - [ ] Add sample articles/readme files
@@ -397,7 +428,23 @@ Final polish, comprehensive testing, accessibility improvements, and production 
 - Math quiz games
 - Typing tutor
 - Geography quiz
-- Simple drawing application
+
+#### Paint Application Enhancements
+- Advanced tools (gradient fill, stamp/clone, eyedropper)
+- Image transformations (flip, rotate, invert colors, trace edges)
+- FatBits mode for pixel-level editing
+- Custom brush shapes and sizes
+- Layer support (basic)
+- Additional file format support (GIF, JPEG)
+
+#### Eliza Enhancements
+- Multiple therapist personalities/modes (Rogerian, Freudian, etc.)
+- Advanced pattern matching with context awareness
+- Conversation analytics and session summaries
+- Easter eggs and special responses
+- Typing delay simulation for realistic feel
+- Conversation export (text file)
+- Integration with NotePad for session notes
 
 ### Phase 8: Social Features (v1.2.0+)
 
