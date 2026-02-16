@@ -312,6 +312,12 @@ export function useWindowManager() {
 }
 ```
 
+#### Application Context Menu
+All applications must include an application-specific dropdown menu in the Menu Bar, titled with the application's name. This is referred to as the **Application Context Menu**.
+- **Location**: Positioned after the Apple menu and before standard menus like File and Edit.
+- **Purpose**: Contains application-specific options and global application commands.
+- **Standard Items**: Should include a "Quit" option at minimum.
+
 ---
 
 ## File Structure Guidelines
@@ -1011,6 +1017,7 @@ Yellow:       #FFFF00
 3. **Click and Drag**: Move or select multiple
 4. **Right Click**: Context menu (optional, not in original)
 5. **Keyboard Shortcuts**: Cmd+key combinations
+6. **Application Context Menu**: Click on the application name in the menu bar to access application-specific options.
 
 ### Sound Design
 - **Startup Chime**: Classic Mac boot sound

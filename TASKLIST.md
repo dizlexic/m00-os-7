@@ -862,6 +862,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 19. Application Context Menus
 
 ### 19.1 Context Menu Implementation
+- [x] `P2` Document Application Context Menu requirements in guidelines
 - [ ] `P2` Implement context menus for each specific application
 - [ ] `P2` Add "Quit" option to all application context menus
 - [x] `P2` Add "Save" and "Save As" options for Paint and SimpleText

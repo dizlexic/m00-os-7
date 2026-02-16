@@ -9,7 +9,7 @@ A nostalgic single-page web application that recreates the classic Apple Macinto
 ### Core Desktop Environment
 - **Window Management** - Movable, resizable, and stackable application windows with classic title bars
 - **Desktop Icons** - Rearrangeable icons with drag-and-drop functionality
-- **Menu Bar** - Classic Apple menu bar with dropdown menus
+- **Menu Bar** - Classic Apple menu bar with dropdown menus and application context menu
 - **Finder** - File and folder explorer for navigating the virtual filesystem
 - **Trash** - Functional trash can for deleting files
 - **Control Panels** - System settings and preferences

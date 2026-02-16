@@ -107,6 +107,7 @@ Build the fundamental desktop experience with window management, menu bar, and d
 - [x] Create dropdown menu system
 - [x] Add Clock component
 - [x] Implement dynamic menus per application
+- [x] Document Application Context Menu architectural standard
 - [x] Add keyboard shortcuts display
 
 #### 2.4 System Dialogs
