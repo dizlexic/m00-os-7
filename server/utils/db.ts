@@ -74,7 +74,21 @@ export function initDb(database?: Database.Database): void {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS system_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
+
+  // Initialize default system settings
+  try {
+    const stmt = connection.prepare('INSERT OR IGNORE INTO system_settings (key, value) VALUES (?, ?)');
+    stmt.run('allow_guest_login', 'true');
+  } catch (e) {
+    // Ignore
+  }
 
   // Migrations: Add size and is_system columns if they don't exist
   try {
