@@ -338,12 +338,11 @@ function saveFile() {
 
 onMounted(() => {
   initCanvas()
+  loadFile()
 })
 
-watch(() => props.isActive, (active) => {
-  if (active) {
-    // Could refocus or re-init if needed
-  }
+watch(() => props.fileId, () => {
+  loadFile()
 })
 
 </script>
