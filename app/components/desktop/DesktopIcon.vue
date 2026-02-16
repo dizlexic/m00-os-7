@@ -9,6 +9,7 @@
 import { ref, computed, nextTick } from 'vue'
 import type { DesktopIcon } from '~/types/desktop'
 import type { WindowType } from '~/types/window'
+import { LABEL_COLORS } from '~/types/filesystem'
 import { useDesktop } from '~/composables/useDesktop'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useTrash } from '~/composables/useTrash'
@@ -53,6 +54,25 @@ const iconStyle = computed(() => ({
   left: `${props.icon.position.x}px`,
   top: `${props.icon.position.y}px`
 }))
+
+const labelBackgroundStyle = computed(() => {
+  if (props.icon.isSelected || !props.icon.label) return {}
+  const color = LABEL_COLORS[props.icon.label]
+  return {
+    backgroundColor: color,
+    color: isDark(color) ? '#FFFFFF' : '#000000'
+  }
+})
+
+function isDark(color: string): boolean {
+  if (!color || color === 'transparent') return false
+  const hex = color.replace('#', '')
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance < 0.5
+}
 
 // Double-click detection
 let clickCount = 0
@@ -273,7 +293,11 @@ function handleContextMenu(event: MouseEvent): void {
     <!-- Icon Label -->
     <div
       class="desktop-icon__label"
-      :class="{ 'desktop-icon__label--selected': icon.isSelected }"
+      :class="{
+        'desktop-icon__label--selected': icon.isSelected,
+        'desktop-icon__label--alias': icon.type === 'alias'
+      }"
+      :style="labelBackgroundStyle"
       @click="handleLabelClick"
     >
       <template v-if="icon.isRenaming">
@@ -353,7 +377,10 @@ function handleContextMenu(event: MouseEvent): void {
 .desktop-icon__label--selected {
   background-color: var(--color-highlight);
   color: var(--color-highlight-text);
-  text-shadow: none;
+}
+
+.desktop-icon__label--alias {
+  font-style: italic;
 }
 
 .desktop-icon__rename-input {

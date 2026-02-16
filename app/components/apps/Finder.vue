@@ -5,6 +5,7 @@ import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
 import { useDesktop } from '~/composables/useDesktop'
 import { useTrash } from '~/composables/useTrash'
+import { LABEL_COLORS, LABEL_NAMES } from '~/types/filesystem'
 import type { FileNode, FolderNode } from '~/types/filesystem'
 
 interface Props {
@@ -22,7 +23,8 @@ const {
   getRoot,
   getPathNodes,
   moveToTrash,
-  createFolder
+  createFolder,
+  updateNode
 } = useFileSystem()
 const { openWindow, updateWindow } = useWindowManager()
 const { addRecentDoc } = useRecentItems()
@@ -58,7 +60,7 @@ watch(selectedItemId, (newId) => {
   }
 })
 
-type ViewMode = 'icon' | 'small-icon' | 'name' | 'size' | 'kind' | 'date'
+type ViewMode = 'icon' | 'small-icon' | 'name' | 'size' | 'kind' | 'date' | 'label'
 const viewMode = ref<ViewMode>('icon')
 
 // Watch for window data changes to sync viewMode
@@ -100,6 +102,8 @@ const items = computed(() => {
         return getKindLabel(a).localeCompare(getKindLabel(b))
       case 'date':
         return (b.modifiedAt || 0) - (a.modifiedAt || 0)
+      case 'label':
+        return (b.label || 0) - (a.label || 0)
       default:
         return 0
     }
@@ -424,6 +428,25 @@ function getKindLabel(item: FileNode): string {
   }
 }
 
+function getItemLabelStyle(item: FileNode) {
+  if (selectedItemId.value === item.id || !item.label) return {}
+  const color = LABEL_COLORS[item.label]
+  return {
+    backgroundColor: color,
+    color: isDark(color) ? '#FFFFFF' : '#000000'
+  }
+}
+
+function isDark(color: string): boolean {
+  if (!color || color === 'transparent') return false
+  const hex = color.replace('#', '')
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance < 0.5
+}
+
 function handleItemContextMenu(event: MouseEvent, item: FileNode) {
   selectItem(item.id)
 
@@ -563,7 +586,11 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
           </div>
           <div
             class="finder__item-label"
-            :class="{ 'finder__item-label--selected': selectedItemId === item.id }"
+            :class="{
+              'finder__item-label--selected': selectedItemId === item.id,
+              'finder__item-label--alias': item.type === 'alias'
+            }"
+            :style="getItemLabelStyle(item)"
             @click.stop="handleLabelClick(item)"
           >
             <template v-if="isRenamingId === item.id">
@@ -599,7 +626,11 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
           </div>
           <div
             class="finder__item-label finder__item-label--small"
-            :class="{ 'finder__item-label--selected': selectedItemId === item.id }"
+            :class="{
+              'finder__item-label--selected': selectedItemId === item.id,
+              'finder__item-label--alias': item.type === 'alias'
+            }"
+            :style="getItemLabelStyle(item)"
             @click.stop="handleLabelClick(item)"
           >
             <template v-if="isRenamingId === item.id">
@@ -644,6 +675,13 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
             Kind
           </div>
           <div
+            class="finder__list-col finder__list-col--label"
+            :class="{ 'finder__list-col--active': viewMode === 'label' }"
+            @click="viewMode = 'label'"
+          >
+            Label
+          </div>
+          <div
             class="finder__list-col finder__list-col--date"
             :class="{ 'finder__list-col--active': viewMode === 'date' }"
             @click="viewMode = 'date'"
@@ -664,7 +702,11 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
             <img :src="getIcon(item)" :alt="item.name" class="finder__item-mini-icon" />
             <span
               class="finder__item-name"
-              :class="{ 'finder__item-name--selected': selectedItemId === item.id }"
+              :class="{
+                'finder__item-name--selected': selectedItemId === item.id,
+                'finder__item-name--alias': item.type === 'alias'
+              }"
+              :style="getItemLabelStyle(item)"
               @click.stop="handleLabelClick(item)"
             >
               <template v-if="isRenamingId === item.id">
@@ -688,6 +730,9 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
           </div>
           <div class="finder__list-col finder__list-col--kind">
             {{ getKindLabel(item) }}
+          </div>
+          <div class="finder__list-col finder__list-col--label">
+            {{ item.label ? LABEL_NAMES[item.label] : '--' }}
           </div>
           <div class="finder__list-col finder__list-col--date">
             {{ new Date(item.modifiedAt).toLocaleDateString() }}
@@ -894,6 +939,7 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
 .finder__list-col--name { flex: 3; }
 .finder__list-col--size { flex: 1; text-align: right; }
 .finder__list-col--kind { flex: 2; }
+.finder__list-col--label { flex: 1.5; }
 .finder__list-col--date { flex: 2; border-right: none; }
 
 .finder__item--icon {
@@ -976,10 +1022,18 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
   color: var(--color-highlight-text);
 }
 
+.finder__item-label--alias {
+  font-style: italic;
+}
+
 .finder__item-name--selected {
   background-color: var(--color-highlight);
   color: var(--color-highlight-text);
   padding: 0 4px;
+}
+
+.finder__item-name--alias {
+  font-style: italic;
 }
 
 .finder__rename-input {

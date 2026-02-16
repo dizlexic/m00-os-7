@@ -50,7 +50,8 @@ export function useFileSystem() {
       modifiedAt: new Date(dbNode.updated_at).getTime(),
       size: dbNode.size || 0,
       content: dbNode.content,
-      isSystem: dbNode.is_system === 1
+      isSystem: dbNode.is_system === 1,
+      label: dbNode.label
     }
     if (node.type === 'folder') {
       node.childrenIds = []
@@ -66,9 +67,10 @@ export function useFileSystem() {
       type: node.type,
       content: node.content || null,
       size: node.size || 0,
-      is_system: node.isSystem ? 1 : 0
+      is_system: node.isSystem ? 1 : 0,
+      label: node.label || 0
     }
-  }
+}
 
   const syncNode = async (node: FileNode) => {
     if (isAuthenticated.value && (!node.isSystem || node.id === NOTEPAD_FILE_ID || node.id === SCRAPBOOK_FILE_ID)) {
@@ -340,7 +342,7 @@ export function useFileSystem() {
   const updateNode = (id: string, updates: Partial<FileNode>): void => {
     const node = state.value.nodes[id]
     if (!node) return
-    
+
     Object.assign(node, updates)
     node.modifiedAt = Date.now()
     syncNode(node)

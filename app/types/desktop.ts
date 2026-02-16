@@ -53,6 +53,8 @@ export interface DesktopIcon {
   path?: string
   /** Application to open with */
   opensWith?: string
+  /** Label index (0-7) */
+  label?: number
 }
 
 /** Desktop background pattern */
