@@ -1,0 +1,45 @@
+import { describe, it, expect, beforeEach } from 'vitest'
+import { mount } from '@vue/test-utils'
+import Minesweeper from '~/components/games/Minesweeper.vue'
+
+describe('Minesweeper.vue', () => {
+  it('renders correctly', () => {
+    const wrapper = mount(Minesweeper)
+    expect(wrapper.find('.minesweeper').exists()).toBe(true)
+    expect(wrapper.find('.minesweeper__header').exists()).toBe(true)
+    expect(wrapper.find('.minesweeper__grid').exists()).toBe(true)
+  })
+
+  it('initializes the grid with default dimensions', () => {
+    const wrapper = mount(Minesweeper)
+    // Default 9x9 grid
+    const cells = wrapper.findAll('.minesweeper__cell')
+    expect(cells.length).toBe(81)
+  })
+
+  it('reveals a cell when clicked', async () => {
+    const wrapper = mount(Minesweeper)
+    const firstCell = wrapper.find('.minesweeper__cell')
+    await firstCell.trigger('mousedown')
+    await firstCell.trigger('mouseup')
+    expect(firstCell.classes()).toContain('minesweeper__cell--revealed')
+  })
+
+  it('flags a cell when right-clicked', async () => {
+    const wrapper = mount(Minesweeper)
+    const firstCell = wrapper.find('.minesweeper__cell')
+    await firstCell.trigger('contextmenu')
+    expect(firstCell.classes()).toContain('minesweeper__cell--flagged')
+  })
+
+  it('resets the game when reset button is clicked', async () => {
+    const wrapper = mount(Minesweeper)
+    // Reveal a cell
+    await wrapper.find('.minesweeper__cell').trigger('mouseup')
+    expect(wrapper.findAll('.minesweeper__cell--revealed').length).toBeGreaterThan(0)
+    
+    // Reset
+    await wrapper.find('.minesweeper__reset-button').trigger('click')
+    expect(wrapper.findAll('.minesweeper__cell--revealed').length).toBe(0)
+  })
+})
