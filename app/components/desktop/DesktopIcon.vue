@@ -276,11 +276,14 @@ function handleContextMenu(event: MouseEvent): void {
       'desktop-icon--drop-target': dropTargetId === icon.id
     }"
     :style="iconStyle"
+    tabindex="0"
     @mousedown="handleMouseDown"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
     @click="handleClick"
     @contextmenu="handleContextMenu"
+    @keydown.enter.prevent="handleDoubleClick"
+    @keydown.space.prevent="toggleSelection(icon.id)"
   >
     <!-- Icon Image -->
     <div class="desktop-icon__image">
@@ -330,6 +333,12 @@ function handleContextMenu(event: MouseEvent): void {
   cursor: default;
   user-select: none;
   z-index: var(--z-desktop-icons);
+  outline: none;
+}
+
+.desktop-icon:focus-visible {
+  outline: 1px dotted var(--color-white);
+  outline-offset: -2px;
 }
 
 .desktop-icon--dragging {

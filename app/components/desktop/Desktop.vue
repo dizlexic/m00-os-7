@@ -301,7 +301,70 @@ function handleKeyDown(event: KeyboardEvent): void {
   if (event.key === 'Escape') {
     deselectAll()
     hideContextMenu()
+    return
   }
+
+  // Handle arrow keys for icon navigation
+  const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
+  if (arrowKeys.includes(event.key)) {
+    handleArrowKey(event)
+  }
+}
+
+function handleArrowKey(event: KeyboardEvent): void {
+  if (icons.value.length === 0) return
+
+  // If nothing selected, select first icon
+  if (!activeWindow.value && selectedIds.value.length === 0) {
+    const firstIcon = icons.value[0]
+    selectIcon(firstIcon.id)
+    focusSelectedIcon()
+    return
+  }
+
+  // Only navigate desktop icons if no window is active or if we are specifically focusing desktop
+  if (activeWindow.value) return
+
+  const currentId = selectedIds.value[selectedIds.value.length - 1]
+  const currentIcon = icons.value.find(i => i.id === currentId)
+  if (!currentIcon) return
+
+  let bestIcon: any = null
+  let minDistance = Infinity
+
+  icons.value.forEach(icon => {
+    if (icon.id === currentId) return
+
+    const dx = icon.position.x - currentIcon.position.x
+    const dy = icon.position.y - currentIcon.position.y
+
+    let isMatch = false
+    // Proximity search in the direction of the arrow
+    if (event.key === 'ArrowUp' && dy < 0 && Math.abs(dx) < 100) isMatch = true
+    if (event.key === 'ArrowDown' && dy > 0 && Math.abs(dx) < 100) isMatch = true
+    if (event.key === 'ArrowLeft' && dx < 0 && Math.abs(dy) < 100) isMatch = true
+    if (event.key === 'ArrowRight' && dx > 0 && Math.abs(dy) < 100) isMatch = true
+
+    if (isMatch) {
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      if (distance < minDistance) {
+        minDistance = distance
+        bestIcon = icon
+      }
+    }
+  })
+
+  if (bestIcon) {
+    selectIcon(bestIcon.id)
+    focusSelectedIcon()
+  }
+}
+
+function focusSelectedIcon() {
+  nextTick(() => {
+    const element = document.querySelector('.desktop-icon--selected') as HTMLElement
+    element?.focus()
+  })
 }
 
 // Lifecycle
