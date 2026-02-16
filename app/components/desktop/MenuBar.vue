@@ -296,7 +296,9 @@ const fileMenuItems = computed<MenuItem[]>(() => [
   { id: 'new-folder', label: 'New Folder', shortcut: '⌘N', action: () => handleNewFolder() },
   { id: 'open', label: 'Open', shortcut: '⌘O' },
   { id: 'sep1', label: '', isSeparator: true },
-  { id: 'close', label: 'Close Window', shortcut: '⌘W' },
+  { id: 'close', label: 'Close Window', shortcut: '⌘W', action: () => {
+    if (activeWindow.value) closeWindow(activeWindow.value.id)
+  } },
   { id: 'sep2', label: '', isSeparator: true },
   { id: 'get-info', label: 'Get Info', shortcut: '⌘I', action: () => handleGetInfo() },
   { id: 'sep3', label: '', isSeparator: true },

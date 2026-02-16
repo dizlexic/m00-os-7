@@ -48,6 +48,8 @@ describe('useSettings', () => {
       expect(settings.value.showDayOfWeek).toBe(false)
       expect(settings.value.dateFormat).toBe('MM/DD/YYYY')
       expect(settings.value.daylightSaving).toBe(false)
+      expect(settings.value.fontSize).toBe('standard')
+      expect(settings.value.menuBlinking).toBe(true)
     })
 
     it('should have a valid timezone', () => {
@@ -165,6 +167,24 @@ describe('useSettings', () => {
       updateSetting('daylightSaving', true)
 
       expect(settings.value.daylightSaving).toBe(true)
+    })
+
+    it('should update fontSize setting', async () => {
+      const { settings, updateSetting } = useSettings()
+      mockFetch.mockResolvedValueOnce({})
+
+      updateSetting('fontSize', 'large')
+
+      expect(settings.value.fontSize).toBe('large')
+    })
+
+    it('should update menuBlinking setting', async () => {
+      const { settings, updateSetting } = useSettings()
+      mockFetch.mockResolvedValueOnce({})
+
+      updateSetting('menuBlinking', false)
+
+      expect(settings.value.menuBlinking).toBe(false)
     })
 
     it('should call saveSettingsToServer when authenticated', async () => {
