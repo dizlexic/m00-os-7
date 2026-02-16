@@ -46,6 +46,7 @@ export function initDb(database?: Database.Database): void {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
+      avatar TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -82,6 +83,11 @@ export function initDb(database?: Database.Database): void {
   }
   try {
     connection.exec('ALTER TABLE filesystem ADD COLUMN is_system INTEGER DEFAULT 0');
+  } catch (e) {
+    // Column might already exist
+  }
+  try {
+    connection.exec('ALTER TABLE users ADD COLUMN avatar TEXT');
   } catch (e) {
     // Column might already exist
   }

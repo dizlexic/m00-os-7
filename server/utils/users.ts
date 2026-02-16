@@ -6,6 +6,7 @@ interface User {
   id: number;
   username: string;
   password_hash: string;
+  avatar?: string;
   created_at: string;
   updated_at: string;
 }
@@ -64,12 +65,46 @@ export function getUserById(id: number, database?: Database): User | null {
 }
 
 /**
- * Get all users (ID and username only).
+ * Get all users (ID, username, and avatar).
  */
-export function getAllUsers(database?: Database): Pick<User, 'id' | 'username'>[] {
+export function getAllUsers(database?: Database): Pick<User, 'id' | 'username' | 'avatar'>[] {
   const db = database || getDb();
-  const stmt = db.prepare('SELECT id, username FROM users ORDER BY username ASC');
-  return stmt.all() as Pick<User, 'id' | 'username'>[];
+  const stmt = db.prepare('SELECT id, username, avatar FROM users ORDER BY username ASC');
+  return stmt.all() as Pick<User, 'id' | 'username' | 'avatar'>[];
+}
+
+/**
+ * Update a user.
+ */
+export function updateUser(id: number, data: { username?: string, password_plain?: string, avatar?: string }, database?: Database): boolean {
+  const db = database || getDb();
+  const sets: string[] = [];
+  const params: any[] = [];
+
+  if (data.username) {
+    sets.push('username = ?');
+    params.push(data.username);
+  }
+
+  if (data.password_plain) {
+    sets.push('password_hash = ?');
+    params.push(hashPassword(data.password_plain));
+  }
+
+  if (data.avatar !== undefined) {
+    sets.push('avatar = ?');
+    params.push(data.avatar);
+  }
+
+  if (sets.length === 0) return false;
+
+  sets.push('updated_at = CURRENT_TIMESTAMP');
+  params.push(id);
+
+  const stmt = db.prepare(`UPDATE users SET ${sets.join(', ')} WHERE id = ?`);
+  const result = stmt.run(...params);
+  
+  return result.changes > 0;
 }
 
 /**
