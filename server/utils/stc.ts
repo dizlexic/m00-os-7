@@ -108,6 +108,18 @@ export function getPeer(peerId: string): ConnectedPeer | undefined {
 }
 
 /**
+ * Get a peer by user ID
+ */
+export function getPeerByUserId(userId: string): ConnectedPeer | undefined {
+  for (const peer of peers.values()) {
+    if (peer.userId === userId) {
+      return peer
+    }
+  }
+  return undefined
+}
+
+/**
  * Get all peers in a session
  */
 export function getSessionPeers(sessionId: string): ConnectedPeer[] {

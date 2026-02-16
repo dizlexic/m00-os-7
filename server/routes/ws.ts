@@ -18,7 +18,8 @@ import {
   updateUserCursor,
   broadcastToSession,
   sendToPeer,
-  getSessionUsersArray
+  getSessionUsersArray,
+  getPeerByUserId
 } from '../utils/stc'
 import type { CursorConfig, Position } from '../utils/stc'
 
@@ -50,6 +51,10 @@ type MessageType =
   | 'session-list'
   | 'session-state'
   | 'session-users'
+  | 'chat-message'
+  | 'chat-private-message'
+  | 'chat-status-update'
+  | 'chat-buddy-update'
   | 'error'
 
 /** Base message structure */
@@ -168,6 +173,90 @@ export default defineWebSocketHandler({
         }, newPeer.userId))
 
         console.log(`[STC] User connected: ${newPeer.username} (${newPeer.userId})`)
+        break
+      }
+
+      case 'chat-message': {
+        if (!connectedPeer) {
+          sendError(peer.id, 'NOT_CONNECTED', 'Must connect first')
+          return
+        }
+
+        const payload = message.payload as { roomId?: string; text: string }
+        if (!payload?.text) {
+          sendError(peer.id, 'INVALID_PAYLOAD', 'Message text is required')
+          return
+        }
+
+        if (payload.roomId) {
+          // Room message
+          broadcastToSession(
+            payload.roomId,
+            createMessage('chat-message', {
+              roomId: payload.roomId,
+              text: payload.text,
+              senderId: connectedPeer.userId,
+              senderName: connectedPeer.username
+            }, connectedPeer.userId)
+          )
+        }
+        break
+      }
+
+      case 'chat-private-message': {
+        if (!connectedPeer) {
+          sendError(peer.id, 'NOT_CONNECTED', 'Must connect first')
+          return
+        }
+
+        const payload = message.payload as { recipientId: string; text: string }
+        if (!payload?.recipientId || !payload?.text) {
+          sendError(peer.id, 'INVALID_PAYLOAD', 'Recipient ID and text are required')
+          return
+        }
+
+        const recipientPeer = getPeerByUserId(payload.recipientId)
+        if (recipientPeer) {
+          sendToPeer(recipientPeer.peerId, createMessage('chat-private-message', {
+            text: payload.text,
+            senderId: connectedPeer.userId,
+            senderName: connectedPeer.username
+          }, connectedPeer.userId))
+          
+          // Also send back to sender for confirmation/sync
+          sendToPeer(peer.id, createMessage('chat-private-message', {
+            recipientId: payload.recipientId,
+            text: payload.text,
+            senderId: connectedPeer.userId,
+            senderName: connectedPeer.username
+          }, connectedPeer.userId))
+        } else {
+          sendError(peer.id, 'USER_NOT_FOUND', 'Recipient not found or offline')
+        }
+        break
+      }
+
+      case 'chat-status-update': {
+        if (!connectedPeer) return
+
+        const payload = message.payload as { status: string; customStatus?: string }
+        // For now just log and maybe broadcast to everyone if they are friends
+        // Simpler: broadcast to all sessions this user is in
+        if (connectedPeer.sessionId) {
+          broadcastToSession(
+            connectedPeer.sessionId,
+            createMessage('chat-status-update', {
+              userId: connectedPeer.userId,
+              status: payload.status,
+              customStatus: payload.customStatus
+            }, connectedPeer.userId)
+          )
+        }
+        break
+      }
+
+      case 'chat-buddy-update': {
+        // Handle friends/block logic - for now just broadcast update
         break
       }
 
