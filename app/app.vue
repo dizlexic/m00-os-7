@@ -19,8 +19,8 @@ import { useWindowManager } from "~/composables/useWindowManager";
 
 const { alertState, hideAlert } = useAlert();
 const { initialize, fetchFilesFromServer } = useFileSystem();
-const { isAuthenticated, init } = useUser();
-const { fetchSettingsFromServer, resetSettings } = useSettings();
+const { isAuthenticated, init, user } = useUser();
+const { fetchSettingsFromServer, resetSettings, settings } = useSettings();
 const { activeWindow, restoreWindows, closeAllWindows } = useWindowManager();
 
 useSeoMeta({
@@ -79,7 +79,7 @@ function onBootComplete() {
 </script>
 
 <template>
-  <div class="app">
+  <div class="app" :class="[`font-size-${settings.fontSize}`]">
     <NuxtRouteAnnouncer />
 
     <BootScreen v-if="isBooting" @complete="onBootComplete" />

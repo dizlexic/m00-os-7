@@ -90,6 +90,25 @@
 }
 
 /* ============================================
+   Font Size Overrides
+   ============================================ */
+
+.font-size-small {
+  --font-size-md: 9px;
+  --font-size-lg: 12px;
+}
+
+.font-size-standard {
+  --font-size-md: 12px;
+  --font-size-lg: 14px;
+}
+
+.font-size-large {
+  --font-size-md: 14px;
+  --font-size-lg: 18px;
+}
+
+/* ============================================
    CSS Reset & Base Styles
    ============================================ */
 
