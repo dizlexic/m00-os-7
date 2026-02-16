@@ -7,6 +7,8 @@
  */
 
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useSettings } from '~/composables/useSettings'
+import { useSound } from '~/composables/useSound'
 
 /** Button configuration for the alert dialog */
 export interface AlertButton {
@@ -140,7 +142,17 @@ function handleKeydown(event: KeyboardEvent): void {
 // Focus management
 const dialogRef = ref<HTMLElement | null>(null)
 
+const { settings } = useSettings()
+const { playSystemSound, playBeep } = useSound()
+
 onMounted(() => {
+  // Play alert sound
+  if (settings.value.alertSound === 'beep') {
+    playBeep()
+  } else {
+    playSystemSound(settings.value.alertSound)
+  }
+
   // Focus the input if it exists, otherwise focus the dialog
   if (props.showInput && inputRef.value) {
     inputRef.value.focus()
