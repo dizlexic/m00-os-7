@@ -17,6 +17,16 @@ const fileName = ref('Untitled')
 const isDirty = ref(false)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
+// Find/Replace state
+const showFindReplace = ref(false)
+const findText = ref('')
+const replaceText = ref('')
+const findIndex = ref(0)
+
+// Font settings
+const currentFont = ref('var(--font-system)')
+const currentFontSize = ref('var(--font-size-md)')
+
 function loadFile() {
   if (props.fileId) {
     const file = getNode(props.fileId)
@@ -120,6 +130,80 @@ async function pasteText(): Promise<void> {
   }
 }
 
+/**
+ * Toggle Find/Replace dialog
+ */
+function toggleFindReplace() {
+  showFindReplace.value = !showFindReplace.value
+}
+
+/**
+ * Find next occurrence of text
+ */
+function findNext() {
+  if (!findText.value) return
+  const text = content.value
+  const index = text.indexOf(findText.value, findIndex.value)
+
+  if (index !== -1) {
+    if (textareaRef.value) {
+      textareaRef.value.focus()
+      textareaRef.value.setSelectionRange(index, index + findText.value.length)
+      findIndex.value = index + findText.value.length
+    }
+  } else {
+    // Wrap around
+    const wrapIndex = text.indexOf(findText.value, 0)
+    if (wrapIndex !== -1) {
+      if (textareaRef.value) {
+        textareaRef.value.focus()
+        textareaRef.value.setSelectionRange(wrapIndex, wrapIndex + findText.value.length)
+        findIndex.value = wrapIndex + findText.value.length
+      }
+    }
+  }
+}
+
+/**
+ * Replace current selection and find next
+ */
+function replace() {
+  if (!textareaRef.value) return
+  const start = textareaRef.value.selectionStart
+  const end = textareaRef.value.selectionEnd
+  const selected = content.value.substring(start, end)
+
+  if (selected === findText.value) {
+    const before = content.value.substring(0, start)
+    const after = content.value.substring(end)
+    content.value = before + replaceText.value + after
+
+    // Set cursor and find next
+    setTimeout(() => {
+      if (textareaRef.value) {
+        textareaRef.value.setSelectionRange(start + replaceText.value.length, start + replaceText.value.length)
+        findIndex.value = start + replaceText.value.length
+        findNext()
+      }
+    }, 0)
+  } else {
+    findNext()
+  }
+}
+
+/**
+ * Replace all occurrences
+ */
+function replaceAll() {
+  if (!findText.value) return
+  const regex = new RegExp(escapeRegExp(findText.value), 'g')
+  content.value = content.value.replace(regex, replaceText.value)
+}
+
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 function handleKeyDown(event: KeyboardEvent) {
   if (!props.isActive) return
   if ((event.metaKey || event.ctrlKey) && event.key === 's') {
@@ -129,6 +213,10 @@ function handleKeyDown(event: KeyboardEvent) {
   if ((event.metaKey || event.ctrlKey) && event.key === 'a') {
     event.preventDefault()
     selectAll()
+  }
+  if ((event.metaKey || event.ctrlKey) && event.key === 'f') {
+    event.preventDefault()
+    toggleFindReplace()
   }
 }
 
@@ -150,22 +238,49 @@ onUnmounted(() => {
 })
 
 // Expose methods for external use (e.g., menu bar integration)
+function setFont(font: string) {
+  currentFont.value = font
+}
+
+function setFontSize(size: string) {
+  currentFontSize.value = size
+}
+
 defineExpose({
   selectAll,
-  hasSelection,
   copyText,
   cutText,
   pasteText,
-  saveFile
+  saveFile,
+  toggleFindReplace,
+  setFont,
+  setFontSize
 })
 </script>
 
 <template>
   <div class="simple-text">
+    <div v-if="showFindReplace" class="simple-text__find-replace">
+      <div class="find-replace__row">
+        <label>Find:</label>
+        <input v-model="findText" type="text" @keydown.enter="findNext" />
+      </div>
+      <div class="find-replace__row">
+        <label>Replace:</label>
+        <input v-model="replaceText" type="text" @keydown.enter="replace" />
+      </div>
+      <div class="find-replace__actions">
+        <button class="simple-text__btn" @click="findNext">Find Next</button>
+        <button class="simple-text__btn" @click="replace">Replace</button>
+        <button class="simple-text__btn" @click="replaceAll">Replace All</button>
+        <button class="simple-text__btn" @click="toggleFindReplace">Close</button>
+      </div>
+    </div>
     <textarea
       ref="textareaRef"
       v-model="content"
       class="simple-text__editor"
+      :style="{ fontFamily: currentFont, fontSize: currentFontSize }"
       spellcheck="false"
     ></textarea>
   </div>
@@ -191,5 +306,56 @@ defineExpose({
   outline: none;
   white-space: pre-wrap;
   background-color: transparent;
+}
+
+.simple-text__find-replace {
+  padding: 8px;
+  background-color: var(--color-gray-light);
+  border-bottom: 1px solid var(--color-black);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.find-replace__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.find-replace__row label {
+  width: 60px;
+  font-size: var(--font-size-sm);
+}
+
+.find-replace__row input {
+  flex: 1;
+  border: 1px solid var(--color-black);
+  padding: 2px 4px;
+  font-family: var(--font-system);
+  font-size: var(--font-size-sm);
+}
+
+.find-replace__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.simple-text__btn {
+  padding: 2px 8px;
+  border: 1px solid var(--color-black);
+  background-color: var(--color-white);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  box-shadow: 1px 1px 0 var(--color-black);
+}
+
+.simple-text__btn:active {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  box-shadow: none;
+  transform: translate(1px, 1px);
 }
 </style>
