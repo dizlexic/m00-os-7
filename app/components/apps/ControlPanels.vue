@@ -55,6 +55,12 @@ const controlPanels: ControlPanelItem[] = [
     name: 'Share Computer',
     icon: '/assets/icons/system/preferences.png',
     type: 'stc-settings'
+  },
+  {
+    id: 'users',
+    name: 'Users & Groups',
+    icon: '/assets/icons/system/preferences.png',
+    type: 'users-settings'
   }
 ]
 
