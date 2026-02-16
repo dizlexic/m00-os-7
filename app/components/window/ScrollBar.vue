@@ -133,12 +133,27 @@ onUnmounted(() => {
     <!-- Arrow Start -->
     <button
       class="scrollbar__arrow scrollbar__arrow--start"
+      :class="orientation === 'vertical' ? 'scrollbar__arrow--up' : 'scrollbar__arrow--left'"
       @click="handleArrowClick(-1)"
     >
-      <img
-        :src="`/assets/icons/ui/scroll-arrow-${orientation === 'vertical' ? 'up' : 'left'}.png`"
-        alt="Scroll Up/Left"
-      />
+      <svg
+        v-if="orientation === 'vertical'"
+        width="8"
+        height="5"
+        viewBox="0 0 8 5"
+        class="scrollbar__arrow-svg"
+      >
+        <path d="M4 0 L8 5 L0 5 Z" fill="currentColor" />
+      </svg>
+      <svg
+        v-else
+        width="5"
+        height="8"
+        viewBox="0 0 5 8"
+        class="scrollbar__arrow-svg"
+      >
+        <path d="M0 4 L5 0 L5 8 Z" fill="currentColor" />
+      </svg>
     </button>
 
     <!-- Track -->
@@ -160,12 +175,27 @@ onUnmounted(() => {
     <!-- Arrow End -->
     <button
       class="scrollbar__arrow scrollbar__arrow--end"
+      :class="orientation === 'vertical' ? 'scrollbar__arrow--down' : 'scrollbar__arrow--right'"
       @click="handleArrowClick(1)"
     >
-      <img
-        :src="`/assets/icons/ui/scroll-arrow-${orientation === 'vertical' ? 'down' : 'right'}.png`"
-        alt="Scroll Down/Right"
-      />
+      <svg
+        v-if="orientation === 'vertical'"
+        width="8"
+        height="5"
+        viewBox="0 0 8 5"
+        class="scrollbar__arrow-svg"
+      >
+        <path d="M0 0 L8 0 L4 5 Z" fill="currentColor" />
+      </svg>
+      <svg
+        v-else
+        width="5"
+        height="8"
+        viewBox="0 0 5 8"
+        class="scrollbar__arrow-svg"
+      >
+        <path d="M0 0 L5 4 L0 8 Z" fill="currentColor" />
+      </svg>
     </button>
   </div>
 </template>
