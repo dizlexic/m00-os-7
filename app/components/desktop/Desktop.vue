@@ -25,7 +25,8 @@ import ControlPanels from '~/components/apps/ControlPanels.vue'
 import GeneralSettings from '~/components/apps/GeneralSettings.vue'
 import SoundSettings from '~/components/apps/SoundSettings.vue'
 import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
-import STCSettings from '~/components/apps/STCSettings.vue'
+import NetworkSettings from '~/components/apps/NetworkSettings.vue'
+import MouseSettings from '~/components/apps/MouseSettings.vue'
 import UsersSettings from '~/components/apps/UsersSettings.vue'
 import MonitorsSettings from '~/components/apps/MonitorsSettings.vue'
 import AboutMac from '~/components/apps/AboutMac.vue'
@@ -64,7 +65,7 @@ const { clipboard, copy, cut, paste } = useClipboard()
 
 // STC (Share the Computer) mode
 const {
-  settings: stcSettings,
+  settings: networkSettings,
   isInSession,
   remoteUsersList,
   sendCursorPosition
@@ -332,8 +333,9 @@ onUnmounted(() => {
         v-else-if="win.type === 'date-time-settings'"
       />
 
-      <STCSettings
-        v-else-if="win.type === 'stc-settings'"
+      <NetworkSettings
+        v-else-if="win.type === 'network-settings'"
+      />
       />
 
       <UsersSettings
@@ -386,13 +388,13 @@ onUnmounted(() => {
       @close="hideContextMenu"
     />
 
-    <!-- Remote Cursors (STC Mode) -->
-    <template v-if="isInSession && stcSettings.showRemoteCursors">
+    <!-- Remote Cursors (Network Mode) -->
+    <template v-if="isInSession && networkSettings.showRemoteCursors">
       <RemoteCursor
         v-for="user in remoteUsersList"
         :key="user.id"
         :user="user"
-        :show-label="stcSettings.showCursorLabels"
+        :show-label="networkSettings.showCursorLabels"
       />
     </template>
   </div>

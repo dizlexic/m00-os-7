@@ -21,10 +21,10 @@ const searchQuery = ref('')
 
 const controlPanels: ControlPanelItem[] = [
   {
-    id: 'share-computer',
-    name: 'Share Computer',
+    id: 'network',
+    name: 'Network',
     icon: '/assets/icons/system/preferences.png',
-    type: 'stc-settings'
+    type: 'network-settings'
   },
   {
     id: 'general',

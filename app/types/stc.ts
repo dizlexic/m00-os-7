@@ -8,7 +8,7 @@
 import type { Position } from './desktop'
 
 /** Cursor style options for remote users */
-export type CursorStyle = 
+export type CursorStyle =
   | 'arrow'
   | 'hand'
   | 'crosshair'
@@ -98,7 +98,7 @@ export interface STCSession {
 }
 
 /** STC connection state */
-export type STCConnectionState = 
+export type STCConnectionState =
   | 'disconnected'
   | 'connecting'
   | 'connected'
@@ -106,7 +106,7 @@ export type STCConnectionState =
   | 'error'
 
 /** STC mode settings stored in user preferences */
-export interface STCSettings {
+export interface NetworkSettings {
   /** Whether STC mode is enabled */
   enabled: boolean
   /** User's cursor configuration */
@@ -118,7 +118,7 @@ export interface STCSettings {
 }
 
 /** Default STC settings */
-export const DEFAULT_STC_SETTINGS: STCSettings = {
+export const DEFAULT_NETWORK_SETTINGS: NetworkSettings = {
   enabled: false,
   cursor: {
     style: 'arrow',
