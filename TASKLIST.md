@@ -649,17 +649,17 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 15. Testing
 
 ### 15.1 Unit Tests
-- [ ] `P1` Test window manager composable
-- [ ] `P1` Test filesystem composable
-- [ ] `P1` Test settings composable
+- [x] `P1` Test window manager composable
+- [x] `P1` Test filesystem composable
+- [x] `P1` Test settings composable
 - [ ] `P2` Test user authentication
 - [x] `P2` Test calculator logic
 - [ ] `P2` Test game logic (Tetris, Solitaire)
 
 ### 15.2 Component Tests
-- [ ] `P1` Test Window component
-- [ ] `P1` Test Desktop component
-- [ ] `P1` Test MenuBar component
+- [x] `P1` Test Window component
+- [x] `P1` Test Desktop component
+- [x] `P1` Test MenuBar component
 - [x] `P2` Test Finder component
 - [x] `P2` Test SimpleText component
 - [ ] `P2` Test application components
