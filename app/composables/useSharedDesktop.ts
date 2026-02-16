@@ -211,7 +211,7 @@ function connect(): void {
 
   // Determine WebSocket URL
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const wsUrl = `${protocol}//${window.location.host}/_ws`
+  const wsUrl = `${protocol}//${window.location.host}/ws`
 
   try {
     ws = new WebSocket(wsUrl)
@@ -383,6 +383,7 @@ export function useSharedDesktop() {
   })
 
   // Watch for authentication changes
+  const { isAuthenticated } = useUser()
   watch(isAuthenticated, (val) => {
     if (val && settings.value.enabled) {
       connect()
