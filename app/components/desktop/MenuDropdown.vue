@@ -89,6 +89,14 @@ function handleSubItemClick(item: MenuItem): void {
           <img v-if="item.icon" :src="item.icon" class="menu-dropdown__icon" alt="" />
         </div>
         <span class="menu-dropdown__check">{{ item.checked ? '✓' : '' }}</span>
+
+        <div
+          v-if="item.color !== undefined"
+          class="menu-dropdown__color"
+          :class="{ 'menu-dropdown__color--none': item.color === 'transparent' }"
+          :style="{ backgroundColor: item.color !== 'transparent' ? item.color : 'transparent' }"
+        ></div>
+
         <span class="menu-dropdown__label">{{ item.label }}</span>
 
         <span v-if="item.shortcut && !(item.submenu && item.submenu.length > 0)" class="menu-dropdown__shortcut">
@@ -181,6 +189,44 @@ function handleSubItemClick(item: MenuItem): void {
   width: 20px;
   display: inline-block;
   font-size: 14px;
+}
+
+.menu-dropdown__color {
+  width: 14px;
+  height: 10px;
+  border: 1px solid var(--color-black);
+  margin-right: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.menu-dropdown__item:hover:not(.menu-dropdown__item--separator):not(.menu-dropdown__item--disabled) .menu-dropdown__color,
+.menu-dropdown__item--active .menu-dropdown__color {
+  border-color: var(--color-white);
+}
+
+.menu-dropdown__color--none {
+  position: relative;
+  background-color: var(--color-white);
+}
+
+.menu-dropdown__item:hover:not(.menu-dropdown__item--separator):not(.menu-dropdown__item--disabled) .menu-dropdown__color--none,
+.menu-dropdown__item--active .menu-dropdown__color--none {
+  background-color: var(--color-black);
+}
+
+.menu-dropdown__color--none::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom right, transparent calc(50% - 1px), var(--color-black) 50%, transparent calc(50% + 1px));
+}
+
+.menu-dropdown__item:hover:not(.menu-dropdown__item--separator):not(.menu-dropdown__item--disabled) .menu-dropdown__color--none::after,
+.menu-dropdown__item--active .menu-dropdown__color--none::after {
+  background: linear-gradient(to bottom right, transparent calc(50% - 1px), var(--color-white) 50%, transparent calc(50% + 1px));
 }
 
 .menu-dropdown__shortcut {

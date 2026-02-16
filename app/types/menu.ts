@@ -14,6 +14,8 @@ export interface MenuItem {
   shortcut?: string
   /** Icon path (optional) */
   icon?: string
+  /** Color for label (optional) */
+  color?: string
   /** Whether item is disabled */
   disabled?: boolean
   /** Whether item is a separator */
