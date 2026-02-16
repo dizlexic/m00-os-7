@@ -1,13 +1,18 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useWindowManager } from '~/composables/useWindowManager'
 
 interface Props {
   isActive?: boolean
+  windowId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isActive: false
+  isActive: false,
+  windowId: ''
 })
+
+const { updateWindow } = useWindowManager()
 
 const GRID_SIZE = 4
 const TOTAL_TILES = GRID_SIZE * GRID_SIZE
@@ -100,6 +105,20 @@ function getTileStyle(index: number) {
 
 onMounted(() => {
   shufflePuzzle()
+
+  if (props.windowId) {
+    updateWindow(props.windowId, {
+      menus: [
+        {
+          id: 'puzzle',
+          label: 'Puzzle',
+          items: [
+            { id: 'new-game', label: 'New Game', action: () => shufflePuzzle() }
+          ]
+        }
+      ]
+    })
+  }
 })
 </script>
 

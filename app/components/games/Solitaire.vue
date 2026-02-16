@@ -1,5 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useWindowManager } from '~/composables/useWindowManager'
+
+interface Props {
+  isActive?: boolean
+  windowId?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  isActive: false,
+  windowId: ''
+})
+
+const { updateWindow } = useWindowManager()
 
 type Suit = 'spades' | 'hearts' | 'diamonds' | 'clubs'
 type Rank = 'a' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'j' | 'q' | 'k'
@@ -193,6 +206,20 @@ function checkWin() {
 
 onMounted(() => {
   startNewGame()
+
+  if (props.windowId) {
+    updateWindow(props.windowId, {
+      menus: [
+        {
+          id: 'solitaire',
+          label: 'Solitaire',
+          items: [
+            { id: 'new-game', label: 'New Game', action: () => startNewGame() }
+          ]
+        }
+      ]
+    })
+  }
 })
 </script>
 
