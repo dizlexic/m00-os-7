@@ -9,13 +9,18 @@ export default defineNitroPlugin((nitroApp) => {
     const db = getDb();
     initDb(db);
     
-    // Create default user if it doesn't exist
-    const defaultUsername = 'Admin';
-    const defaultPassword = 'password';
+    // Create default Admin user only in development mode
+    // This prevents security risks from hardcoded credentials in production
+    const isDevelopment = process.env.NODE_ENV !== 'production';
     
-    if (!getUserByName(defaultUsername, db)) {
-      console.log(`Creating default user: ${defaultUsername}`);
-      createUser(defaultUsername, defaultPassword, db);
+    if (isDevelopment) {
+      const defaultUsername = 'Admin';
+      const defaultPassword = 'password';
+      
+      if (!getUserByName(defaultUsername, db)) {
+        console.log(`Creating default user: ${defaultUsername}`);
+        createUser(defaultUsername, defaultPassword, db);
+      }
     }
     
     console.log('Database initialized successfully.');
