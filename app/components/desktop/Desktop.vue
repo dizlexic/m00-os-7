@@ -361,6 +361,7 @@ onUnmounted(() => {
 
       <Puzzle
         v-else-if="win.type === 'puzzle'"
+        :window-id="win.id"
       />
 
       <Paint
@@ -426,6 +427,10 @@ onUnmounted(() => {
         v-else-if="win.type === 'eliza'"
       />
 
+      <Chooser
+        v-else-if="win.type === 'chooser'"
+      />
+
       <Brickle
         v-else-if="win.type === 'brickle'"
         :window-id="win.id"
@@ -440,6 +445,13 @@ onUnmounted(() => {
 
       <Solitaire
         v-else-if="win.type === 'solitaire'"
+        :window-id="win.id"
+        :is-active="win.isActive"
+      />
+
+      <Tetris
+        v-else-if="win.type === 'tetris'"
+        :window-id="win.id"
         :is-active="win.isActive"
       />
 
