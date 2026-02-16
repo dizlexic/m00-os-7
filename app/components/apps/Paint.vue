@@ -229,6 +229,59 @@ function hexToRgb(hex: string) {
   } : null
 }
 
+function clearCanvas() {
+  if (!ctx.value || !canvasRef.value) return
+  ctx.value.fillStyle = '#FFFFFF'
+  ctx.value.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height)
+}
+
+function printCanvas() {
+  if (!canvasRef.value) return
+  const dataUrl = canvasRef.value.toDataURL()
+  const windowContent = `<img src="${dataUrl}" />`
+  const printWindow = window.open('', '_blank')
+  if (printWindow) {
+    printWindow.document.open()
+    printWindow.document.write(windowContent)
+    printWindow.document.close()
+    printWindow.focus()
+    printWindow.print()
+    printWindow.close()
+  }
+}
+
+function loadFile() {
+  if (props.fileId && canvasRef.value && ctx.value) {
+    const file = getNode(props.fileId)
+    if (file && (file.type === 'image' || file.type === 'file') && file.content) {
+      const img = new Image()
+      img.onload = () => {
+        if (ctx.value && canvasRef.value) {
+          ctx.value.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
+          ctx.value.drawImage(img, 0, 0)
+        }
+      }
+      img.src = file.content
+    }
+  }
+}
+
+function saveFile() {
+  if (canvasRef.value) {
+    const dataUrl = canvasRef.value.toDataURL('image/png')
+    if (props.fileId) {
+      updateFileContent(props.fileId, dataUrl)
+    } else {
+      console.warn('Save As not implemented yet')
+      // For now, let's just download it as a fallback if no fileId
+      const link = document.createElement('a')
+      link.download = 'painting.png'
+      link.href = dataUrl
+      link.click()
+    }
+  }
+}
+
 onMounted(() => {
   initCanvas()
 })
