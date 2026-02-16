@@ -1,6 +1,21 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Minesweeper from '~/components/games/Minesweeper.vue'
+
+// Mock useWindowManager
+vi.mock('~/composables/useWindowManager', () => ({
+  useWindowManager: () => ({
+    updateWindow: vi.fn()
+  })
+}))
+
+// Mock useAlert
+vi.mock('~/composables/useAlert', () => ({
+  useAlert: () => ({
+    showAlert: vi.fn()
+  })
+}))
 
 describe('Minesweeper.vue', () => {
   it('renders correctly', () => {
