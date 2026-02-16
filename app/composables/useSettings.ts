@@ -1,5 +1,6 @@
 import { ref, watch, readonly } from 'vue'
 import { useUser } from '~/composables/useUser'
+import { DEFAULT_LABEL_COLORS, DEFAULT_LABEL_NAMES } from '~/types/filesystem'
 
 export interface Settings {
   desktopPattern: string;
@@ -16,6 +17,8 @@ export interface Settings {
   appData?: Record<string, any>;
   fontSize: 'small' | 'standard' | 'large';
   menuBlinking: boolean;
+  labelNames: string[];
+  labelColors: string[];
 }
 
 export interface SystemSettings {
@@ -35,7 +38,9 @@ const defaultSettings: Settings = {
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   daylightSaving: false,
   fontSize: 'standard',
-  menuBlinking: true
+  menuBlinking: true,
+  labelNames: [...DEFAULT_LABEL_NAMES],
+  labelColors: [...DEFAULT_LABEL_COLORS]
 }
 
 const settings = ref<Settings>({ ...defaultSettings })

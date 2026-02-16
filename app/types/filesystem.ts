@@ -30,7 +30,7 @@ export interface FileSystemState {
   rootId: string;
 }
 
-export const LABEL_COLORS = [
+export const DEFAULT_LABEL_COLORS = [
   'transparent',
   '#FF8000', // Orange
   '#FF0000', // Red
@@ -41,7 +41,7 @@ export const LABEL_COLORS = [
   '#00FF00'  // Green
 ];
 
-export const LABEL_NAMES = [
+export const DEFAULT_LABEL_NAMES = [
   'None',
   'Essential',
   'Hot',
