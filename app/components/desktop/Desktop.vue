@@ -27,6 +27,7 @@ import SoundSettings from '~/components/apps/SoundSettings.vue'
 import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
 import STCSettings from '~/components/apps/STCSettings.vue'
 import UsersSettings from '~/components/apps/UsersSettings.vue'
+import MonitorsSettings from '~/components/apps/MonitorsSettings.vue'
 import AboutMac from '~/components/apps/AboutMac.vue'
 import ArticleViewer from '~/components/apps/ArticleViewer.vue'
 import ImageViewer from '~/components/apps/ImageViewer.vue'
@@ -335,6 +336,10 @@ onUnmounted(() => {
 
       <UsersSettings
         v-else-if="win.type === 'users-settings'"
+      />
+
+      <MonitorsSettings
+        v-else-if="win.type === 'monitors-settings'"
       />
 
       <AboutMac

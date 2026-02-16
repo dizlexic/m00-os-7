@@ -79,10 +79,19 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       size: { width: 200, height: 240 },
       resizable: false,
       maximizable: false
+    })
+  },
+  {
+    id: 'share-computer',
+    label: 'Share Computer',
+    action: () => handleControlPanel('Share Computer', 'stc-settings')
+  },
+  {
     id: 'control-panels',
     label: 'Control Panels',
     action: () => handleControlPanels(),
     submenu: [
+      { id: 'cp-share-computer', label: 'Share Computer', action: () => handleControlPanel('Share Computer', 'stc-settings') },
       { id: 'cp-apple-menu', label: 'Apple Menu Options', action: () => handleControlPanel('Apple Menu Options', 'apple-menu-settings') },
       { id: 'cp-color', label: 'Color', action: () => handleControlPanel('Color', 'color-settings') },
       { id: 'cp-date-time', label: 'Date & Time', action: () => handleControlPanel('Date & Time', 'date-time-settings') },

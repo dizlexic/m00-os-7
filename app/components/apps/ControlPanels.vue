@@ -21,6 +21,12 @@ const searchQuery = ref('')
 
 const controlPanels: ControlPanelItem[] = [
   {
+    id: 'share-computer',
+    name: 'Share Computer',
+    icon: '/assets/icons/system/preferences.png',
+    type: 'stc-settings'
+  },
+  {
     id: 'general',
     name: 'General Controls',
     icon: '/assets/icons/system/preferences.png',
@@ -49,12 +55,6 @@ const controlPanels: ControlPanelItem[] = [
     name: 'Mouse',
     icon: '/assets/icons/system/preferences.png',
     type: 'mouse-settings'
-  },
-  {
-    id: 'share-computer',
-    name: 'Share Computer',
-    icon: '/assets/icons/system/preferences.png',
-    type: 'stc-settings'
   },
   {
     id: 'users',
