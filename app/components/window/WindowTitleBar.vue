@@ -61,6 +61,7 @@ function handleCollapseClick(event: MouseEvent): void {
       v-if="closable"
       class="title-bar__button title-bar__button--close"
       :class="{ 'title-bar__button--active': isActive }"
+      aria-label="Close window"
       @click="handleCloseClick"
       @mousedown.stop
     >
@@ -92,6 +93,7 @@ function handleCollapseClick(event: MouseEvent): void {
         'title-bar__button--active': isActive,
         'title-bar__button--collapsed': isCollapsed
       }"
+      :aria-label="isCollapsed ? 'Expand window' : 'Collapse window'"
       @click="handleCollapseClick"
       @mousedown.stop
     >
@@ -103,6 +105,7 @@ function handleCollapseClick(event: MouseEvent): void {
       v-if="maximizable"
       class="title-bar__button title-bar__button--zoom"
       :class="{ 'title-bar__button--active': isActive }"
+      aria-label="Zoom window"
       @click="handleZoomClick"
       @mousedown.stop
     >
