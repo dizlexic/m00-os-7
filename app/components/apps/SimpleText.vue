@@ -21,6 +21,10 @@ const fileName = ref('Untitled')
 const isDirty = ref(false)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
+// Font settings
+const currentFont = ref('var(--font-system)')
+const currentFontSize = ref('var(--font-size-md)')
+
 // Font and Size options
 const fonts = [
   { label: 'Chicago', value: 'var(--font-system)' },
@@ -116,10 +120,6 @@ const showFindReplace = ref(false)
 const findText = ref('')
 const replaceText = ref('')
 const findIndex = ref(0)
-
-// Font settings
-const currentFont = ref('var(--font-system)')
-const currentFontSize = ref('var(--font-size-md)')
 
 function loadFile() {
   if (props.fileId) {
