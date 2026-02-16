@@ -55,6 +55,52 @@ const tools = [
 
 const lineWeights = [1, 2, 4, 8]
 
+const menus = computed<Menu[]>(() => [
+  {
+    id: 'file',
+    label: 'File',
+    items: [
+      { id: 'new', label: 'New', shortcut: '⌘N', action: () => clearCanvas() },
+      { id: 'open', label: 'Open...', shortcut: '⌘O', disabled: true },
+      { id: 'sep1', label: '', isSeparator: true },
+      { id: 'close', label: 'Close', shortcut: '⌘W', action: () => props.windowId && useWindowManager().closeWindow(props.windowId) },
+      { id: 'save', label: 'Save', shortcut: '⌘S', action: () => saveFile() },
+      { id: 'save-as', label: 'Save As...', action: () => console.log('Save As') },
+      { id: 'sep2', label: '', isSeparator: true },
+      { id: 'page-setup', label: 'Page Setup...', disabled: true },
+      { id: 'print', label: 'Print...', shortcut: '⌘P', action: () => printCanvas() },
+      { id: 'sep3', label: '', isSeparator: true },
+      { id: 'quit', label: 'Quit', shortcut: '⌘Q', disabled: true }
+    ]
+  },
+  {
+    id: 'edit',
+    label: 'Edit',
+    items: [
+      { id: 'undo', label: 'Undo', shortcut: '⌘Z', disabled: true },
+      { id: 'sep1', label: '', isSeparator: true },
+      { id: 'cut', label: 'Cut', shortcut: '⌘X', disabled: true },
+      { id: 'copy', label: 'Copy', shortcut: '⌘C', disabled: true },
+      { id: 'paste', label: 'Paste', shortcut: '⌘V', disabled: true },
+      { id: 'clear', label: 'Clear', action: () => clearCanvas() },
+      { id: 'sep2', label: '', isSeparator: true },
+      { id: 'select-all', label: 'Select All', shortcut: '⌘A', disabled: true }
+    ]
+  }
+])
+
+watch(menus, (newMenus) => {
+  if (props.windowId && props.isActive) {
+    updateWindow(props.windowId, { menus: newMenus })
+  }
+}, { immediate: true })
+
+watch(() => props.isActive, (active) => {
+  if (active && props.windowId) {
+    updateWindow(props.windowId, { menus: menus.value })
+  }
+})
+
 function initCanvas() {
   if (!canvasRef.value) return
   ctx.value = canvasRef.value.getContext('2d', { willReadFrequently: true })
