@@ -3,6 +3,7 @@ import { ref, readonly } from 'vue'
 interface User {
   id: number | string;
   username: string;
+  avatar?: string;
   isGuest?: boolean;
 }
 
@@ -112,6 +113,23 @@ export function useUser() {
     }
   }
 
+  const updateProfile = async (data: { username?: string, password?: string, avatar?: string }): Promise<boolean> => {
+    try {
+      // @ts-ignore
+      const response = await $fetch('/api/users/update', {
+        method: 'POST',
+        body: data
+      }) as { user: User }
+      
+      currentUser.value = response.user
+      await fetchUsers()
+      return true
+    } catch (e) {
+      console.error('Failed to update profile:', e)
+      return false
+    }
+  }
+
   return {
     currentUser: readonly(currentUser),
     isAuthenticated: readonly(isAuthenticated),
@@ -123,6 +141,7 @@ export function useUser() {
     fetchUsers,
     register,
     removeUser,
+    updateProfile,
     setAuthenticatedUser
   }
 }
