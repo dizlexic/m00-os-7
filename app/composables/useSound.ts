@@ -102,9 +102,55 @@ export function useSound() {
     }
   }
 
+  /**
+   * Generates a "crumpling paper" sound for the trash using Web Audio API.
+   */
+  const playTrashSound = () => {
+    try {
+      const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext
+      if (!AudioContextClass) return
+
+      const context = new AudioContextClass()
+      const volume = (settings.value?.soundVolume || 75) / 100
+
+      // Create white noise
+      const bufferSize = 2 * context.sampleRate
+      const noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate)
+      const output = noiseBuffer.getChannelData(0)
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1
+      }
+
+      const noise = context.createBufferSource()
+      noise.buffer = noiseBuffer
+
+      const filter = context.createBiquadFilter()
+      filter.type = 'highpass'
+      filter.frequency.setValueAtTime(1000, context.currentTime)
+
+      const gain = context.createGain()
+      gain.gain.setValueAtTime(volume * 0.2, context.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3)
+
+      noise.connect(filter)
+      filter.connect(gain)
+      gain.connect(context.destination)
+
+      noise.start()
+      noise.stop(context.currentTime + 0.3)
+
+      setTimeout(() => {
+        context.close()
+      }, 500)
+    } catch (e) {
+      console.error('Failed to play trash sound:', e)
+    }
+  }
+
   return {
     playSystemSound,
     playBeep,
-    playStartupChime
+    playStartupChime,
+    playTrashSound
   }
 }

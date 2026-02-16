@@ -9,10 +9,12 @@ import { computed, watch } from 'vue'
 import { useDesktop } from '~/composables/useDesktop'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useAlert } from '~/composables/useAlert'
+import { useSound } from '~/composables/useSound'
 
 export function useTrash() {
   const { updateIcon, icons, removeIcon } = useDesktop()
   const { getTrash, getChildren, moveToTrash: fsMoveToTrash, emptyTrash: fsEmptyTrash, moveNode } = useFileSystem()
+  const { playTrashSound } = useSound()
 
   const trashFolder = computed(() => getTrash())
   const items = computed(() => trashFolder.value ? getChildren(trashFolder.value.id) : [])
@@ -74,6 +76,7 @@ export function useTrash() {
       onClose: (value) => {
         if (value === 'ok') {
           fsEmptyTrash()
+          playTrashSound()
         }
       }
     })
