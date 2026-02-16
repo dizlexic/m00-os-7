@@ -130,7 +130,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Add icon selection highlight effect
 - [x] `P1` Implement multi-select with Shift/Cmd
 - [x] `P1` Add icon rename functionality (click on label)
-- [ ] `P2` Implement icon sorting options
+- [x] `P2` Implement icon sorting options
 - [x] `P2` Add drag-to-trash functionality
 
 ### 3.3 Menu Bar
