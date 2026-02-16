@@ -239,7 +239,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Implement password input field
 - [x] `P0` Add "Guest" login option
 - [x] `P0` Handle login authentication
-- [ ] `P1` Show user icons/avatars
+- [x] `P1` Show user icons/avatars
 - [ ] `P1` Add "Cancel" to return to user list
 - [ ] `P2` Implement "Forgot Password" flow
 - [ ] `P2` Add login attempt limiting
@@ -249,9 +249,9 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Create user registration flow
 - [x] `P0` Implement user data storage
 - [x] `P0` Create user settings storage
-- [ ] `P1` Implement user profile editing
-- [ ] `P1` Add user avatar/icon selection
-- [ ] `P2` Implement user deletion
+- [x] `P1` Implement user profile editing
+- [x] `P1` Add user avatar/icon selection
+- [x] `P2` Implement user deletion
 - [ ] `P2` Add admin user capabilities
 - [ ] `P3` Implement user data export/import
 
@@ -269,8 +269,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
   - [x] Allow users to enable/disable shared desktop mode post-login
   - [x] Show connection status indicator when sharing is enabled
   - [x] Implement real-time cursor/activity sharing when enabled
-- [ ] `P2` Add visual indicator for shared session status
-- [ ] `P2` Implement user presence list when sharing is active
+- [x] `P2` Add visual indicator for shared session status
+- [x] `P2` Implement user presence list when sharing is active
 - [ ] `P3` Add permissions for shared session (view-only vs interactive)
 
 ### 5.5 Alert Dialogs
