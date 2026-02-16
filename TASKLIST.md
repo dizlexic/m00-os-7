@@ -528,10 +528,10 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
   - [x] Oval/ellipse tool (filled and outline)
   - [x] Paint bucket (flood fill)
 - [x] `P1` Implement tool palette UI (classic MacPaint style)
-- [ ] `P1` Add pattern/fill selector:
-  - [ ] Solid black/white fills
-  - [ ] Classic Mac dither patterns
-  - [ ] Custom pattern support
+- [x] `P1` Add pattern/fill selector:
+  - [x] Solid black/white fills
+  - [x] Classic Mac dither patterns
+  - [x] Custom pattern support
 - [x] `P1` Implement line width selector
 - [x] `P1` Add color palette (Mac OS 7 16-color palette)
 - [ ] `P2` Implement selection tools:
