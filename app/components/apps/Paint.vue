@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { MAC_PATTERNS, createPatternCanvas, getPatternDataUrl, type Pattern } from '~/utils/paintPatterns'
+import { useFileSystem } from '~/composables/useFileSystem'
+import { useWindowManager } from '~/composables/useWindowManager'
+import type { Menu } from '~/types/menu'
 
 interface Props {
   isActive?: boolean
@@ -9,6 +12,9 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   isActive: false
 })
+
+const { getNode, updateFileContent } = useFileSystem()
+const { updateWindow } = useWindowManager()
 
 // Canvas refs
 const canvasRef = ref<HTMLCanvasElement | null>(null)
