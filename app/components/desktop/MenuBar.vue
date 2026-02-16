@@ -425,6 +425,32 @@ const helpMenuItems: MenuItem[] = [
   { id: 'macos-help', label: 'Mac OS Help', action: () => handleHelp() }
 ]
 
+const appMenuItems = computed<MenuItem[]>(() => {
+  const items: MenuItem[] = [
+    { id: 'about-app', label: `About ${props.appName}...`, action: () => handleAboutApp() },
+    { id: 'sep0', label: '', isSeparator: true },
+  ]
+
+  // If active window has app-specific items, add them here
+  if (activeWindow.value && activeWindow.value.appMenu) {
+    items.push(...activeWindow.value.appMenu)
+    items.push({ id: 'sep-app', label: '', isSeparator: true })
+  }
+
+  items.push({
+    id: 'quit',
+    label: 'Quit',
+    shortcut: '⌘Q',
+    action: () => {
+      if (activeWindow.value) {
+        closeWindow(activeWindow.value.id)
+      }
+    }
+  })
+
+  return items
+})
+
 const menus = computed<Menu[]>(() => {
   // If active window has custom menus, use them
   if (activeWindow.value && activeWindow.value.menus && activeWindow.value.menus.length > 0) {
@@ -493,6 +519,32 @@ function handleAbout(): void {
     resizable: false,
     maximizable: false
   })
+}
+
+function handleAboutApp(): void {
+  if (activeWindow.value) {
+    // If it's Finder, show About This Macintosh
+    if (activeWindow.value.type === 'finder') {
+      handleAbout()
+      return
+    }
+
+    // Try to open about window for specific app
+    openWindow({
+      type: 'about',
+      title: `About ${props.appName}`,
+      icon: activeWindow.value.icon || '/assets/icons/system/finder.png',
+      size: { width: 380, height: 220 },
+      resizable: false,
+      maximizable: false,
+      data: {
+        appName: props.appName,
+        appType: activeWindow.value.type
+      }
+    })
+  } else {
+    handleAbout()
+  }
 }
 
 function handleHelp(): void {
@@ -891,8 +943,20 @@ onUnmounted(() => {
     </div>
 
     <!-- Application Name -->
-    <div class="menu-bar__app-name">
+    <div
+      class="menu-bar__item menu-bar__app-name"
+      :class="{ 'menu-bar__item--active': activeMenuId === 'app' }"
+      @click="handleMenuClick('app')"
+      @mouseenter="handleMenuHover('app')"
+    >
       {{ appName }}
+
+      <!-- App Menu Dropdown -->
+      <MenuDropdown
+        v-if="activeMenuId === 'app'"
+        :items="appMenuItems"
+        @item-click="handleMenuItemClick"
+      />
     </div>
 
     <!-- Application Menus -->
