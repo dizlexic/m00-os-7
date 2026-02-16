@@ -35,10 +35,12 @@ import ImageViewer from '~/components/apps/ImageViewer.vue'
 import Eliza from '~/components/apps/Eliza.vue'
 import Brickle from '~/components/games/Brickle.vue'
 import Minesweeper from '~/components/games/Minesweeper.vue'
+import Solitaire from '~/components/games/Solitaire.vue'
 import Messenger from '~/components/apps/Messenger.vue'
 import RemoteCursor from '~/components/stc/RemoteCursor.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useClipboard } from '~/composables/useClipboard'
+import { useLabels } from '~/composables/useLabels'
 import ContextMenu from './ContextMenu.vue'
 import type { MenuItem } from '~/types/menu'
 
@@ -63,8 +65,9 @@ const {
   openWindow
 } = useWindowManager()
 
-const { getRoot, getNodeByPath, createFolder, moveToTrash } = useFileSystem()
+const { getRoot, getNodeByPath, createFolder, moveToTrash, copyNode, createAlias } = useFileSystem()
 const { clipboard, copy, cut, paste } = useClipboard()
+const { getLabelMenuItems } = useLabels()
 
 // STC (Share the Computer) mode
 const {
@@ -209,6 +212,38 @@ function handleIconContextMenu(event: MouseEvent, icon: any): void {
       }
     },
     { id: 'sep1', label: '', isSeparator: true },
+    {
+      id: 'duplicate',
+      label: 'Duplicate',
+      disabled: icon.isSystem || icon.type === 'hard-drive' || icon.type === 'trash',
+      action: () => {
+        if (icon.path) {
+          const node = getNodeByPath(icon.path)
+          if (node && node.parentId) {
+            copyNode(node.id, node.parentId)
+          }
+        }
+      }
+    },
+    {
+      id: 'make-alias',
+      label: 'Make Alias',
+      disabled: icon.isSystem || icon.type === 'trash',
+      action: () => {
+        if (icon.path) {
+          const node = getNodeByPath(icon.path)
+          if (node && node.parentId) {
+            createAlias(node.id, node.parentId)
+          }
+        }
+      }
+    },
+    {
+      id: 'label',
+      label: 'Label',
+      submenu: getLabelMenuItems(undefined, icon.id)
+    },
+    { id: 'sep2', label: '', isSeparator: true },
     {
       id: 'get-info',
       label: 'Get Info',
@@ -374,12 +409,18 @@ onUnmounted(() => {
 
       <Brickle
         v-else-if="win.type === 'brickle'"
+        :window-id="win.id"
         :is-active="win.isActive"
       />
 
       <Minesweeper
         v-else-if="win.type === 'minesweeper'"
         :window-id="win.id"
+        :is-active="win.isActive"
+      />
+
+      <Solitaire
+        v-else-if="win.type === 'solitaire'"
         :is-active="win.isActive"
       />
 

@@ -120,6 +120,18 @@ const appleMenuItems = computed<MenuItem[]>(() => [
     })
   },
   {
+    id: 'solitaire',
+    label: 'Solitaire',
+    action: () => openWindow({
+      type: 'solitaire',
+      title: 'Solitaire',
+      icon: '/assets/icons/apps/solitaire.png',
+      size: { width: 400, height: 450 },
+      resizable: true,
+      maximizable: true
+    })
+  },
+  {
     id: 'messenger',
     label: 'Messenger',
     action: () => openWindow({
