@@ -47,6 +47,19 @@ const activeMenuId = ref<string | null>(null)
 // Menus configuration
 const appleMenuItems = computed<MenuItem[]>(() => [
   { id: 'about', label: 'About This Macintosh', action: () => handleAbout() },
+  { id: 'sep0', label: '', isSeparator: true },
+  {
+    id: 'chooser',
+    label: 'Chooser',
+    action: () => openWindow({
+      type: 'chooser',
+      title: 'Chooser',
+      icon: '/assets/icons/apps/chooser.png',
+      size: { width: 450, height: 400 },
+      resizable: true,
+      maximizable: false
+    })
+  },
   { id: 'sep1', label: '', isSeparator: true },
   {
     id: 'calculator',
@@ -130,6 +143,18 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       size: { width: 400, height: 450 },
       resizable: true,
       maximizable: true
+    })
+  },
+  {
+    id: 'tetris',
+    label: 'Tetris',
+    action: () => openWindow({
+      type: 'tetris',
+      title: 'Tetris',
+      icon: '/assets/icons/apps/tetris.png',
+      size: { width: 350, height: 500 },
+      resizable: false,
+      maximizable: false
     })
   },
   {
