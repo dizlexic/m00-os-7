@@ -17,6 +17,8 @@ A nostalgic single-page web application that recreates the classic Apple Macinto
 ### System Features
 - **Boot Sequence** - Simulated startup with classic "Welcome to Macintosh" screen
 - **User Accounts** - Multi-user support with login screen or guest mode
+- **Guest Usernames** - Auto-generated unique friendly names for guest users
+- **Share the Computer** - Toggle collaborative mode to share your desktop with other users post-login
 - **Persistent Storage** - Application and user data persistence
 - **Clock & Date** - Menu bar clock with timezone settings
 - **Sound Effects** - Classic Mac system sounds (optional)
