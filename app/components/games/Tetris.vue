@@ -6,6 +6,7 @@
  */
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useWindowManager } from '~/composables/useWindowManager'
+import { useSettings } from '~/composables/useSettings'
 
 interface Props {
   isActive?: boolean
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { updateWindow } = useWindowManager()
+const { settings, updateAppData } = useSettings()
 
 // Game constants
 const COLS = 10
@@ -53,6 +55,15 @@ const lines = ref(0)
 const level = ref(1)
 const gameState = ref<'idle' | 'playing' | 'paused' | 'gameover'>('idle')
 const dropTime = ref(INITIAL_DROP_TIME)
+
+const highScore = ref(settings.value.appData?.tetris?.highScore || 0)
+
+watch(score, (newScore) => {
+  if (newScore > highScore.value) {
+    highScore.value = newScore
+    updateAppData('tetris', { highScore: newScore })
+  }
+})
 
 let dropInterval: any = null
 
@@ -326,6 +337,11 @@ const displayGrid = computed(() => {
         <div class="tetris__info-box mac-inset-panel mt-md">
           <div class="tetris__info-label">SCORE</div>
           <div class="tetris__info-value">{{ score }}</div>
+        </div>
+
+        <div class="tetris__info-box mac-inset-panel mt-md">
+          <div class="tetris__info-label">HIGH SCORE</div>
+          <div class="tetris__info-value">{{ highScore }}</div>
         </div>
 
         <div class="tetris__info-box mac-inset-panel mt-md">

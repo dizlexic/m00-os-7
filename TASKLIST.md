@@ -624,7 +624,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P2` Implement scoring
 - [x] `P3` Add level progression
 - [x] `P3` Implement next piece preview
-- [ ] `P3` Add high score tracking
+- [x] `P3` Add high score tracking
 - [x] `P3` Implement pause functionality
 
 ### 10.3 Galaga (Space Shooter)
