@@ -452,7 +452,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ### 8.4 Finder Menu Integration
 - [x] `P0` Implement File menu items
 - [x] `P0` Implement Edit menu items
-- [ ] `P1` Implement View menu items
+- [x] `P1` Implement View menu items
 - [x] `P1` Add Special menu (Empty Trash, etc.)
 - [ ] `P2` Implement Label menu (color labels)
 - [ ] `P2` Add Window menu

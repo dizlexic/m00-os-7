@@ -67,6 +67,7 @@ function handleSubItemClick(item: MenuItem): void {
       @click.stop="handleItemClick(item)"
     >
       <template v-if="!item.isSeparator">
+        <span class="menu-dropdown__check">{{ item.checked ? '✓' : '' }}</span>
         <span class="menu-dropdown__label">{{ item.label }}</span>
 
         <span v-if="item.shortcut && !(item.submenu && item.submenu.length > 0)" class="menu-dropdown__shortcut">
@@ -138,6 +139,12 @@ function handleSubItemClick(item: MenuItem): void {
 
 .menu-dropdown__label {
   flex: 1;
+}
+
+.menu-dropdown__check {
+  width: 20px;
+  display: inline-block;
+  font-size: 14px;
 }
 
 .menu-dropdown__shortcut {

@@ -25,7 +25,7 @@ const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash, 
 const { activeWindow, openWindow, updateWindow } = useWindowManager()
 const { recentApps, recentDocs } = useRecentItems()
 const { clipboard, copy, cut, paste } = useClipboard()
-const { icons: desktopIcons } = useDesktop()
+const { icons: desktopIcons, cleanUpDesktop } = useDesktop()
 const { showAlert } = useAlert()
 const { restoreItem, items: trashItems, emptyTrash: confirmEmptyTrash } = useTrash()
 const { logout, currentUser } = useUser()
@@ -266,15 +266,86 @@ const editMenuItems = computed<MenuItem[]>(() => [
   { id: 'select-all', label: 'Select All', shortcut: '⌘A' }
 ])
 
-const viewMenuItems: MenuItem[] = [
-  { id: 'by-icon', label: 'by Icon' },
-  { id: 'by-name', label: 'by Name' },
-  { id: 'by-date', label: 'by Date' },
-  { id: 'by-size', label: 'by Size' },
-  { id: 'by-kind', label: 'by Kind' },
-  { id: 'sep1', label: '', isSeparator: true },
-  { id: 'clean-up', label: 'Clean Up Desktop' }
-]
+const viewMenuItems = computed<MenuItem[]>(() => {
+  const isFinder = !activeWindow.value || activeWindow.value.type === 'finder'
+  if (!isFinder) return []
+
+  const currentViewMode = activeWindow.value?.data?.viewMode || 'icon'
+  const isDesktop = !activeWindow.value
+
+  return [
+    {
+      id: 'by-icon',
+      label: 'by Icon',
+      checked: currentViewMode === 'icon',
+      action: () => setViewMode('icon')
+    },
+    {
+      id: 'by-small-icon',
+      label: 'by Small Icon',
+      checked: currentViewMode === 'small-icon',
+      action: () => setViewMode('small-icon')
+    },
+    {
+      id: 'by-name',
+      label: 'by Name',
+      checked: currentViewMode === 'name',
+      disabled: isDesktop,
+      action: () => setViewMode('name')
+    },
+    {
+      id: 'by-size',
+      label: 'by Size',
+      checked: currentViewMode === 'size',
+      disabled: isDesktop,
+      action: () => setViewMode('size')
+    },
+    {
+      id: 'by-kind',
+      label: 'by Kind',
+      checked: currentViewMode === 'kind',
+      disabled: isDesktop,
+      action: () => setViewMode('kind')
+    },
+    {
+      id: 'by-date',
+      label: 'by Date',
+      checked: currentViewMode === 'date',
+      disabled: isDesktop,
+      action: () => setViewMode('date')
+    },
+    { id: 'sep1', label: '', isSeparator: true },
+    {
+      id: 'clean-up',
+      label: isDesktop ? 'Clean Up Desktop' : 'Clean Up Window',
+      action: () => handleCleanUp()
+    }
+  ]
+})
+
+function setViewMode(mode: string): void {
+  if (activeWindow.value && activeWindow.value.type === 'finder') {
+    const currentData = activeWindow.value.data || {}
+    updateWindow(activeWindow.value.id, {
+      data: {
+        ...currentData,
+        viewMode: mode
+      }
+    })
+  } else if (!activeWindow.value) {
+    // Desktop ViewMode changes could be implemented here if needed
+  }
+}
+
+function handleCleanUp(): void {
+  if (activeWindow.value && activeWindow.value.type === 'finder') {
+    // Window-level cleanup
+    // For now, this is just a no-op as sorting is automatic in list views
+    // and manual in icon view.
+  } else if (!activeWindow.value) {
+    cleanUpDesktop()
+  }
+}
 
 const specialMenuItems = computed<MenuItem[]>(() => [
   { id: 'empty-trash', label: 'Empty Trash...', action: () => confirmEmptyTrash() },
@@ -308,7 +379,7 @@ const menus = computed<Menu[]>(() => {
     return [
       { id: 'file', label: 'File', items: fileMenuItems.value },
       { id: 'edit', label: 'Edit', items: editMenuItems.value },
-      { id: 'view', label: 'View', items: viewMenuItems },
+      { id: 'view', label: 'View', items: viewMenuItems.value },
       { id: 'special', label: 'Special', items: specialMenuItems.value },
       { id: 'help', label: 'Help', items: helpMenuItems }
     ]
