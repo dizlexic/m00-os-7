@@ -228,9 +228,9 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Show "Welcome to Macintosh" message
 - [x] `P0` Implement loading progress bar
 - [x] `P1` Add extension loading simulation
-- [ ] `P1` Show startup items loading
-- [ ] `P2` Add boot chime sound effect
-- [ ] `P2` Implement "Sad Mac" error screen
+- [x] `P1` Show startup items loading
+- [x] `P2` Add boot chime sound effect
+- [x] `P2` Implement "Sad Mac" error screen
 - [ ] `P3` Add startup key combinations (skip login, etc.)
 
 ### 5.2 Login Screen
@@ -298,7 +298,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Create useSound.ts composable
 - [x] `P1` Implement sound effect playback
 - [x] `P1` Add system beep sound
-- [ ] `P2` Add startup chime
+- [x] `P2` Add startup chime
 - [ ] `P2` Add trash empty sound
 - [ ] `P2` Add window open/close sounds
 - [ ] `P3` Implement volume control

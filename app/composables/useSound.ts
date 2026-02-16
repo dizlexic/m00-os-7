@@ -55,8 +55,56 @@ export function useSound() {
     }
   }
 
+  /**
+   * Generates a classic Mac startup chime using Web Audio API.
+   * Plays a C major-ish chord with square waves.
+   */
+  const playStartupChime = () => {
+    try {
+      const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext
+      if (!AudioContextClass) return
+
+      const context = new AudioContextClass()
+      const masterGain = context.createGain()
+      masterGain.connect(context.destination)
+
+      const volume = (settings.value?.soundVolume || 75) / 100
+      masterGain.gain.setValueAtTime(volume, context.currentTime)
+
+      // C major chord: C3, E3, G3, C4
+      const frequencies = [130.81, 164.81, 196.00, 261.63]
+
+      frequencies.forEach((freq) => {
+        const osc = context.createOscillator()
+        const gain = context.createGain()
+
+        osc.type = 'square'
+        osc.frequency.setValueAtTime(freq, context.currentTime)
+
+        gain.gain.setValueAtTime(0.1, context.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 2.0)
+
+        osc.connect(gain)
+        gain.connect(masterGain)
+
+        osc.start()
+        osc.stop(context.currentTime + 2.0)
+      })
+
+      // Close context after playback
+      setTimeout(() => {
+        if (context.state !== 'closed') {
+          context.close()
+        }
+      }, 2500)
+    } catch (e) {
+      console.error('Failed to play startup chime:', e)
+    }
+  }
+
   return {
     playSystemSound,
-    playBeep
+    playBeep,
+    playStartupChime
   }
 }
