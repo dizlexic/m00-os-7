@@ -110,6 +110,85 @@ describe('SimpleText.vue', () => {
     wrapper.unmount()
   })
 
+  describe('Text Selection', () => {
+    it('should select all text when selectAll method is called', async () => {
+      const wrapper = mount(SimpleText, {
+        props: {
+          fileId: 'file-1',
+          isActive: true
+        }
+      })
+
+      await nextTick()
+
+      const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+      
+      // Call selectAll method
+      wrapper.vm.selectAll()
+      
+      expect(textarea.selectionStart).toBe(0)
+      expect(textarea.selectionEnd).toBe(textarea.value.length)
+      wrapper.unmount()
+    })
+
+    it('should select all text on Cmd+A when active', async () => {
+      const wrapper = mount(SimpleText, {
+        props: {
+          fileId: 'file-1',
+          isActive: true
+        }
+      })
+
+      await nextTick()
+
+      const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+      
+      // Simulate Cmd+A
+      const event = new KeyboardEvent('keydown', {
+        key: 'a',
+        metaKey: true,
+        bubbles: true
+      })
+      window.dispatchEvent(event)
+      
+      await nextTick()
+      
+      expect(textarea.selectionStart).toBe(0)
+      expect(textarea.selectionEnd).toBe(textarea.value.length)
+      wrapper.unmount()
+    })
+
+    it('should not select all text on Cmd+A when inactive', async () => {
+      const wrapper = mount(SimpleText, {
+        props: {
+          fileId: 'file-1',
+          isActive: false
+        }
+      })
+
+      await nextTick()
+
+      const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+      const initialSelectionStart = textarea.selectionStart
+      const initialSelectionEnd = textarea.selectionEnd
+      
+      // Simulate Cmd+A
+      const event = new KeyboardEvent('keydown', {
+        key: 'a',
+        metaKey: true,
+        bubbles: true
+      })
+      window.dispatchEvent(event)
+      
+      await nextTick()
+      
+      // Selection should not change when inactive
+      expect(textarea.selectionStart).toBe(initialSelectionStart)
+      expect(textarea.selectionEnd).toBe(initialSelectionEnd)
+      wrapper.unmount()
+    })
+  })
+
   describe('Clipboard Operations', () => {
     const mockWriteText = vi.fn().mockResolvedValue(undefined)
     const mockReadText = vi.fn().mockResolvedValue('Pasted Text')

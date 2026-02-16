@@ -42,6 +42,15 @@ function saveFile() {
   }
 }
 
+/**
+ * Select all text in the editor
+ */
+function selectAll() {
+  if (textareaRef.value) {
+    textareaRef.value.focus()
+    textareaRef.value.setSelectionRange(0, textareaRef.value.value.length)
+  }
+}
 
 /**
  * Check if there is any text selected
@@ -116,6 +125,10 @@ function handleKeyDown(event: KeyboardEvent) {
   if ((event.metaKey || event.ctrlKey) && event.key === 's') {
     event.preventDefault()
     saveFile()
+  }
+  if ((event.metaKey || event.ctrlKey) && event.key === 'a') {
+    event.preventDefault()
+    selectAll()
   }
 }
 
