@@ -65,5 +65,13 @@ export default defineNuxtConfig({
   // Image optimization configuration
   image: {
     // Image optimization settings
+  },
+
+  // Nitro server configuration
+  nitro: {
+    experimental: {
+      // Enable WebSocket support for STC (Share the Computer) mode
+      websocket: true
+    }
   }
 })
