@@ -5,7 +5,7 @@
  * Recursive component for rendering Mac OS 7 style menus and submenus.
  */
 
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { MenuItem } from '~/types/menu'
 
 interface Props {
@@ -22,6 +22,8 @@ const emit = defineEmits<{
 }>()
 
 const activeSubmenuId = ref<string | null>(null)
+
+const hasAnyIcon = computed(() => props.items.some(item => !!item.icon))
 
 function handleItemMouseEnter(item: MenuItem): void {
   if (item.submenu && item.submenu.length > 0 && !item.disabled) {
