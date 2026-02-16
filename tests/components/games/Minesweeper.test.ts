@@ -30,6 +30,15 @@ describe('Minesweeper.vue', () => {
     const firstCell = wrapper.find('.minesweeper__cell')
     await firstCell.trigger('contextmenu')
     expect(firstCell.classes()).toContain('minesweeper__cell--flagged')
+
+    // Cycle to question mark
+    await firstCell.trigger('contextmenu')
+    expect(firstCell.classes()).toContain('minesweeper__cell--question')
+    expect(firstCell.text()).toBe('?')
+
+    // Cycle back to hidden
+    await firstCell.trigger('contextmenu')
+    expect(firstCell.classes()).toContain('minesweeper__cell--hidden')
   })
 
   it('resets the game when reset button is clicked', async () => {

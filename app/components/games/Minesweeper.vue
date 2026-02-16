@@ -15,6 +15,10 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 type CellStatus = 'hidden' | 'revealed' | 'flagged' | 'exploded' | 'wrong-flag'
+const { updateWindow } = useWindowManager()
+const { showAlert } = useAlert()
+
+type CellStatus = 'hidden' | 'revealed' | 'flagged' | 'question' | 'exploded' | 'wrong-flag'
 
 interface Cell {
   isMine: boolean
@@ -185,8 +189,10 @@ function toggleFlag(r: number, c: number, event: Event) {
     cell.status = 'flagged'
     minesLeft.value--
   } else if (cell.status === 'flagged') {
-    cell.status = 'hidden'
+    cell.status = 'question'
     minesLeft.value++
+  } else if (cell.status === 'question') {
+    cell.status = 'hidden'
   }
 }
 
@@ -315,6 +321,9 @@ const faceIcon = computed(() => {
             <template v-if="cell.status === 'flagged'">
               🚩
             </template>
+            <template v-if="cell.status === 'question'">
+              ?
+            </template>
             <template v-if="cell.status === 'wrong-flag'">
               ❌
             </template>
@@ -400,6 +409,7 @@ const faceIcon = computed(() => {
 
 .minesweeper__cell--hidden,
 .minesweeper__cell--flagged,
+.minesweeper__cell--question,
 .minesweeper__cell--wrong-flag {
   background-color: var(--color-gray-light);
   border-color: var(--color-white) var(--color-gray-dark) var(--color-gray-dark) var(--color-white);
