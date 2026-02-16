@@ -2,6 +2,9 @@
   "name": "m00-os-7",
   "type": "module",
   "private": true,
+  "overrides": {
+    "citty": "^0.2.1"
+  },
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -41,7 +44,7 @@
     "@vitejs/plugin-vue": "^5.0.3",
     "@vue/test-utils": "^2.4.4",
     "commander": "^13.1.0",
-    "happy-dom": "^13.3.8",
+    "happy-dom": "^20.6.1",
     "prettier": "^3.2.5",
     "typescript": "^5.3.3",
     "vitest": "^3.2.0",
