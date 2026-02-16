@@ -1,8 +1,9 @@
 import { ref, readonly } from 'vue'
 
 interface User {
-  id: number;
+  id: number | string;
   username: string;
+  isGuest?: boolean;
 }
 
 const currentUser = ref<User | null>(null)
@@ -27,10 +28,23 @@ export function useUser() {
     }
   }
 
-  const loginAsGuest = () => {
-    currentUser.value = { id: 0, username: 'Guest' }
+  const loginAsGuest = async (): Promise<User | null> => {
+    try {
+      // @ts-ignore
+      const response = await $fetch('/api/auth/guest-login', {
+        method: 'POST'
+      }) as { user: User }
+
+      return response.user
+    } catch (e) {
+      console.error('Guest login failed:', e)
+      return null
+    }
+  }
+
+  const setAuthenticatedUser = (user: User) => {
+    currentUser.value = user
     isAuthenticated.value = true
-    return true
   }
 
   const logout = async () => {
@@ -108,6 +122,7 @@ export function useUser() {
     init,
     fetchUsers,
     register,
-    removeUser
+    removeUser,
+    setAuthenticatedUser
   }
 }
