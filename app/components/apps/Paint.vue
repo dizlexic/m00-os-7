@@ -23,7 +23,7 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 const ctx = ref<CanvasRenderingContext2D | null>(null)
 
 // Tools state
-type Tool = 'select-rect' | 'select-lasso' | 'pencil' | 'eraser' | 'spray' | 'text' | 'line' | 'rect' | 'rect-filled' | 'round-rect' | 'round-rect-filled' | 'oval' | 'oval-filled' | 'bucket'
+type Tool = 'select-rect' | 'select-lasso' | 'pencil' | 'eraser' | 'spray' | 'text' | 'line' | 'rect' | 'rect-filled' | 'round-rect' | 'round-rect-filled' | 'oval' | 'oval-filled' | 'polygon' | 'polygon-filled' | 'arc' | 'arc-filled' | 'bucket'
 const currentTool = ref<Tool>('pencil')
 const currentColor = ref('#000000')
 const currentLineWidth = ref(1)
@@ -42,7 +42,19 @@ const isMovingSelection = ref(false)
 const selectionOffset = ref({ x: 0, y: 0 })
 const selectionSnapshot = ref<ImageData | null>(null)
 const lassoPoints = ref<{ x: number, y: number }[]>([])
+const polygonPoints = ref<{ x: number, y: number }[]>([])
 const clipboard = ref<ImageData | null>(null)
+
+function resetPolygon() {
+  polygonPoints.value = []
+  if (isDrawing.value && (currentTool.value === 'polygon' || currentTool.value === 'polygon-filled')) {
+    isDrawing.value = false
+  }
+}
+
+watch(currentTool, () => {
+  resetPolygon()
+})
 
 // History state
 const history = ref<ImageData[]>([])
@@ -70,6 +82,9 @@ const tools = [
   { id: 'round-rect-filled', icon: '▰', name: 'Filled Rounded Rect' },
   { id: 'oval', icon: '○', name: 'Oval' },
   { id: 'oval-filled', icon: '●', name: 'Filled Oval' },
+  { id: 'polygon', icon: '⬠', name: 'Polygon' },
+  { id: 'polygon-filled', icon: '⬟', name: 'Filled Polygon' },
+  { id: 'arc', icon: '⌒', name: 'Arc' },
   { id: 'bucket', icon: '⧊', name: 'Paint Bucket' }
 ]
 
@@ -175,6 +190,25 @@ function startDrawing(event: MouseEvent) {
 
   isDrawing.value = true
   startPos.value = pos
+
+  if (currentTool.value === 'polygon' || currentTool.value === 'polygon-filled') {
+    if (polygonPoints.value.length === 0) {
+      polygonPoints.value = [pos]
+      snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+    } else {
+      // Check if clicking near the first point to close it
+      const firstPoint = polygonPoints.value[0]
+      const dist = Math.sqrt(Math.pow(pos.x - firstPoint.x, 2) + Math.pow(pos.y - firstPoint.y, 2))
+      if (dist < 5 && polygonPoints.value.length > 2) {
+        finishPolygon()
+        return
+      } else {
+        polygonPoints.value.push(pos)
+      }
+    }
+    return
+  }
+
   if (currentTool.value === 'select-lasso') {
     lassoPoints.value = [pos]
   }
@@ -255,6 +289,20 @@ function draw(event: MouseEvent) {
     ctx.value.drawImage(tempCanvas, selectionRect.value.x, selectionRect.value.y)
 
     drawSelectionMarquee()
+    return
+  }
+
+  if (currentTool.value === 'polygon' || currentTool.value === 'polygon-filled') {
+    if (polygonPoints.value.length > 0) {
+      ctx.value.putImageData(snapshot.value, 0, 0)
+      ctx.value.beginPath()
+      ctx.value.moveTo(polygonPoints.value[0].x, polygonPoints.value[0].y)
+      for (let i = 1; i < polygonPoints.value.length; i++) {
+        ctx.value.lineTo(polygonPoints.value[i].x, polygonPoints.value[i].y)
+      }
+      ctx.value.lineTo(pos.x, pos.y)
+      ctx.value.stroke()
+    }
     return
   }
 
@@ -350,8 +398,92 @@ function draw(event: MouseEvent) {
       } else {
         ctx.value.stroke()
       }
+    } else if (currentTool.value === 'arc' || currentTool.value === 'arc-filled') {
+      ctx.value.beginPath()
+      const x = Math.min(pos.x, startPos.value.x)
+      const y = Math.min(pos.y, startPos.value.y)
+      const width = Math.abs(pos.x - startPos.value.x)
+      const height = Math.abs(pos.y - startPos.value.y)
+
+      // Determine quadrant based on drag direction
+      let startAngle = 0
+      let endAngle = Math.PI / 2
+
+      if (pos.x < startPos.value.x && pos.y < startPos.value.y) {
+        // Top left
+        startAngle = Math.PI
+        endAngle = 1.5 * Math.PI
+      } else if (pos.x > startPos.value.x && pos.y < startPos.value.y) {
+        // Top right
+        startAngle = 1.5 * Math.PI
+        endAngle = 2 * Math.PI
+      } else if (pos.x < startPos.value.x && pos.y > startPos.value.y) {
+        // Bottom left
+        startAngle = 0.5 * Math.PI
+        endAngle = Math.PI
+      } else {
+        // Bottom right
+        startAngle = 0
+        endAngle = 0.5 * Math.PI
+      }
+
+      // Draw arc. If filled, it's a wedge (pie slice)
+      if (currentTool.value === 'arc-filled') {
+        ctx.value.moveTo(startPos.value.x, startPos.value.y)
+        // Center is startPos for the wedge?
+        // No, if it's like Oval, it's inscribed in the rect.
+        const centerX = x + width / 2
+        const centerY = y + height / 2
+        ctx.value.moveTo(centerX, centerY)
+        ctx.value.ellipse(centerX, centerY, width / 2, height / 2, 0, startAngle, endAngle)
+        ctx.value.lineTo(centerX, centerY)
+        ctx.value.closePath()
+        ctx.value.fillStyle = getFillStyle()
+        ctx.value.fill()
+        ctx.value.strokeStyle = currentColor.value
+        ctx.value.stroke()
+      } else {
+        // For non-filled, just the curve.
+        // We need to find the correct center so the curve starts/ends at startPos/pos
+        // Actually, let's keep it simple and just use the bounding box logic.
+        ctx.value.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, startAngle, endAngle)
+        ctx.value.stroke()
+      }
     }
   }
+}
+
+function finishPolygon() {
+  if (!ctx.value || polygonPoints.value.length < 2) {
+    resetPolygon()
+    return
+  }
+
+  // Restore before drawing the final closed shape
+  ctx.value.putImageData(snapshot.value!, 0, 0)
+
+  ctx.value.beginPath()
+  ctx.value.moveTo(polygonPoints.value[0].x, polygonPoints.value[0].y)
+  for (let i = 1; i < polygonPoints.value.length; i++) {
+    ctx.value.lineTo(polygonPoints.value[i].x, polygonPoints.value[i].y)
+  }
+  ctx.value.closePath()
+
+  if (currentTool.value === 'polygon-filled') {
+    ctx.value.fillStyle = getFillStyle()
+    ctx.value.fill()
+    // Always stroke the outline in Mac Paint
+    ctx.value.strokeStyle = currentColor.value
+    ctx.value.lineWidth = currentLineWidth.value
+    ctx.value.stroke()
+  } else {
+    ctx.value.strokeStyle = currentColor.value
+    ctx.value.lineWidth = currentLineWidth.value
+    ctx.value.stroke()
+  }
+
+  resetPolygon()
+  saveToHistory()
 }
 
 function stopDrawing() {
@@ -361,6 +493,11 @@ function stopDrawing() {
   }
 
   if (isDrawing.value) {
+    if (currentTool.value === 'polygon' || currentTool.value === 'polygon-filled') {
+      // Don't stop drawing on mouseup for polygons
+      return
+    }
+
     if (currentTool.value === 'select-rect' && selectionRect.value) {
       if (selectionRect.value.width > 0 && selectionRect.value.height > 0) {
         selectionActive.value = true
@@ -779,6 +916,7 @@ watch(() => props.fileId, () => {
         @mousemove="draw"
         @mouseup="stopDrawing"
         @mouseleave="stopDrawing"
+        @dblclick="finishPolygon"
       ></canvas>
     </div>
   </div>
