@@ -15,7 +15,7 @@ const { users, currentUser, fetchUsers, register, removeUser, updateUserProfile,
 const { showConfirm } = useAlert()
 const { fetchSystemSettings, updateSystemSetting, systemSettings } = useSettings()
 const {
-  settings: stcSettings,
+  settings: networkSettings,
   updateSettings,
   isConnected,
   connectionState,
@@ -65,7 +65,7 @@ const availableAvatars = [
 // Computed
 const userCount = computed(() => users.value.length)
 const stcEnabled = computed({
-  get: () => stcSettings.value.enabled,
+  get: () => networkSettings.value.enabled,
   set: (val) => updateSettings({ enabled: val })
 })
 
