@@ -132,6 +132,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Add icon rename functionality (click on label)
 - [x] `P2` Implement icon sorting options
 - [x] `P2` Add drag-to-trash functionality
+- [x] `P2` Implement icon position persistence
 
 ### 3.3 Menu Bar
 - [x] `P0` Create MenuBar.vue component

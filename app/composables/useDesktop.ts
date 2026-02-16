@@ -74,6 +74,18 @@ export function useDesktop() {
     showGrid: showGrid.value
   }))
 
+  const { updateAppData, settings } = useSettings()
+
+  function saveIconPositions(): void {
+    const positions: Record<string, Position> = {}
+    icons.value.forEach(icon => {
+      // Use path or name as key for stable identification
+      const key = icon.path || icon.name
+      positions[key] = icon.position
+    })
+    updateAppData('desktop', { iconPositions: positions })
+  }
+
   // Icon management
   function addIcon(icon: Omit<DesktopIcon, 'id' | 'isSelected' | 'isRenaming'>): DesktopIcon {
     const newIcon: DesktopIcon = {
@@ -112,6 +124,7 @@ export function useDesktop() {
 
   function moveIcon(id: string, position: Position): void {
     updateIcon(id, { position: snapToGrid(position, gridSize.value) })
+    saveIconPositions()
   }
 
   function getIconById(id: string): DesktopIcon | undefined {
@@ -360,20 +373,23 @@ export function useDesktop() {
     icons.value = []
     selectedIds.value = []
 
+    // Get saved positions
+    const savedPositions = settings.value.appData?.desktop?.iconPositions || {}
+
     // Add default desktop icons
     const defaultIcons: Omit<DesktopIcon, 'id' | 'isSelected' | 'isRenaming'>[] = [
       {
         name: 'Macintosh HD',
         type: 'hard-drive',
         icon: '/assets/icons/system/hard-drive.png',
-        position: { x: window.innerWidth - 100, y: 20 },
+        position: savedPositions['Macintosh HD'] || { x: window.innerWidth - 100, y: 20 },
         path: 'Macintosh HD'
       },
       {
         name: 'Readme',
         type: 'document',
         icon: '/assets/icons/system/document.png',
-        position: { x: window.innerWidth - 100, y: 100 },
+        position: savedPositions['articles/welcome'] || { x: window.innerWidth - 100, y: 100 },
         path: 'articles/welcome',
         opensWith: 'article'
       },
@@ -381,14 +397,14 @@ export function useDesktop() {
         name: 'Messenger',
         type: 'messenger',
         icon: '/assets/icons/apps/chat.png',
-        position: { x: window.innerWidth - 100, y: 180 },
+        position: savedPositions['messenger'] || { x: window.innerWidth - 100, y: 180 },
         opensWith: 'messenger'
       },
       {
         name: 'Trash',
         type: 'trash',
         icon: '/assets/icons/system/trash-empty.png',
-        position: { x: window.innerWidth - 100, y: window.innerHeight - 120 },
+        position: savedPositions['Macintosh HD/Trash'] || { x: window.innerWidth - 100, y: window.innerHeight - 120 },
         path: 'Macintosh HD/Trash'
       }
     ]
