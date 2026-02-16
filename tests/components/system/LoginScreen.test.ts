@@ -57,13 +57,31 @@ describe('LoginScreen.vue', () => {
     expect(wrapper.text()).toContain('Register')
   })
 
-  it('does not display list of existing users (security)', () => {
+  it('displays list of existing users when available', async () => {
+    vi.mocked(useUser).mockReturnValue({
+      ...vi.mocked(useUser)(),
+      users: ref([{ id: 1, username: 'Alice' }, { id: 2, username: 'Bob' }]) as any,
+    })
     const wrapper = mount(LoginScreen)
-    // Should not show any user list or existing usernames
-    expect(wrapper.find('.user-list').exists()).toBe(false)
-    expect(wrapper.find('.user-item').exists()).toBe(false)
-    // Should not expose any usernames
-    expect(wrapper.text()).not.toContain('Admin')
+    await flushPromises()
+    
+    expect(wrapper.find('.user-list').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Alice')
+    expect(wrapper.text()).toContain('Bob')
+  })
+
+  it('shows password input after selecting a user from list', async () => {
+    vi.mocked(useUser).mockReturnValue({
+      ...vi.mocked(useUser)(),
+      users: ref([{ id: 1, username: 'Alice' }]) as any,
+    })
+    const wrapper = mount(LoginScreen)
+    await flushPromises()
+    
+    await wrapper.find('.user-item').trigger('click')
+    
+    expect(wrapper.text()).toContain('Password for Alice:')
+    expect(wrapper.find('input#password').exists()).toBe(true)
   })
 
   it('shows username and password inputs in login mode by default', () => {

@@ -239,8 +239,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Implement password input field
 - [x] `P0` Add "Guest" login option
 - [x] `P0` Handle login authentication
-- [ ] `P1` Show user icons/avatars
-- [ ] `P1` Add "Cancel" to return to user list
+- [x] `P1` Show user icons/avatars
+- [x] `P1` Add "Cancel" to return to user list
 - [ ] `P2` Implement "Forgot Password" flow
 - [ ] `P2` Add login attempt limiting
 - [ ] `P3` Support keyboard navigation

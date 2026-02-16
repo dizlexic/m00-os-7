@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUser } from '~/composables/useUser'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useSettings } from '~/composables/useSettings'
 
-const { login, loginAsGuest, register, setAuthenticatedUser } = useUser()
+const { login, loginAsGuest, register, setAuthenticatedUser, fetchUsers, users } = useUser()
 const { fetchFilesFromServer } = useFileSystem()
 const { fetchSettingsFromServer } = useSettings()
 
@@ -17,6 +17,11 @@ const error = ref('')
 const isLoading = ref(false)
 const showGuestConfirmation = ref(false)
 const generatedGuestUser = ref<any>(null)
+const selectedUser = ref<any>(null)
+
+onMounted(async () => {
+  await fetchUsers()
+})
 
 async function handleLogin() {
   if (loginMode.value === 'guest') {
@@ -46,7 +51,9 @@ async function handleLogin() {
     return
   }
 
-  if (!username.value || !password.value) {
+  const loginUsername = selectedUser.value ? selectedUser.value.username : username.value
+
+  if (!loginUsername || !password.value) {
     error.value = 'Please enter both username and password.'
     return
   }
@@ -61,14 +68,14 @@ async function handleLogin() {
       isLoading.value = false
       return
     }
-    success = await register(username.value, password.value)
+    success = await register(loginUsername, password.value)
     if (success) {
-      success = await login(username.value, password.value)
+      success = await login(loginUsername, password.value)
     } else {
       error.value = 'Registration failed. Username might be taken.'
     }
   } else {
-    success = await login(username.value, password.value)
+    success = await login(loginUsername, password.value)
     if (!success) {
       error.value = 'Invalid username or password.'
     }
@@ -91,9 +98,33 @@ function selectMode(mode: 'login' | 'guest' | 'new') {
   confirmPassword.value = ''
   showGuestConfirmation.value = false
   generatedGuestUser.value = null
+  selectedUser.value = null
   if (mode === 'login') {
     username.value = ''
   }
+}
+
+function handleCancel() {
+  if (loginMode.value === 'guest' && showGuestConfirmation.value) {
+    showGuestConfirmation.value = false
+    generatedGuestUser.value = null
+    return
+  }
+
+  if (selectedUser.value) {
+    selectedUser.value = null
+    password.value = ''
+    return
+  }
+
+  // Otherwise reset to login mode
+  selectMode('login')
+}
+
+function selectUser(user: any) {
+  selectedUser.value = user
+  password.value = ''
+  error.value = ''
 }
 
 function clearForm() {
@@ -101,6 +132,7 @@ function clearForm() {
   password.value = ''
   confirmPassword.value = ''
   error.value = ''
+  selectedUser.value = null
 }
 </script>
 
@@ -143,8 +175,27 @@ function clearForm() {
           </div>
         </div>
 
-        <!-- Username input (shown for login and register modes) -->
-        <div v-if="loginMode !== 'guest'" class="input-group flex flex-col gap-xs">
+        <!-- User selection list (shown for login mode if users exist and no user selected) -->
+        <div v-if="loginMode === 'login' && !selectedUser && users && users.length > 0" class="user-list-container flex flex-col gap-xs">
+          <label class="login-label">Select User:</label>
+          <div class="user-list mac-inset-panel">
+            <div
+              v-for="user in users"
+              :key="user.id"
+              class="user-item"
+              @click="selectUser(user)"
+            >
+              <div class="user-icon">
+                <img :src="user.avatar || '/assets/icons/system/document.png'" alt="" />
+              </div>
+              <span class="user-name">{{ user.username }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Username input (shown for register mode, or if login mode and no users or no user selected yet) -->
+        <!-- In Mac OS 7, you could also type the name if not in list, but here we simplify -->
+        <div v-if="loginMode === 'new' || (loginMode === 'login' && (!users || users.length === 0))" class="input-group flex flex-col gap-xs">
           <label for="username" class="login-label">Username:</label>
           <input
             id="username"
@@ -157,8 +208,11 @@ function clearForm() {
         </div>
 
         <!-- Password input (shown for login and register modes) -->
-        <div v-if="loginMode !== 'guest'" class="input-group flex flex-col gap-xs">
-          <label for="password" class="login-label">Password:</label>
+        <!-- For login, only shown if a user is selected OR if no users exist (manual entry) -->
+        <div v-if="(loginMode === 'new') || (loginMode === 'login' && (selectedUser || !users || users.length === 0))" class="input-group flex flex-col gap-xs">
+          <label for="password" class="login-label">
+            {{ selectedUser ? `Password for ${selectedUser.username}:` : 'Password:' }}
+          </label>
           <input
             id="password"
             v-model="password"
@@ -196,16 +250,21 @@ function clearForm() {
         </div>
 
         <div class="login-actions flex justify-between items-center mt-md">
-          <button class="mac-button" @click="clearForm">
-            Clear
+          <button class="mac-button" @click="handleCancel">
+            Cancel
           </button>
-          <button
-            class="mac-button mac-button--default"
-            :disabled="isLoading"
-            @click="handleLogin"
-          >
-            {{ isLoading ? 'Processing...' : (loginMode === 'new' ? 'Register' : (loginMode === 'guest' ? (showGuestConfirmation ? 'Start' : 'Continue') : 'Login')) }}
-          </button>
+          <div class="flex gap-sm">
+            <button class="mac-button" @click="clearForm">
+              Clear
+            </button>
+            <button
+              class="mac-button mac-button--default"
+              :disabled="isLoading"
+              @click="handleLogin"
+            >
+              {{ isLoading ? 'Processing...' : (loginMode === 'new' ? 'Register' : (loginMode === 'guest' ? (showGuestConfirmation ? 'Start' : 'Continue') : 'Login')) }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -317,6 +376,57 @@ function clearForm() {
   margin-top: var(--spacing-xs) !important;
   font-size: var(--font-size-md);
   color: var(--color-highlight);
+}
+
+.user-list-container {
+  margin-top: calc(-1 * var(--spacing-md));
+}
+
+.mac-inset-panel {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-dark);
+  box-shadow: inset 1px 1px 0 var(--color-gray-medium);
+}
+
+.user-list {
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 1px;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: pointer;
+}
+
+.user-item:hover {
+  background-color: var(--color-highlight);
+  color: var(--color-highlight-text);
+}
+
+.user-icon {
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.user-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+}
+
+.user-name {
+  font-size: var(--font-size-md);
+  font-weight: bold;
 }
 
 .mb-xs {

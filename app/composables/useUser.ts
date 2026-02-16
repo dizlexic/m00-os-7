@@ -146,6 +146,7 @@ export function useUser() {
     fetchUsers,
     register,
     removeUser,
+    updateUserProfile,
     setAuthenticatedUser
   }
 }
