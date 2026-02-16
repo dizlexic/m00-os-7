@@ -7,6 +7,7 @@
 
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import Clock from '~/components/system/Clock.vue'
+import SharingIndicator from '~/components/stc/SharingIndicator.vue'
 import MenuDropdown from '~/components/desktop/MenuDropdown.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
@@ -637,6 +638,9 @@ onUnmounted(() => {
 
     <!-- Spacer -->
     <div class="menu-bar__spacer" />
+
+    <!-- Sharing Indicator -->
+    <SharingIndicator />
 
     <!-- Clock -->
     <Clock />
