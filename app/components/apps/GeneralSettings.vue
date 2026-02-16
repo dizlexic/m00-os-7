@@ -40,6 +40,14 @@ function selectPattern(patternId: string) {
 function selectColor(color: string) {
   updateSetting('highlightColor', color)
 }
+
+function updateFontSize(size: 'small' | 'standard' | 'large') {
+  updateSetting('fontSize', size)
+}
+
+function toggleMenuBlinking() {
+  updateSetting('menuBlinking', !settings.value.menuBlinking)
+}
 </script>
 
 <template>
@@ -78,6 +86,73 @@ function selectColor(color: string) {
           :title="color.name"
           @click="selectColor(color.value)"
         ></div>
+      </div>
+    </div>
+
+    <div class="general-settings__section">
+      <h3 class="general-settings__title">System Font Size</h3>
+      <div class="general-settings__font-sizes">
+        <label class="mac-radio">
+          <input
+            type="radio"
+            name="fontSize"
+            class="sr-only"
+            :checked="settings.fontSize === 'small'"
+            @change="updateFontSize('small')"
+          />
+          <div
+            class="mac-radio__circle"
+            :class="{ 'mac-radio__circle--selected': settings.fontSize === 'small' }"
+          ></div>
+          <span>Small (9pt)</span>
+        </label>
+        <label class="mac-radio">
+          <input
+            type="radio"
+            name="fontSize"
+            class="sr-only"
+            :checked="settings.fontSize === 'standard'"
+            @change="updateFontSize('standard')"
+          />
+          <div
+            class="mac-radio__circle"
+            :class="{ 'mac-radio__circle--selected': settings.fontSize === 'standard' }"
+          ></div>
+          <span>Standard (12pt)</span>
+        </label>
+        <label class="mac-radio">
+          <input
+            type="radio"
+            name="fontSize"
+            class="sr-only"
+            :checked="settings.fontSize === 'large'"
+            @change="updateFontSize('large')"
+          />
+          <div
+            class="mac-radio__circle"
+            :class="{ 'mac-radio__circle--selected': settings.fontSize === 'large' }"
+          ></div>
+          <span>Large (14pt)</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="general-settings__section">
+      <h3 class="general-settings__title">Menu Blinking</h3>
+      <div class="general-settings__blinking">
+        <label class="mac-checkbox">
+          <input
+            type="checkbox"
+            class="sr-only"
+            :checked="settings.menuBlinking"
+            @change="toggleMenuBlinking"
+          />
+          <div
+            class="mac-checkbox__box"
+            :class="{ 'mac-checkbox__box--checked': settings.menuBlinking }"
+          ></div>
+          <span>Blink menu items when selected</span>
+        </label>
       </div>
     </div>
   </div>
@@ -151,5 +226,28 @@ function selectColor(color: string) {
 
 .general-settings__color--active {
   outline: 2px solid var(--color-highlight);
+}
+
+.general-settings__font-sizes,
+.general-settings__blinking {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.mac-radio,
+.mac-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  font-family: var(--font-system);
+  font-size: var(--font-size-md);
+  padding: 2px;
+}
+
+.mac-radio:focus-within,
+.mac-checkbox:focus-within {
+  outline: 1px solid var(--color-highlight);
 }
 </style>
