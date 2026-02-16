@@ -5,6 +5,7 @@
  */
 
 import { defineWebSocketHandler } from 'h3'
+import { parse } from 'cookie'
 import {
   registerPeer,
   unregisterPeer,
@@ -78,6 +79,16 @@ function sendError(peerId: string, code: string, message: string): void {
 export default defineWebSocketHandler({
   open(peer) {
     console.log(`[STC] WebSocket connection opened: ${peer.id}`)
+
+    // Check authentication via cookies in headers
+    const cookieHeader = peer.headers?.cookie || ''
+    const cookies = parse(cookieHeader)
+    const userId = cookies.user_id
+
+    if (!userId) {
+      console.warn(`[STC] Unauthenticated connection attempt from ${peer.id}`)
+      // We don't close yet, wait for 'connect' message to verify
+    }
   },
 
   close(peer) {
@@ -119,6 +130,18 @@ export default defineWebSocketHandler({
     switch (message.type) {
       case 'connect': {
         const payload = message.payload as { username: string; cursor: CursorConfig }
+
+        // Verify authentication
+        const cookieHeader = peer.headers?.cookie || ''
+        const cookies = parse(cookieHeader)
+        const authenticatedUserId = cookies.user_id
+
+        if (!authenticatedUserId) {
+          sendError(peer.id, 'UNAUTHENTICATED', 'You must be logged in to connect')
+          peer.close(1008, 'Unauthenticated')
+          return
+        }
+
         if (!payload?.username) {
           sendError(peer.id, 'INVALID_PAYLOAD', 'Username is required')
           return
