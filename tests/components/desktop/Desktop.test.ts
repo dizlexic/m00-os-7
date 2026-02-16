@@ -15,7 +15,9 @@ const mockUseDesktop = {
   showContextMenu: vi.fn(),
   hideContextMenu: vi.fn(),
   initializeDesktop: vi.fn(),
-  cleanUpDesktop: vi.fn()
+  cleanUpDesktop: vi.fn(),
+  addIcon: vi.fn(() => ({ id: 'new-icon' })),
+  updateIcon: vi.fn()
 }
 
 // Mock useDesktop
@@ -34,7 +36,27 @@ vi.mock('~/composables/useWindowManager', () => ({
 vi.mock('~/composables/useFileSystem', () => ({
   useFileSystem: () => ({
     getRoot: () => ({ id: 'root' }),
-    getNodeByPath: vi.fn()
+    getNodeByPath: vi.fn(),
+    createFolder: vi.fn(() => ({ id: 'new-folder', name: 'untitled folder' })),
+    getUniqueName: vi.fn((name) => name),
+    moveToTrash: vi.fn(),
+    copyNode: vi.fn(),
+    createAlias: vi.fn()
+  })
+}))
+
+vi.mock('~/composables/useClipboard', () => ({
+  useClipboard: () => ({
+    clipboard: { value: null },
+    copy: vi.fn(),
+    cut: vi.fn(),
+    paste: vi.fn()
+  })
+}))
+
+vi.mock('~/composables/useLabels', () => ({
+  useLabels: () => ({
+    getLabelMenuItems: vi.fn()
   })
 }))
 
@@ -56,7 +78,10 @@ describe('Desktop.vue', () => {
 
     expect(mockUseDesktop.showContextMenu).toHaveBeenCalledWith(
       expect.objectContaining({ x: 100, y: 200 }),
-      expect.any(Array)
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'new-folder', label: 'New Folder' }),
+        expect.objectContaining({ id: 'paste', label: 'Paste' })
+      ])
     )
   })
 
