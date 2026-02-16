@@ -28,6 +28,10 @@ export type IconType =
   | 'alias'
   | 'markdown'
   | 'image'
+  | 'messenger'
+
+/** Desktop icon sorting orders */
+export type SortOrder = 'name' | 'kind' | 'date' | 'size'
 
 /** Desktop icon state */
 export interface DesktopIcon {

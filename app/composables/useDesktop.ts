@@ -11,7 +11,8 @@ import type {
   DesktopState,
   Position,
   MarqueeSelection,
-  ContextMenuState
+  ContextMenuState,
+  SortOrder
 } from '~/types/desktop'
 import { DEFAULT_PATTERNS, DEFAULT_GRID_SIZE } from '~/types/desktop'
 import { useSettings } from '~/composables/useSettings'
@@ -277,13 +278,26 @@ export function useDesktop() {
   }
 
   // Clean up desktop (arrange icons)
-  function cleanUpDesktop(): void {
+  function cleanUpDesktop(sortBy: SortOrder = 'kind'): void {
     const sortedIcons = [...icons.value].sort((a, b) => {
-      // Sort by type first, then by name
-      if (a.type !== b.type) {
-        const typeOrder = ['hard-drive', 'folder', 'application', 'document', 'alias', 'trash']
-        return typeOrder.indexOf(a.type) - typeOrder.indexOf(b.type)
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name)
       }
+
+      // Default kind-based sorting
+      if (a.type !== b.type) {
+        const typeOrder = ['hard-drive', 'folder', 'application', 'messenger', 'document', 'markdown', 'image', 'alias', 'trash']
+        const aIndex = typeOrder.indexOf(a.type)
+        const bIndex = typeOrder.indexOf(b.type)
+        
+        // If one type is not in list, it goes to the end
+        if (aIndex !== bIndex) {
+          if (aIndex === -1) return 1
+          if (bIndex === -1) return -1
+          return aIndex - bIndex
+        }
+      }
+      
       return a.name.localeCompare(b.name)
     })
 
