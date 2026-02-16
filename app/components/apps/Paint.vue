@@ -23,7 +23,7 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 const ctx = ref<CanvasRenderingContext2D | null>(null)
 
 // Tools state
-type Tool = 'pencil' | 'eraser' | 'line' | 'rect' | 'rect-filled' | 'oval' | 'oval-filled' | 'bucket'
+type Tool = 'select-rect' | 'select-lasso' | 'pencil' | 'eraser' | 'spray' | 'text' | 'line' | 'rect' | 'rect-filled' | 'round-rect' | 'round-rect-filled' | 'oval' | 'oval-filled' | 'bucket'
 const currentTool = ref<Tool>('pencil')
 const currentColor = ref('#000000')
 const currentLineWidth = ref(1)
@@ -35,6 +35,15 @@ const isDrawing = ref(false)
 const startPos = ref({ x: 0, y: 0 })
 const snapshot = ref<ImageData | null>(null)
 
+// Selection state
+const selectionRect = ref<{ x: number, y: number, width: number, height: number } | null>(null)
+const selectionActive = ref(false)
+const isMovingSelection = ref(false)
+const selectionOffset = ref({ x: 0, y: 0 })
+const selectionSnapshot = ref<ImageData | null>(null)
+const lassoPoints = ref<{ x: number, y: number }[]>([])
+const clipboard = ref<ImageData | null>(null)
+
 // Mac OS 7 16-color palette
 const colors = [
   '#000000', '#FFFFFF', '#CCCCCC', '#999999', '#666666', '#333333',
@@ -43,6 +52,8 @@ const colors = [
 ]
 
 const tools = [
+  { id: 'select-rect', icon: '✂', name: 'Marquee' },
+  { id: 'select-lasso', icon: '➰', name: 'Lasso' },
   { id: 'pencil', icon: '✎', name: 'Pencil' },
   { id: 'eraser', icon: '□', name: 'Eraser' },
   { id: 'line', icon: '/', name: 'Line' },
@@ -65,7 +76,7 @@ const menus = computed<Menu[]>(() => [
       { id: 'sep1', label: '', isSeparator: true },
       { id: 'close', label: 'Close', shortcut: '⌘W', action: () => props.windowId && useWindowManager().closeWindow(props.windowId) },
       { id: 'save', label: 'Save', shortcut: '⌘S', action: () => saveFile() },
-      { id: 'save-as', label: 'Save As...', action: () => console.log('Save As') },
+      { id: 'save-as', label: 'Save As...', action: () => saveFile() },
       { id: 'sep2', label: '', isSeparator: true },
       { id: 'page-setup', label: 'Page Setup...', disabled: true },
       { id: 'print', label: 'Print...', shortcut: '⌘P', action: () => printCanvas() },
@@ -79,12 +90,12 @@ const menus = computed<Menu[]>(() => [
     items: [
       { id: 'undo', label: 'Undo', shortcut: '⌘Z', disabled: true },
       { id: 'sep1', label: '', isSeparator: true },
-      { id: 'cut', label: 'Cut', shortcut: '⌘X', disabled: true },
-      { id: 'copy', label: 'Copy', shortcut: '⌘C', disabled: true },
-      { id: 'paste', label: 'Paste', shortcut: '⌘V', disabled: true },
+      { id: 'cut', label: 'Cut', shortcut: '⌘X', action: () => cutSelection(), disabled: !selectionActive.value },
+      { id: 'copy', label: 'Copy', shortcut: '⌘C', action: () => copySelection(), disabled: !selectionActive.value },
+      { id: 'paste', label: 'Paste', shortcut: '⌘V', action: () => pasteSelection() },
       { id: 'clear', label: 'Clear', action: () => clearCanvas() },
       { id: 'sep2', label: '', isSeparator: true },
-      { id: 'select-all', label: 'Select All', shortcut: '⌘A', disabled: true }
+      { id: 'select-all', label: 'Select All', shortcut: '⌘A', action: () => selectAll() }
     ]
   }
 ])
@@ -125,9 +136,36 @@ function getMousePos(event: MouseEvent) {
 
 function startDrawing(event: MouseEvent) {
   if (!ctx.value || !canvasRef.value) return
-  isDrawing.value = true
   const pos = getMousePos(event)
+
+  // Handle moving existing selection
+  if (selectionActive.value && selectionRect.value && isInsideRect(pos, selectionRect.value)) {
+    isMovingSelection.value = true
+    selectionOffset.value = {
+      x: pos.x - selectionRect.value.x,
+      y: pos.y - selectionRect.value.y
+    }
+    // Save current canvas state to snapshot before moving
+    snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+    return
+  }
+
+  // Clear selection if clicking outside or using another tool
+  if (currentTool.value !== 'select-rect' && currentTool.value !== 'select-lasso') {
+    if (selectionActive.value) {
+      finalizeSelection()
+    }
+  } else if (!isInsideRect(pos, selectionRect.value || { x: 0, y: 0, width: 0, height: 0 })) {
+    if (selectionActive.value) {
+      finalizeSelection()
+    }
+  }
+
+  isDrawing.value = true
   startPos.value = pos
+  if (currentTool.value === 'select-lasso') {
+    lassoPoints.value = [pos]
+  }
 
   // Save snapshot for previewing shapes
   snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
@@ -148,12 +186,59 @@ function startDrawing(event: MouseEvent) {
   } else if (currentTool.value === 'bucket') {
     floodFill(Math.round(pos.x), Math.round(pos.y), currentColor.value)
     isDrawing.value = false
+function isInsideRect(pos: { x: number, y: number }, rect: { x: number, y: number, width: number, height: number }) {
+  return pos.x >= rect.x && pos.x <= rect.x + rect.width &&
+         pos.y >= rect.y && pos.y <= rect.y + rect.height
+}
+
+function finalizeSelection() {
+  if (!ctx.value || !selectionRect.value || !selectionSnapshot.value) {
+    selectionActive.value = false
+    selectionRect.value = null
+    return
   }
+
+  // Draw the selection onto the canvas permanently
+  // Use a temporary canvas to support transparency with drawImage
+  const tempCanvas = document.createElement('canvas')
+  tempCanvas.width = selectionRect.value.width
+  tempCanvas.height = selectionRect.value.height
+  const tempCtx = tempCanvas.getContext('2d')!
+  tempCtx.putImageData(selectionSnapshot.value, 0, 0)
+  ctx.value.drawImage(tempCanvas, selectionRect.value.x, selectionRect.value.y)
+
+  selectionActive.value = false
+  selectionRect.value = null
+  selectionSnapshot.value = null
+
+  // Update snapshot after finalizing
+  if (canvasRef.value) {
+    snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+  }
+  saveToHistory()
 }
 
 function draw(event: MouseEvent) {
-  if (!isDrawing.value || !ctx.value || !canvasRef.value || !snapshot.value) return
+  if (!ctx.value || !canvasRef.value || !snapshot.value) return
+  if (!isDrawing.value && !isMovingSelection.value) return
   const pos = getMousePos(event)
+
+  if (isMovingSelection.value && selectionRect.value && selectionSnapshot.value) {
+    ctx.value.putImageData(snapshot.value, 0, 0)
+    selectionRect.value.x = pos.x - selectionOffset.value.x
+    selectionRect.value.y = pos.y - selectionOffset.value.y
+
+    // Draw selectionSnapshot with transparency
+    const tempCanvas = document.createElement('canvas')
+    tempCanvas.width = selectionRect.value.width
+    tempCanvas.height = selectionRect.value.height
+    const tempCtx = tempCanvas.getContext('2d')!
+    tempCtx.putImageData(selectionSnapshot.value, 0, 0)
+    ctx.value.drawImage(tempCanvas, selectionRect.value.x, selectionRect.value.y)
+
+    drawSelectionMarquee()
+    return
+  }
 
   if (currentTool.value === 'pencil') {
     ctx.value.lineTo(pos.x, pos.y)
@@ -162,6 +247,28 @@ function draw(event: MouseEvent) {
     ctx.value.strokeStyle = '#FFFFFF'
     ctx.value.lineTo(pos.x, pos.y)
     ctx.value.stroke()
+  } else if (currentTool.value === 'select-rect') {
+    ctx.value.putImageData(snapshot.value, 0, 0)
+    const x = Math.min(pos.x, startPos.value.x)
+    const y = Math.min(pos.y, startPos.value.y)
+    const width = Math.abs(pos.x - startPos.value.x)
+    const height = Math.abs(pos.y - startPos.value.y)
+    selectionRect.value = { x, y, width, height }
+    drawSelectionMarquee()
+  } else if (currentTool.value === 'select-lasso') {
+    ctx.value.putImageData(snapshot.value, 0, 0)
+    lassoPoints.value.push(pos)
+
+    ctx.value.beginPath()
+    ctx.value.moveTo(lassoPoints.value[0].x, lassoPoints.value[0].y)
+    for (let i = 1; i < lassoPoints.value.length; i++) {
+      ctx.value.lineTo(lassoPoints.value[i].x, lassoPoints.value[i].y)
+    }
+    ctx.value.setLineDash([4, 4])
+    ctx.value.strokeStyle = '#000000'
+    ctx.value.lineWidth = 1
+    ctx.value.stroke()
+    ctx.value.setLineDash([])
   } else {
     // For shapes, restore snapshot first to show preview
     ctx.value.putImageData(snapshot.value, 0, 0)
@@ -211,7 +318,156 @@ function draw(event: MouseEvent) {
 }
 
 function stopDrawing() {
+  if (isMovingSelection.value) {
+    isMovingSelection.value = false
+    return
+  }
+
+  if (isDrawing.value) {
+    if (currentTool.value === 'select-rect' && selectionRect.value) {
+      if (selectionRect.value.width > 0 && selectionRect.value.height > 0) {
+        selectionActive.value = true
+        // Capture the selected pixels
+        selectionSnapshot.value = ctx.value!.getImageData(selectionRect.value.x, selectionRect.value.y, selectionRect.value.width, selectionRect.value.height)
+
+        // Clear the area on the canvas (cut behavior)
+        ctx.value!.fillStyle = '#FFFFFF'
+        ctx.value!.fillRect(selectionRect.value.x, selectionRect.value.y, selectionRect.value.width, selectionRect.value.height)
+        snapshot.value = ctx.value!.getImageData(0, 0, canvasRef.value!.width, canvasRef.value!.height)
+        drawSelectionMarquee()
+      } else {
+        selectionActive.value = false
+        selectionRect.value = null
+      }
+    } else if (currentTool.value === 'select-lasso' && lassoPoints.value.length > 2) {
+      // Find bounding box
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+      lassoPoints.value.forEach(p => {
+        minX = Math.min(minX, p.x); minY = Math.min(minY, p.y)
+        maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y)
+      })
+      const width = Math.ceil(maxX - minX)
+      const height = Math.ceil(maxY - minY)
+
+      if (width > 0 && height > 0) {
+        selectionRect.value = { x: Math.floor(minX), y: Math.floor(minY), width, height }
+        selectionActive.value = true
+
+        // Create mask
+        const maskCanvas = document.createElement('canvas')
+        maskCanvas.width = width
+        maskCanvas.height = height
+        const maskCtx = maskCanvas.getContext('2d')!
+        maskCtx.translate(-Math.floor(minX), -Math.floor(minY))
+        maskCtx.beginPath()
+        maskCtx.moveTo(lassoPoints.value[0].x, lassoPoints.value[0].y)
+        lassoPoints.value.forEach(p => maskCtx.lineTo(p.x, p.y))
+        maskCtx.closePath()
+        maskCtx.fill()
+
+        // Extract pixels
+        const tempCanvas = document.createElement('canvas')
+        tempCanvas.width = width
+        tempCanvas.height = height
+        const tempCtx = tempCanvas.getContext('2d')!
+        tempCtx.drawImage(canvasRef.value!, Math.floor(minX), Math.floor(minY), width, height, 0, 0, width, height)
+        tempCtx.globalCompositeOperation = 'destination-in'
+        tempCtx.drawImage(maskCanvas, 0, 0)
+
+        selectionSnapshot.value = tempCtx.getImageData(0, 0, width, height)
+
+        // Clear area on canvas (cut behavior)
+        ctx.value!.save()
+        ctx.value!.beginPath()
+        ctx.value!.moveTo(lassoPoints.value[0].x, lassoPoints.value[0].y)
+        lassoPoints.value.forEach(p => ctx.value!.lineTo(p.x, p.y))
+        ctx.value!.closePath()
+        ctx.value!.clip()
+        ctx.value!.fillStyle = '#FFFFFF'
+        ctx.value!.fillRect(Math.floor(minX), Math.floor(minY), width, height)
+        ctx.value!.restore()
+
+        snapshot.value = ctx.value!.getImageData(0, 0, canvasRef.value!.width, canvasRef.value!.height)
+        drawSelectionMarquee()
+      } else {
+        selectionActive.value = false
+        selectionRect.value = null
+      }
   isDrawing.value = false
+}
+
+function drawSelectionMarquee() {
+  if (!ctx.value || !selectionRect.value) return
+  ctx.value.setLineDash([4, 4])
+  ctx.value.strokeStyle = '#000000'
+  ctx.value.lineWidth = 1
+  ctx.value.strokeRect(selectionRect.value.x, selectionRect.value.y, selectionRect.value.width, selectionRect.value.height)
+  ctx.value.setLineDash([])
+}
+
+  if (selectionActive.value && selectionSnapshot.value) {
+    clipboard.value = selectionSnapshot.value
+    selectionActive.value = false
+    selectionRect.value = null
+    selectionSnapshot.value = null
+    // Snapshot already cleared in stopDrawing
+  }
+}
+
+function copySelection() {
+  if (selectionActive.value && selectionSnapshot.value) {
+    clipboard.value = selectionSnapshot.value
+  }
+}
+
+function pasteSelection() {
+  if (clipboard.value && ctx.value && canvasRef.value) {
+    if (selectionActive.value) {
+      finalizeSelection()
+    }
+
+    // Create new selection from clipboard
+    selectionSnapshot.value = clipboard.value
+    selectionRect.value = {
+      x: 10,
+      y: 10,
+      width: clipboard.value.width,
+      height: clipboard.value.height
+    }
+    selectionActive.value = true
+    currentTool.value = 'select-rect'
+
+    // Update snapshot for movement
+    snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+
+    // Draw for preview
+    ctx.value.putImageData(selectionSnapshot.value, selectionRect.value.x, selectionRect.value.y)
+    drawSelectionMarquee()
+  }
+}
+
+function selectAll() {
+  if (!canvasRef.value || !ctx.value) return
+  if (selectionActive.value) {
+    finalizeSelection()
+  }
+
+  currentTool.value = 'select-rect'
+  selectionRect.value = {
+    x: 0,
+    y: 0,
+    width: canvasRef.value.width,
+    height: canvasRef.value.height
+  }
+  selectionSnapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+  selectionActive.value = true
+
+  // Clear canvas
+  ctx.value.fillStyle = '#FFFFFF'
+  ctx.value.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height)
+  snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+
+  drawSelectionMarquee()
 }
 
 function getFillStyle() {
