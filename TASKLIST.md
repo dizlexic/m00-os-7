@@ -78,7 +78,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Generate NotePad icon
 - [x] `P1` Generate Scrapbook icon
 - [x] `P2` Generate Solitaire icon
-- [ ] `P2` Generate Tetris icon
+- [x] `P2` Generate Tetris icon
 - [x] `P2` Generate Chat/IM icon
 - [ ] `P3` Generate Browser icon
 - [ ] `P3` Generate Galaga icon
@@ -151,7 +151,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Add Control Panels submenu
 - [x] `P1` Add recent applications list
 - [x] `P2` Add recent documents list
-- [ ] `P2` Add Chooser item (printer selection mock)
+- [x] `P2` Add Chooser item (printer selection mock)
 - [x] `P2` Add Shut Down option
 
 ### 3.5 Trash
@@ -240,8 +240,6 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Add "Guest" login option
 - [x] `P0` Handle login authentication
 - [x] `P1` Show user icons/avatars
-- [ ] `P1` Add "Cancel" to return to user list
-- [x] `P1` Show user icons/avatars
 - [x] `P1` Add "Cancel" to return to user list
 - [ ] `P2` Implement "Forgot Password" flow
 - [ ] `P2` Add login attempt limiting
@@ -251,10 +249,6 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Create user registration flow
 - [x] `P0` Implement user data storage
 - [x] `P0` Create user settings storage
-- [x] `P1` Implement user profile editing
-- [x] `P1` Add user avatar/icon selection
-- [x] `P2` Implement user deletion
-- [x] `P2` Add admin user capabilities
 - [x] `P1` Implement user profile editing
 - [x] `P1` Add user avatar/icon selection
 - [x] `P2` Implement user deletion
@@ -618,18 +612,18 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Implement game statistics
 
 ### 10.2 Tetris
-- [ ] `P2` Create Tetris.vue component
-- [ ] `P2` Implement game board (10x20)
-- [ ] `P2` Create tetromino shapes
-- [ ] `P2` Implement piece falling
-- [ ] `P2` Add piece rotation
-- [ ] `P2` Implement piece movement (left/right)
-- [ ] `P2` Add line clearing
-- [ ] `P2` Implement scoring
-- [ ] `P3` Add level progression
-- [ ] `P3` Implement next piece preview
+- [x] `P2` Create Tetris.vue component
+- [x] `P2` Implement game board (10x20)
+- [x] `P2` Create tetromino shapes
+- [x] `P2` Implement piece falling
+- [x] `P2` Add piece rotation
+- [x] `P2` Implement piece movement (left/right)
+- [x] `P2` Add line clearing
+- [x] `P2` Implement scoring
+- [x] `P3` Add level progression
+- [x] `P3` Implement next piece preview
 - [ ] `P3` Add high score tracking
-- [ ] `P3` Implement pause functionality
+- [x] `P3` Implement pause functionality
 
 ### 10.3 Galaga (Space Shooter)
 - [ ] `P3` Create Galaga.vue component
@@ -871,7 +865,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P2` Implement context menus for each specific application
 - [ ] `P2` Add "Quit" option to all application context menus
 - [x] `P2` Add "Save" and "Save As" options for Paint and SimpleText
-- [ ] `P2` Add "New Game" option for game applications (Puzzle, Solitaire, etc.)
+- [x] `P2` Add "New Game" option for game applications (Puzzle, Solitaire, etc.)
 
 ---
 

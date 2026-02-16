@@ -395,6 +395,29 @@ def generate_eliza_icon():
     img = add_shadow(img)
     save_icon(img, 'eliza', 'icons/apps')
 
+def generate_chooser_icon():
+    """Generate Chooser application icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Outline of a computer and printer
+    # Computer (left)
+    draw.rectangle([4, 10, 16, 20], fill=COLORS['white'], outline=COLORS['black'])
+    draw.rectangle([6, 12, 14, 18], fill=COLORS['gray_light'], outline=COLORS['black']) # Screen
+    draw.rectangle([4, 20, 16, 22], fill=COLORS['gray_medium'], outline=COLORS['black']) # Keyboard base
+
+    # Printer (right)
+    draw.rectangle([18, 14, 28, 22], fill=COLORS['white'], outline=COLORS['black'])
+    draw.rectangle([20, 12, 26, 14], fill=COLORS['white'], outline=COLORS['black']) # Paper top
+    draw.line([20, 18, 26, 18], fill=COLORS['black']) # Paper output slot
+
+    # Network cable connecting them
+    draw.line([16, 21, 18, 21], fill=COLORS['black'])
+    draw.point((17, 21), fill=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'chooser', 'icons/apps')
+
 def generate_tetris_icon():
     """Generate Tetris game icon."""
     img, draw = create_icon()
@@ -1032,6 +1055,7 @@ def generate_app_icons():
     generate_puzzle_icon()
     generate_paint_icon()
     generate_eliza_icon()
+    generate_chooser_icon()
     generate_tetris_icon()
     generate_chat_icon()
     generate_browser_icon()
