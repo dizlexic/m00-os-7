@@ -42,4 +42,18 @@ describe('Minesweeper.vue', () => {
     await wrapper.find('.minesweeper__reset-button').trigger('click')
     expect(wrapper.findAll('.minesweeper__cell--revealed').length).toBe(0)
   })
+
+  describe('Difficulty Levels', () => {
+    it('changes grid size when changeDifficulty is called', async () => {
+      const wrapper = mount(Minesweeper) as any
+      await wrapper.vm.changeDifficulty('intermediate')
+
+      const cells = wrapper.findAll('.minesweeper__cell')
+      expect(cells.length).toBe(256) // 16x16
+
+      await wrapper.vm.changeDifficulty('expert')
+      const cellsExpert = wrapper.findAll('.minesweeper__cell')
+      expect(cellsExpert.length).toBe(480) // 16x30
+    })
+
 })

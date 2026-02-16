@@ -22,9 +22,25 @@ interface Cell {
   status: CellStatus
 }
 
-const ROWS = 9
-const COLS = 9
-const MINES = 10
+interface Difficulty {
+  name: string
+  rows: number
+  cols: number
+  mines: number
+}
+
+const DIFFICULTIES: Record<string, Difficulty> = {
+  beginner: { name: 'Beginner', rows: 9, cols: 9, mines: 10 },
+  intermediate: { name: 'Intermediate', rows: 16, cols: 16, mines: 40 },
+  expert: { name: 'Expert', rows: 16, cols: 30, mines: 99 }
+}
+
+const currentDifficultyKey = ref('beginner')
+const currentDifficulty = computed(() => DIFFICULTIES[currentDifficultyKey.value])
+
+const ROWS = computed(() => currentDifficulty.value.rows)
+const COLS = computed(() => currentDifficulty.value.cols)
+const MINES = computed(() => currentDifficulty.value.mines)
 
 const grid = ref<Cell[][]>([])
 const gameState = ref<'idle' | 'playing' | 'won' | 'lost'>('idle')
@@ -33,10 +49,12 @@ const timer = ref(0)
 let timerInterval: number | null = null
 
 function initGrid() {
+  const rows = ROWS.value
+  const cols = COLS.value
   const newGrid: Cell[][] = []
-  for (let r = 0; r < ROWS; r++) {
+  for (let r = 0; r < rows; r++) {
     const row: Cell[] = []
-    for (let c = 0; c < COLS; c++) {
+    for (let c = 0; c < cols; c++) {
       row.push({
         isMine: false,
         neighborMines: 0,
@@ -73,9 +91,13 @@ function stopTimer() {
 
 function placeMines(firstR: number, firstC: number) {
   let placed = 0
-  while (placed < MINES) {
-    const r = Math.floor(Math.random() * ROWS)
-    const c = Math.floor(Math.random() * COLS)
+  const rows = ROWS.value
+  const cols = COLS.value
+  const mines = MINES.value
+
+  while (placed < mines) {
+    const r = Math.floor(Math.random() * rows)
+    const c = Math.floor(Math.random() * cols)
 
     // Don't place mine on first click or already placed mine
     if ((r === firstR && c === firstC) || grid.value[r][c].isMine) {
@@ -87,8 +109,8 @@ function placeMines(firstR: number, firstC: number) {
   }
 
   // Calculate neighbor counts
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       if (!grid.value[r][c].isMine) {
         grid.value[r][c].neighborMines = countNeighborMines(r, c)
       }
@@ -98,11 +120,14 @@ function placeMines(firstR: number, firstC: number) {
 
 function countNeighborMines(r: number, c: number): number {
   let count = 0
+  const rows = ROWS.value
+  const cols = COLS.value
+
   for (let dr = -1; dr <= 1; dr++) {
     for (let dc = -1; dc <= 1; dc++) {
       const nr = r + dr
       const nc = c + dc
-      if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && grid.value[nr][nc].isMine) {
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid.value[nr][nc].isMine) {
         count++
       }
     }
@@ -132,11 +157,14 @@ function revealCell(r: number, c: number) {
 
   if (cell.neighborMines === 0) {
     // Reveal neighbors
+    const rows = ROWS.value
+    const cols = COLS.value
+
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
         const nr = r + dr
         const nc = c + dc
-        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
           revealCell(nr, nc)
         }
       }
@@ -164,8 +192,11 @@ function toggleFlag(r: number, c: number, event: Event) {
 
 function checkWin() {
   let hiddenNonMines = 0
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
+  const rows = ROWS.value
+  const cols = COLS.value
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       if (!grid.value[r][c].isMine && grid.value[r][c].status !== 'revealed') {
         hiddenNonMines++
       }
@@ -176,8 +207,8 @@ function checkWin() {
     gameState.value = 'won'
     stopTimer()
     // Flag all remaining mines
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
         if (grid.value[r][c].isMine) {
           grid.value[r][c].status = 'flagged'
         }
@@ -191,10 +222,13 @@ function gameOver(won: boolean) {
   gameState.value = won ? 'won' : 'lost'
   stopTimer()
 
+  const rows = ROWS.value
+  const cols = COLS.value
+
   if (!won) {
     // Reveal all mines
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
         const cell = grid.value[r][c]
         if (cell.isMine && cell.status !== 'exploded') {
           cell.status = 'revealed'
@@ -208,6 +242,29 @@ function gameOver(won: boolean) {
 
 function handleReset() {
   initGrid()
+}
+
+function changeDifficulty(key: string) {
+  currentDifficultyKey.value = key
+  initGrid()
+  updateWindowMenus()
+
+  // Calculate window size based on grid
+  // Cell is 20px, border is 2px each side = 24px per cell? No, let's check CSS.
+  // .minesweeper__cell is 20x20 with 2px border.
+  // So each cell is 20px wide (border-box by default in Nuxt/Tailwind? No, standard CSS).
+  // width: 20px; height: 20px; border: 2px solid;
+  // So total cell width is 20 + 2 + 2 = 24px.
+
+  const cellTotalSize = 20
+  const gridWidth = COLS.value * cellTotalSize + 20 // padding/borders
+  const gridHeight = ROWS.value * cellTotalSize + 80 // header + padding/borders
+
+  if (props.windowId) {
+    updateWindow(props.windowId, {
+      size: { width: Math.max(220, gridWidth), height: Math.max(300, gridHeight) }
+    })
+  }
 }
 
 initGrid()
