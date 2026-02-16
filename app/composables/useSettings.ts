@@ -13,6 +13,7 @@ export interface Settings {
   dateFormat: string;
   timezone: string;
   daylightSaving: boolean;
+  appData?: Record<string, any>;
 }
 
 export interface SystemSettings {
@@ -43,6 +44,14 @@ export function useSettings() {
 
   const updateSetting = <K extends keyof Settings>(key: K, value: Settings[K]) => {
     settings.value[key] = value
+    saveSettingsToServer()
+  }
+
+  const updateAppData = (key: string, value: any) => {
+    if (!settings.value.appData) {
+      settings.value.appData = {}
+    }
+    settings.value.appData[key] = value
     saveSettingsToServer()
   }
 
@@ -103,6 +112,7 @@ export function useSettings() {
     settings: readonly(settings),
     systemSettings: readonly(systemSettings),
     updateSetting,
+    updateAppData,
     updateSystemSetting,
     fetchSettingsFromServer,
     fetchSystemSettings,

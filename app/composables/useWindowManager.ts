@@ -5,8 +5,9 @@
  * and arranging windows.
  */
 
-import { ref, computed, readonly } from 'vue'
+import { ref, computed, readonly, watch } from 'vue'
 import { useRecentItems } from '~/composables/useRecentItems'
+import { useSettings } from '~/composables/useSettings'
 import type { Position, Size } from '~/types/desktop'
 import type {
   WindowConfig,
@@ -51,6 +52,72 @@ export function useWindowManager() {
   const sortedWindows = computed(() =>
     [...windowList.value].sort((a, b) => a.zIndex - b.zIndex)
   )
+
+  const { updateAppData, settings } = useSettings()
+
+  function saveWindowsState(): void {
+    const windowsToSave = Array.from(windows.value.values()).map(w => ({
+      type: w.type,
+      title: w.title,
+      position: w.position,
+      size: w.size,
+      state: w.state,
+      zIndex: w.zIndex,
+      data: w.data,
+      icon: w.icon
+    }))
+    updateAppData('windows', { openWindows: windowsToSave })
+  }
+
+  function restoreWindows(): void {
+    const savedWindows = settings.value.appData?.windows?.openWindows
+    if (!savedWindows || !Array.isArray(savedWindows) || savedWindows.length === 0) return
+
+    // Clear current windows
+    windows.value.clear()
+
+    // Sort by zIndex to maintain layering
+    const sortedSaved = [...savedWindows].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
+
+    sortedSaved.forEach((w: any) => {
+      const id = generateWindowId()
+      const defaultSize = DEFAULT_WINDOW_SIZES[w.type as WindowType] || DEFAULT_WINDOW_SIZES.generic
+
+      const windowInstance: WindowInstance = {
+        id,
+        type: w.type,
+        title: w.title,
+        position: w.position || { ...INITIAL_WINDOW_POSITION },
+        size: w.size || { ...defaultSize },
+        minSize: { ...DEFAULT_MIN_SIZE },
+        maxSize: { ...DEFAULT_MAX_SIZE },
+        state: w.state || 'normal',
+        zIndex: w.zIndex || 100,
+        isActive: false,
+        resizable: true,
+        closable: true,
+        minimizable: true,
+        maximizable: true,
+        collapsible: true,
+        data: w.data,
+        icon: w.icon,
+        createdAt: Date.now()
+      }
+
+      windows.value.set(id, windowInstance)
+      if (w.zIndex > topZIndex.value) {
+        topZIndex.value = w.zIndex
+      }
+    })
+
+    // Find the one with highest z-index and make it active
+    if (windows.value.size > 0) {
+      const highest = Array.from(windows.value.values())
+        .reduce((prev, curr) => (curr.zIndex > prev.zIndex ? curr : prev))
+      activeWindowId.value = highest.id
+      highest.isActive = true
+    }
+  }
 
   // Window creation
   function openWindow(config: WindowConfig): string {
@@ -116,6 +183,7 @@ export function useWindowManager() {
 
     // Track recent apps
     trackRecentApp(config)
+    saveWindowsState()
 
     return id
   }
@@ -172,6 +240,7 @@ export function useWindowManager() {
         activeWindowId.value = null
       }
     }
+    saveWindowsState()
   }
 
   function closeAllWindows(): void {
@@ -179,6 +248,7 @@ export function useWindowManager() {
     activeWindowId.value = null
     topZIndex.value = 100
     cascadePosition.value = { ...INITIAL_WINDOW_POSITION }
+    saveWindowsState()
   }
 
   // Window focus/activation
@@ -199,6 +269,7 @@ export function useWindowManager() {
     window.zIndex = topZIndex.value
     window.isActive = true
     activeWindowId.value = id
+    saveWindowsState()
   }
 
   function bringToFront(id: string): void {
@@ -321,6 +392,7 @@ export function useWindowManager() {
       x: Math.max(0, Math.min(position.x, maxX)),
       y: Math.max(TITLE_BAR_HEIGHT + 20, Math.min(position.y, maxY))
     }
+    saveWindowsState()
   }
 
   function resizeWindow(id: string, size: Size): void {
@@ -331,6 +403,7 @@ export function useWindowManager() {
       width: Math.max(window.minSize.width, Math.min(size.width, window.maxSize.width)),
       height: Math.max(window.minSize.height, Math.min(size.height, window.maxSize.height))
     }
+    saveWindowsState()
   }
 
   // Window arrangement
@@ -348,6 +421,7 @@ export function useWindowManager() {
     })
 
     cascadePosition.value = { x, y }
+    saveWindowsState()
   }
 
   function tileWindows(): void {
@@ -377,6 +451,7 @@ export function useWindowManager() {
       }
       window.state = 'normal'
     })
+    saveWindowsState()
   }
 
   // Window queries
@@ -398,6 +473,7 @@ export function useWindowManager() {
     if (!window) return
 
     Object.assign(window, updates)
+    saveWindowsState()
   }
 
   function setWindowTitle(id: string, title: string): void {
@@ -408,6 +484,10 @@ export function useWindowManager() {
     // State (readonly)
     windows: readonly(windows),
     activeWindowId: readonly(activeWindowId),
+
+    // Persistence
+    saveWindowsState,
+    restoreWindows,
 
     // Computed
     windowList,

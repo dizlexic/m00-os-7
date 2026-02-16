@@ -206,7 +206,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Implement window minimize to dock/corner
 - [x] `P1` Add window cascade positioning
 - [x] `P1` Implement window tile arrangement
-- [ ] `P2` Add window state persistence
+- [x] `P2` Add window state persistence
 - [ ] `P2` Implement window groups
 
 ### 4.5 Scrollbars

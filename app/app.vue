@@ -20,8 +20,8 @@ import { useWindowManager } from "~/composables/useWindowManager";
 const { alertState, hideAlert } = useAlert();
 const { initialize, fetchFilesFromServer } = useFileSystem();
 const { isAuthenticated, init } = useUser();
-const { fetchSettingsFromServer } = useSettings();
-const { activeWindow } = useWindowManager();
+const { fetchSettingsFromServer, resetSettings } = useSettings();
+const { activeWindow, restoreWindows, closeAllWindows } = useWindowManager();
 
 useSeoMeta({
   title: 'm00-os-7 - Mac OS 7 Web Clone',
@@ -39,6 +39,8 @@ useSeoMeta({
 })
 
 const isBooting = ref(true);
+    restoreWindows();
+    isInitialDataLoaded.value = true;
 
 const currentAppName = computed(() => {
   if (activeWindow.value) {

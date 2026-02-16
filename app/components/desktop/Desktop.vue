@@ -64,7 +64,8 @@ const {
 const {
   windowList,
   activeWindow,
-  openWindow
+  openWindow,
+  restoreWindows
 } = useWindowManager()
 
 const { getRoot, getNodeByPath, createFolder, moveToTrash, copyNode, createAlias, getUniqueName } = useFileSystem()
