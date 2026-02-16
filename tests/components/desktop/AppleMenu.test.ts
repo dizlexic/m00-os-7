@@ -41,5 +41,24 @@ describe('MenuBar Apple Menu', () => {
     await controlPanelsItem?.trigger('mouseenter')
 
     expect(wrapper.text()).toContain('Network')
+
+    // Check if icons are rendered in submenus
+    // Re-enter Applications submenu
+    await applicationsItem?.trigger('mouseenter')
+    const applicationsIcons = wrapper.findAll('.menu-dropdown--submenu .menu-dropdown__icon')
+    expect(applicationsIcons.length).toBeGreaterThan(0)
+    expect(applicationsIcons[0].attributes('src')).toContain('/assets/icons/apps/calculator.png')
+
+    // Re-enter Control Panels submenu
+    await controlPanelsItem?.trigger('mouseenter')
+    const controlPanelsIcons = wrapper.findAll('.menu-dropdown--submenu .menu-dropdown__icon')
+    expect(controlPanelsIcons.length).toBeGreaterThan(0)
+    // Verify specific unique icons
+    const iconSrcs = controlPanelsIcons.map(i => i.attributes('src'))
+    expect(iconSrcs).toContain('/assets/icons/system/cp-network.png')
+    expect(iconSrcs).toContain('/assets/icons/system/cp-apple-menu.png')
+    expect(iconSrcs).toContain('/assets/icons/system/cp-color.png')
+    // They should no longer use the generic preferences icon
+    expect(iconSrcs[0]).not.toBe('/assets/icons/system/preferences.png')
   })
 })
