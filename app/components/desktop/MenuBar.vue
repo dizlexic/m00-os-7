@@ -10,7 +10,6 @@ import Clock from '~/components/system/Clock.vue'
 import SharingIndicator from '~/components/stc/SharingIndicator.vue'
 import MenuDropdown from '~/components/desktop/MenuDropdown.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
-import { LABEL_NAMES } from '~/types/filesystem'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
 import { useClipboard } from '~/composables/useClipboard'
@@ -18,6 +17,7 @@ import { useDesktop } from '~/composables/useDesktop'
 import { useAlert } from '~/composables/useAlert'
 import { useTrash } from '~/composables/useTrash'
 import { useUser } from '~/composables/useUser'
+import { useLabels } from '~/composables/useLabels'
 import type { WindowType } from '~/types/window'
 import type { RecentItem } from '~/types/recent'
 import type { MenuItem, Menu } from '~/types/menu'
@@ -30,6 +30,7 @@ const { icons: desktopIcons, cleanUpDesktop, updateIcon } = useDesktop()
 const { showAlert } = useAlert()
 const { restoreItem, items: trashItems, emptyTrash: confirmEmptyTrash } = useTrash()
 const { logout, currentUser } = useUser()
+const { getLabelMenuItems } = useLabels()
 
 // Props
 interface Props {
@@ -344,29 +345,7 @@ const viewMenuItems = computed<MenuItem[]>(() => {
 })
 
 const labelMenuItems = computed<MenuItem[]>(() => {
-  const isFinder = !activeWindow.value || activeWindow.value.type === 'finder'
-  if (!isFinder) return []
-
-  // Find currently selected item label to show checkmark
-  let currentLabel: number | undefined = undefined
-  if (activeWindow.value && activeWindow.value.type === 'finder') {
-    const selectedId = (activeWindow.value.data as any)?.selectedItemId
-    if (selectedId) {
-      currentLabel = getNode(selectedId)?.label || 0
-    }
-  } else if (!activeWindow.value) {
-    const selected = desktopIcons.value.find(icon => icon.isSelected)
-    if (selected) {
-      currentLabel = selected.label || 0
-    }
-  }
-
-  return LABEL_NAMES.map((name, index) => ({
-    id: `label-${index}`,
-    label: name,
-    checked: currentLabel === index,
-    action: () => handleSetLabel(index)
-  }))
+  return getLabelMenuItems()
 })
 
 const windowMenuItems = computed<MenuItem[]>(() => {
@@ -377,30 +356,6 @@ const windowMenuItems = computed<MenuItem[]>(() => {
     action: () => bringToFront(win.id)
   }))
 })
-
-function handleSetLabel(label: number) {
-  if (activeWindow.value && activeWindow.value.type === 'finder') {
-    const selectedId = (activeWindow.value.data as any)?.selectedItemId
-    if (selectedId) {
-      updateNode(selectedId, { label })
-    }
-  } else if (!activeWindow.value) {
-    const selectedIcons = desktopIcons.value.filter(icon => icon.isSelected)
-
-    selectedIcons.forEach(icon => {
-      // Update desktop icon state
-      updateIcon(icon.id, { label })
-
-      // If it has a path, it's likely a file/folder, update filesystem too
-      if (icon.path) {
-        const node = getNodeByPath(icon.path)
-        if (node) {
-          updateNode(node.id, { label })
-        }
-      }
-    })
-  }
-}
 
 function setViewMode(mode: string): void {
   if (activeWindow.value && activeWindow.value.type === 'finder') {

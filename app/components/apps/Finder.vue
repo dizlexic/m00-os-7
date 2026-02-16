@@ -5,6 +5,7 @@ import { useWindowManager } from '~/composables/useWindowManager'
 import { useRecentItems } from '~/composables/useRecentItems'
 import { useDesktop } from '~/composables/useDesktop'
 import { useTrash } from '~/composables/useTrash'
+import { useLabels } from '~/composables/useLabels'
 import { LABEL_COLORS, LABEL_NAMES } from '~/types/filesystem'
 import type { FileNode, FolderNode } from '~/types/filesystem'
 
@@ -30,6 +31,7 @@ const { openWindow, updateWindow } = useWindowManager()
 const { addRecentDoc } = useRecentItems()
 const { showContextMenu } = useDesktop()
 const { restoreItem } = useTrash()
+const { getLabelMenuItems } = useLabels()
 
 const currentFolderId = ref(props.folderId)
 
@@ -461,6 +463,13 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
       action: () => handleDoubleClick(item)
     },
     { id: 'sep1', label: '', isSeparator: true },
+    {
+    {
+      id: 'label',
+      label: 'Label',
+      submenu: getLabelMenuItems(item.id)
+    },
+    { id: 'sep2', label: '', isSeparator: true },
     {
       id: 'get-info',
       label: 'Get Info',
