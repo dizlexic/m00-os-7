@@ -378,6 +378,8 @@ onUnmounted(() => {
 
       <Minesweeper
         v-else-if="win.type === 'minesweeper'"
+        :window-id="win.id"
+        :is-active="win.isActive"
       />
 
       <Messenger

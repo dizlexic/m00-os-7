@@ -8,13 +8,14 @@ import { ref, onMounted, computed } from 'vue'
 
 interface Props {
   isActive?: boolean
+  windowId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isActive: false
+  isActive: false,
+  windowId: ''
 })
 
-type CellStatus = 'hidden' | 'revealed' | 'flagged' | 'exploded' | 'wrong-flag'
 const { updateWindow } = useWindowManager()
 const { showAlert } = useAlert()
 
@@ -345,11 +346,65 @@ function changeDifficulty(key: string) {
   }
 }
 
+function updateWindowMenus() {
+  if (!props.windowId) return
+
+  updateWindow(props.windowId, {
+    menus: [
+      {
+        id: 'file',
+        label: 'File',
+        items: [
+          { id: 'new-game', label: 'New Game', action: handleReset },
+          { id: 'sep1', label: '', isSeparator: true },
+          { id: 'close', label: 'Close', action: () => { /* Handled by window manager */ } }
+        ]
+      },
+      {
+        id: 'game',
+        label: 'Game',
+        items: [
+          {
+            id: 'beginner',
+            label: 'Beginner',
+            action: () => changeDifficulty('beginner'),
+            checked: currentDifficultyKey.value === 'beginner'
+          },
+          {
+            id: 'intermediate',
+            label: 'Intermediate',
+            action: () => changeDifficulty('intermediate'),
+            checked: currentDifficultyKey.value === 'intermediate'
+          },
+          {
+            id: 'expert',
+            label: 'Expert',
+            action: () => changeDifficulty('expert'),
+            checked: currentDifficultyKey.value === 'expert'
+          },
+          { id: 'sep2', label: '', isSeparator: true },
+          { id: 'best-times', label: 'Best Times...', action: showBestTimes }
+        ]
+      }
+    ]
+  })
+}
+
+watch(() => props.isActive, (active) => {
+  if (active) {
+    updateWindowMenus()
+  }
+})
+
 initGrid()
 loadHighScores()
 
 onMounted(() => {
-  // initGrid already called in setup
+  if (props.isActive) {
+    updateWindowMenus()
+  }
+})
+
 })
 
 const faceIcon = computed(() => {
