@@ -44,6 +44,11 @@ const selectionSnapshot = ref<ImageData | null>(null)
 const lassoPoints = ref<{ x: number, y: number }[]>([])
 const clipboard = ref<ImageData | null>(null)
 
+// History state
+const history = ref<ImageData[]>([])
+const historyIndex = ref(-1)
+const maxHistory = 20
+
 // Mac OS 7 16-color palette
 const colors = [
   '#000000', '#FFFFFF', '#CCCCCC', '#999999', '#666666', '#333333',
@@ -88,7 +93,8 @@ const menus = computed<Menu[]>(() => [
     id: 'edit',
     label: 'Edit',
     items: [
-      { id: 'undo', label: 'Undo', shortcut: '⌘Z', disabled: true },
+      { id: 'undo', label: 'Undo', shortcut: '⌘Z', action: () => undo(), disabled: historyIndex.value <= 0 },
+      { id: 'redo', label: 'Redo', shortcut: '⌘Y', action: () => redo(), disabled: historyIndex.value >= history.value.length - 1 },
       { id: 'sep1', label: '', isSeparator: true },
       { id: 'cut', label: 'Cut', shortcut: '⌘X', action: () => cutSelection(), disabled: !selectionActive.value },
       { id: 'copy', label: 'Copy', shortcut: '⌘C', action: () => copySelection(), disabled: !selectionActive.value },
@@ -122,6 +128,8 @@ function initCanvas() {
     // Set white background
     ctx.value.fillStyle = '#FFFFFF'
     ctx.value.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height)
+    snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+    saveToHistory()
   }
 }
 
@@ -393,6 +401,11 @@ function stopDrawing() {
         selectionActive.value = false
         selectionRect.value = null
       }
+    } else {
+      saveToHistory()
+    }
+  }
+
   isDrawing.value = false
 }
 
@@ -470,6 +483,38 @@ function selectAll() {
   drawSelectionMarquee()
 }
 
+function saveToHistory() {
+  if (!ctx.value || !canvasRef.value) return
+  const imageData = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+
+  if (historyIndex.value < history.value.length - 1) {
+    history.value = history.value.slice(0, historyIndex.value + 1)
+  }
+
+  history.value.push(imageData)
+  if (history.value.length > maxHistory) {
+    history.value.shift()
+  } else {
+    historyIndex.value++
+  }
+}
+
+function undo() {
+  if (historyIndex.value > 0 && ctx.value) {
+    historyIndex.value--
+    ctx.value.putImageData(history.value[historyIndex.value], 0, 0)
+    snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value!.width, canvasRef.value!.height)
+  }
+}
+
+function redo() {
+  if (historyIndex.value < history.value.length - 1 && ctx.value) {
+    historyIndex.value++
+    ctx.value.putImageData(history.value[historyIndex.value], 0, 0)
+    snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value!.width, canvasRef.value!.height)
+  }
+}
+
 function getFillStyle() {
   if (!ctx.value) return currentColor.value
   if (currentPatternId.value === 'solid') return currentColor.value
@@ -543,6 +588,8 @@ function clearCanvas() {
   if (!ctx.value || !canvasRef.value) return
   ctx.value.fillStyle = '#FFFFFF'
   ctx.value.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height)
+  snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+  saveToHistory()
 }
 
 function printCanvas() {
@@ -569,6 +616,8 @@ function loadFile() {
         if (ctx.value && canvasRef.value) {
           ctx.value.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
           ctx.value.drawImage(img, 0, 0)
+          snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+          saveToHistory()
         }
       }
       img.src = file.content
