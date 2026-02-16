@@ -5,14 +5,21 @@
  * A classic Breakout clone for Mac OS 7.
  */
 import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useWindowManager } from '~/composables/useWindowManager'
+import { useDesktop } from '~/composables/useDesktop'
 
 interface Props {
   isActive?: boolean
+  windowId?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isActive: false
+  isActive: false,
+  windowId: ''
 })
+
+const { updateWindow } = useWindowManager()
+const { showContextMenu } = useDesktop()
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 const container = ref<HTMLElement | null>(null)
@@ -69,6 +76,16 @@ function startGame() {
   resetBall()
   gameState.value = 'playing'
   draw()
+}
+
+function togglePause() {
+  if (gameState.value === 'playing') {
+    gameState.value = 'paused'
+    if (animationId) cancelAnimationFrame(animationId)
+  } else if (gameState.value === 'paused') {
+    gameState.value = 'playing'
+    draw()
+  }
 }
 
 function resetBall() {
@@ -215,6 +232,64 @@ function handleMouseMove(e: MouseEvent) {
   }
 }
 
+function handleContextMenu(e: MouseEvent) {
+  e.preventDefault()
+  const items = [
+    {
+      id: 'pause',
+      label: gameState.value === 'paused' ? 'Resume Game' : 'Pause Game',
+      disabled: gameState.value === 'idle' || gameState.value === 'gameover' || gameState.value === 'won',
+      action: togglePause
+    },
+    { id: 'sep1', label: '', isSeparator: true },
+    { id: 'new-game', label: 'New Game', action: startGame }
+  ]
+  showContextMenu({ x: e.clientX, y: e.clientY }, items)
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (!props.isActive) return
+
+  if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+    if (gameState.value === 'playing' || gameState.value === 'paused') {
+      togglePause()
+    }
+  }
+}
+
+function updateWindowMenus() {
+  if (!props.windowId) return
+
+  updateWindow(props.windowId, {
+    menus: [
+      {
+        id: 'file',
+        label: 'File',
+        items: [
+          { id: 'new-game', label: 'New Game', action: startGame },
+          { id: 'sep1', label: '', isSeparator: true },
+          { id: 'close', label: 'Close', action: () => { /* Handled by window manager */ } }
+        ]
+      },
+      {
+        id: 'game',
+        label: 'Game',
+        items: [
+          {
+            id: 'pause',
+            label: gameState.value === 'paused' ? 'Resume Game' : 'Pause Game',
+            shortcut: 'P',
+            disabled: gameState.value === 'idle' || gameState.value === 'gameover' || gameState.value === 'won',
+            action: togglePause
+          },
+          { id: 'sep2', label: '', isSeparator: true },
+          { id: 'start-game', label: 'Start New Game', action: startGame }
+        ]
+      }
+    ]
+  })
+}
+
 onMounted(() => {
   if (canvas.value) {
     canvasWidth = canvas.value.width
@@ -222,16 +297,28 @@ onMounted(() => {
     initBricks()
     resetBall()
   }
+  window.addEventListener('keydown', handleKeydown)
+  if (props.isActive) {
+    updateWindowMenus()
+  }
 })
 
 onUnmounted(() => {
   if (animationId) {
     cancelAnimationFrame(animationId)
   }
+  window.removeEventListener('keydown', handleKeydown)
+})
+
+watch(gameState, () => {
+  updateWindowMenus()
 })
 
 // Pause game when window is not active
 watch(() => props.isActive, (active) => {
+  if (active) {
+    updateWindowMenus()
+  }
   if (!active && gameState.value === 'playing') {
     gameState.value = 'paused'
     if (animationId) cancelAnimationFrame(animationId)
@@ -240,7 +327,7 @@ watch(() => props.isActive, (active) => {
 </script>
 
 <template>
-  <div ref="container" class="brickle" @mousemove="handleMouseMove">
+  <div ref="container" class="brickle" @mousemove="handleMouseMove" @contextmenu="handleContextMenu">
     <div class="brickle__header">
       <div class="brickle__info">
         <span>Score: {{ score }}</span>
