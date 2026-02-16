@@ -9,7 +9,7 @@ import { ref, computed, readonly, onUnmounted, watch } from 'vue'
 import { useUser } from '~/composables/useUser'
 import type {
   STCConnectionState,
-  STCSettings,
+  NetworkSettings,
   STCSession,
   RemoteUser,
   CursorConfig,
@@ -21,12 +21,12 @@ import type {
   UserPresencePayload,
   ErrorPayload
 } from '~/types/stc'
-import { DEFAULT_STC_SETTINGS } from '~/types/stc'
+import { DEFAULT_NETWORK_SETTINGS } from '~/types/stc'
 import type { Position } from '~/types/desktop'
 
 // Singleton state for STC mode
 const connectionState = ref<STCConnectionState>('disconnected')
-const settings = ref<STCSettings>({ ...DEFAULT_STC_SETTINGS })
+const settings = ref<NetworkSettings>({ ...DEFAULT_NETWORK_SETTINGS })
 const currentSession = ref<STCSession | null>(null)
 const remoteUsers = ref<Map<string, RemoteUser>>(new Map())
 const localUserId = ref<string | null>(null)
@@ -337,7 +337,7 @@ function broadcastAction(type: STCMessageType, payload: unknown): void {
 /**
  * Update STC settings
  */
-function updateSettings(newSettings: Partial<STCSettings>): void {
+function updateSettings(newSettings: Partial<NetworkSettings>): void {
   settings.value = { ...settings.value, ...newSettings }
 
   // Handle enabled state change
