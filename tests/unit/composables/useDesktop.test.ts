@@ -6,7 +6,8 @@ vi.mock('~/composables/useSettings', () => ({
   useSettings: () => ({
     settings: {
       value: {
-        desktopPattern: 'default'
+        desktopPattern: 'default',
+        highlightColor: '#000080'
       }
     }
   })
@@ -45,5 +46,39 @@ describe('useDesktop', () => {
 
     hideContextMenu()
     expect(contextMenu.value.isVisible).toBe(false)
+  })
+
+  it('cleans up desktop by sorting strictly by name', () => {
+    const { addIcon, cleanUpDesktop, icons, initializeDesktop } = useDesktop()
+    initializeDesktop()
+
+    // In kind-first sort, folder comes before document
+    // If sorting by name only, 'Apple Document' should come before 'Zebra Folder'
+    addIcon({ name: 'Zebra Folder', type: 'folder', icon: '', position: { x: 0, y: 0 } })
+    addIcon({ name: 'Apple Document', type: 'document', icon: '', position: { x: 0, y: 0 } })
+
+    cleanUpDesktop('name')
+
+    const appleIndex = icons.value.findIndex(i => i.name === 'Apple Document')
+    const zebraIndex = icons.value.findIndex(i => i.name === 'Zebra Folder')
+
+    expect(appleIndex).toBeLessThan(zebraIndex)
+  })
+
+  it('cleans up desktop by sorting by kind (default)', () => {
+    const { addIcon, cleanUpDesktop, icons, initializeDesktop } = useDesktop()
+    initializeDesktop()
+
+    addIcon({ name: 'Zebra Folder', type: 'folder', icon: '', position: { x: 0, y: 0 } })
+    addIcon({ name: 'Apple Document', type: 'document', icon: '', position: { x: 0, y: 0 } })
+
+    // Default should be by kind
+    cleanUpDesktop()
+
+    const zebraIndex = icons.value.findIndex(i => i.name === 'Zebra Folder')
+    const appleIndex = icons.value.findIndex(i => i.name === 'Apple Document')
+
+    // Folder comes before document
+    expect(zebraIndex).toBeLessThan(appleIndex)
   })
 })
