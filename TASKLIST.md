@@ -518,7 +518,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P3` Implement move counter
 
 ### 9.7 Paint (MacPaint-style Drawing Application)
-- [~] `P1` Create Paint.vue component
+- [x] `P1` Create Paint.vue component
 - [x] `P1` Implement canvas-based drawing area
 - [x] `P1` Add basic drawing tools:
   - [x] Pencil/freehand drawing tool
@@ -542,8 +542,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P2` Implement spray can/airbrush tool
 - [x] `P2` Add shape tools:
   - [x] Rounded rectangle
-  - [ ] Polygon tool
-  - [ ] Arc tool
+  - [x] Polygon tool
+  - [x] Arc tool
 - [x] `P2` Implement undo/redo functionality
 - [ ] `P2` Add zoom/magnification tool
 - [x] `P2` Implement file operations:
@@ -863,8 +863,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 
 ### 19.1 Context Menu Implementation
 - [x] `P2` Document Application Context Menu requirements in guidelines
-- [ ] `P2` Implement context menus for each specific application
-- [ ] `P2` Add "Quit" option to all application context menus
+- [x] `P2` Implement context menus for each specific application
+- [x] `P2` Add "Quit" option to all application context menus
 - [x] `P2` Add "Save" and "Save As" options for Paint and SimpleText
 - [x] `P2` Add "New Game" option for game applications (Puzzle, Solitaire, etc.)
 
