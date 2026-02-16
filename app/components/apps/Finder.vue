@@ -40,7 +40,6 @@ watch(() => props.folderId, (newId) => {
 })
 
 const currentFolder = computed(() => getNode(currentFolderId.value) as FolderNode)
-const items = computed(() => getChildren(currentFolderId.value))
 const selectedItemId = ref<string | null>(null)
 const isRenamingId = ref<string | null>(null)
 const editingName = ref('')
@@ -59,13 +58,60 @@ watch(selectedItemId, (newId) => {
   }
 })
 
-type ViewMode = 'icon' | 'list'
+type ViewMode = 'icon' | 'small-icon' | 'name' | 'size' | 'kind' | 'date'
 const viewMode = ref<ViewMode>('icon')
+
+// Watch for window data changes to sync viewMode
+watch(() => useWindowManager().getWindow(props.windowId || '')?.data?.viewMode, (newMode) => {
+  if (newMode && newMode !== viewMode.value) {
+    viewMode.value = newMode as ViewMode
+  }
+})
+
+// Update window data when viewMode changes
+watch(viewMode, (newMode) => {
+  if (props.windowId) {
+    const currentData = useWindowManager().getWindow(props.windowId)?.data || {}
+    updateWindow(props.windowId, {
+      data: {
+        ...currentData,
+        viewMode: newMode
+      }
+    })
+  }
+})
 
 const isRoot = computed(() => currentFolderId.value === getRoot()?.id)
 
+const items = computed(() => {
+  const baseItems = getChildren(currentFolderId.value)
+
+  if (viewMode.value === 'icon' || viewMode.value === 'small-icon') {
+    return baseItems
+  }
+
+  return [...baseItems].sort((a, b) => {
+    switch (viewMode.value) {
+      case 'name':
+        return a.name.localeCompare(b.name)
+      case 'size':
+        return (b.size || 0) - (a.size || 0)
+      case 'kind':
+        return getKindLabel(a).localeCompare(getKindLabel(b))
+      case 'date':
+        return (b.modifiedAt || 0) - (a.modifiedAt || 0)
+      default:
+        return 0
+    }
+  })
+})
+
 function toggleViewMode() {
-  viewMode.value = viewMode.value === 'icon' ? 'list' : 'icon'
+  if (viewMode.value === 'icon') {
+    viewMode.value = 'name'
+  } else {
+    viewMode.value = 'icon'
+  }
 }
 
 function goUp() {
@@ -497,7 +543,10 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
 
     <div
       class="finder__content"
-      :class="{ 'finder__content--list': viewMode === 'list' }"
+      :class="{
+        'finder__content--list': ['name', 'size', 'kind', 'date'].includes(viewMode),
+        'finder__content--small-icon': viewMode === 'small-icon'
+      }"
     >
       <template v-if="viewMode === 'icon'">
         <div
@@ -535,11 +584,72 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
         </div>
       </template>
 
+      <template v-else-if="viewMode === 'small-icon'">
+        <div
+          v-for="item in items"
+          :key="item.id"
+          class="finder__item finder__item--small-icon"
+          :class="{ 'finder__item--selected': selectedItemId === item.id }"
+          @click.stop="selectItem(item.id)"
+          @dblclick.stop="handleDoubleClick(item)"
+          @contextmenu.stop.prevent="handleItemContextMenu($event, item)"
+        >
+          <div class="finder__item-mini-icon">
+            <img :src="getIcon(item)" :alt="item.name" draggable="false" />
+          </div>
+          <div
+            class="finder__item-label finder__item-label--small"
+            :class="{ 'finder__item-label--selected': selectedItemId === item.id }"
+            @click.stop="handleLabelClick(item)"
+          >
+            <template v-if="isRenamingId === item.id">
+              <input
+                ref="renameInput"
+                v-model="editingName"
+                type="text"
+                class="finder__rename-input finder__rename-input--small"
+                @keydown="handleRenameKeyDown"
+                @blur="finishRename"
+                @click.stop
+              />
+            </template>
+            <template v-else>
+              {{ item.name }}
+            </template>
+          </div>
+        </div>
+      </template>
+
       <template v-else>
         <div class="finder__list-header">
-          <div class="finder__list-col finder__list-col--name">Name</div>
-          <div class="finder__list-col finder__list-col--size">Size</div>
-          <div class="finder__list-col finder__list-col--kind">Kind</div>
+          <div
+            class="finder__list-col finder__list-col--name"
+            :class="{ 'finder__list-col--active': viewMode === 'name' }"
+            @click="viewMode = 'name'"
+          >
+            Name
+          </div>
+          <div
+            class="finder__list-col finder__list-col--size"
+            :class="{ 'finder__list-col--active': viewMode === 'size' }"
+            @click="viewMode = 'size'"
+          >
+            Size
+          </div>
+          <div
+            class="finder__list-col finder__list-col--kind"
+            :class="{ 'finder__list-col--active': viewMode === 'kind' }"
+            @click="viewMode = 'kind'"
+          >
+            Kind
+          </div>
+          <div
+            class="finder__list-col finder__list-col--date"
+            :class="{ 'finder__list-col--active': viewMode === 'date' }"
+            @click="viewMode = 'date'"
+          >
+            Last Modified
+          </div>
         </div>
         <div
           v-for="item in items"
@@ -578,6 +688,9 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
           </div>
           <div class="finder__list-col finder__list-col--kind">
             {{ getKindLabel(item) }}
+          </div>
+          <div class="finder__list-col finder__list-col--date">
+            {{ new Date(item.modifiedAt).toLocaleDateString() }}
           </div>
         </div>
       </template>
@@ -766,11 +879,22 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.finder__list-col:hover {
+  background-color: var(--color-gray-medium);
+}
+
+.finder__list-col--active {
+  background-color: var(--color-black);
+  color: var(--color-white);
 }
 
 .finder__list-col--name { flex: 3; }
-.finder__list-col--size { flex: 1; }
-.finder__list-col--kind { flex: 2; border-right: none; }
+.finder__list-col--size { flex: 1; text-align: right; }
+.finder__list-col--kind { flex: 2; }
+.finder__list-col--date { flex: 2; border-right: none; }
 
 .finder__item--icon {
   display: flex;
@@ -778,6 +902,23 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
   align-items: center;
   width: 80px;
   cursor: default;
+  padding: var(--spacing-sm) 0;
+}
+
+.finder__content--small-icon {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  align-content: start;
+}
+
+.finder__item--small-icon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: default;
+  padding: 2px 4px;
 }
 
 .finder__item--list {
@@ -853,8 +994,19 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
   padding: 0;
 }
 
+.finder__rename-input--small {
+  text-align: left;
+  padding: 0 2px;
+}
+
 .finder__rename-input--list {
   text-align: left;
   padding: 0 2px;
+}
+
+.finder__item-label--small {
+  margin-left: var(--spacing-xs);
+  flex: 1;
+  text-align: left;
 }
 </style>
