@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUser } from '~/composables/useUser'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useSettings } from '~/composables/useSettings'
 
-const { login, loginAsGuest, register, setAuthenticatedUser } = useUser()
+const { login, loginAsGuest, register, setAuthenticatedUser, users, fetchUsers } = useUser()
 const { fetchFilesFromServer } = useFileSystem()
 const { fetchSettingsFromServer } = useSettings()
 
@@ -17,6 +17,10 @@ const error = ref('')
 const isLoading = ref(false)
 const showGuestConfirmation = ref(false)
 const generatedGuestUser = ref<any>(null)
+
+onMounted(async () => {
+  await fetchUsers()
+})
 
 async function handleLogin() {
   if (loginMode.value === 'guest') {
@@ -102,6 +106,10 @@ function clearForm() {
   confirmPassword.value = ''
   error.value = ''
 }
+
+function getUserAvatar(user: any) {
+  return user.avatar || '/assets/icons/system/document.png'
+}
 </script>
 
 <template>
@@ -140,6 +148,23 @@ function clearForm() {
             >
               Register
             </button>
+          </div>
+        </div>
+
+        <!-- User Selection List (only for login mode) -->
+        <div v-if="loginMode === 'login' && users.length > 0" class="user-selection mb-md">
+          <label class="login-label mb-xs block">Select User:</label>
+          <div class="user-list">
+            <div
+              v-for="user in users"
+              :key="user.id"
+              class="user-item"
+              :class="{ 'user-item--selected': username === user.username }"
+              @click="username = user.username"
+            >
+              <img :src="getUserAvatar(user)" class="user-avatar" alt="" />
+              <span>{{ user.username }}</span>
+            </div>
           </div>
         </div>
 
@@ -325,5 +350,39 @@ function clearForm() {
 
 .block {
   display: block;
+}
+
+.user-list {
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid var(--color-black);
+  background-color: var(--color-white);
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: default;
+}
+
+.user-item:hover {
+  background-color: var(--color-gray-light);
+}
+
+.user-item--selected {
+  background-color: var(--color-highlight);
+  color: var(--color-highlight-text);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.mb-md {
+  margin-bottom: var(--spacing-md);
 }
 </style>
