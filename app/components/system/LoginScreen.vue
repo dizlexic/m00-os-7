@@ -4,7 +4,7 @@ import { useUser } from '~/composables/useUser'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useSettings } from '~/composables/useSettings'
 
-const { login, loginAsGuest, register } = useUser()
+const { login, loginAsGuest, register, setAuthenticatedUser } = useUser()
 const { fetchFilesFromServer } = useFileSystem()
 const { fetchSettingsFromServer } = useSettings()
 
@@ -15,10 +15,34 @@ const password = ref('')
 const confirmPassword = ref('')
 const error = ref('')
 const isLoading = ref(false)
+const showGuestConfirmation = ref(false)
+const generatedGuestUser = ref<any>(null)
 
 async function handleLogin() {
   if (loginMode.value === 'guest') {
-    loginAsGuest()
+    if (!showGuestConfirmation.value) {
+      isLoading.value = true
+      const guest = await loginAsGuest()
+      isLoading.value = false
+      if (guest) {
+        generatedGuestUser.value = guest
+        showGuestConfirmation.value = true
+      } else {
+        error.value = 'Failed to create guest session.'
+      }
+      return
+    }
+
+    // Proceed to desktop
+    if (generatedGuestUser.value) {
+      isLoading.value = true
+      await Promise.all([
+        fetchFilesFromServer(),
+        fetchSettingsFromServer()
+      ])
+      setAuthenticatedUser(generatedGuestUser.value)
+      isLoading.value = false
+    }
     return
   }
 
@@ -65,6 +89,8 @@ function selectMode(mode: 'login' | 'guest' | 'new') {
   error.value = ''
   password.value = ''
   confirmPassword.value = ''
+  showGuestConfirmation.value = false
+  generatedGuestUser.value = null
   if (mode === 'login') {
     username.value = ''
   }
@@ -156,7 +182,13 @@ function clearForm() {
 
         <!-- Guest mode message -->
         <div v-if="loginMode === 'guest'" class="guest-message">
-          <p>Continue as Guest to explore without saving your data.</p>
+          <template v-if="!showGuestConfirmation">
+            <p>Continue as Guest to explore without saving your data.</p>
+          </template>
+          <template v-else>
+            <p>You will be logged in as:</p>
+            <p class="generated-name">{{ generatedGuestUser.username }}</p>
+          </template>
         </div>
 
         <div v-if="error" class="error-message">
@@ -172,7 +204,7 @@ function clearForm() {
             :disabled="isLoading"
             @click="handleLogin"
           >
-            {{ isLoading ? 'Processing...' : (loginMode === 'new' ? 'Register' : (loginMode === 'guest' ? 'Continue' : 'Login')) }}
+            {{ isLoading ? 'Processing...' : (loginMode === 'new' ? 'Register' : (loginMode === 'guest' ? (showGuestConfirmation ? 'Start' : 'Continue') : 'Login')) }}
           </button>
         </div>
       </div>
@@ -278,6 +310,13 @@ function clearForm() {
 
 .guest-message p {
   margin: 0;
+}
+
+.generated-name {
+  font-weight: bold;
+  margin-top: var(--spacing-xs) !important;
+  font-size: var(--font-size-md);
+  color: var(--color-highlight);
 }
 
 .mb-xs {
