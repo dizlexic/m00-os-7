@@ -6,6 +6,7 @@
  */
 
 import type { Position, Size } from './desktop'
+import type { Menu } from './menu'
 
 /** Window state enumeration */
 export type WindowState = 'normal' | 'minimized' | 'maximized' | 'collapsed'
@@ -71,6 +72,8 @@ export interface WindowConfig {
   data?: unknown
   /** Icon path for window */
   icon?: string
+  /** Custom menus for this window */
+  menus?: Menu[]
 }
 
 /** Window instance state */
@@ -115,6 +118,8 @@ export interface WindowInstance {
   icon?: string
   /** Timestamp when window was created */
   createdAt: number
+  /** Custom menus for this window */
+  menus?: Menu[]
 }
 
 /** Window manager state */
