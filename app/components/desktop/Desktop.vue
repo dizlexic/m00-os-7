@@ -169,9 +169,10 @@ function handleContextMenu(event: MouseEvent): void {
     {
       id: 'clean-up',
       label: 'Clean Up Desktop',
-      action: () => {
-        cleanUpDesktop()
-      }
+      submenu: [
+        { id: 'clean-by-kind', label: 'by Kind', action: () => cleanUpDesktop('kind') },
+        { id: 'clean-by-name', label: 'by Name', action: () => cleanUpDesktop('name') }
+      ]
     },
     {
       id: 'desktop-patterns',
