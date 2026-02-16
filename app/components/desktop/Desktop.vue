@@ -23,6 +23,7 @@ import GeneralSettings from '~/components/apps/GeneralSettings.vue'
 import SoundSettings from '~/components/apps/SoundSettings.vue'
 import DateTimeSettings from '~/components/apps/DateTimeSettings.vue'
 import STCSettings from '~/components/apps/STCSettings.vue'
+import UsersSettings from '~/components/apps/UsersSettings.vue'
 import AboutMac from '~/components/apps/AboutMac.vue'
 import ArticleViewer from '~/components/apps/ArticleViewer.vue'
 import ImageViewer from '~/components/apps/ImageViewer.vue'
@@ -315,6 +316,10 @@ onUnmounted(() => {
 
       <STCSettings
         v-else-if="win.type === 'stc-settings'"
+      />
+
+      <UsersSettings
+        v-else-if="win.type === 'users-settings'"
       />
 
       <AboutMac
