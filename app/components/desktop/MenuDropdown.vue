@@ -7,6 +7,7 @@
 
 import { ref, computed } from 'vue'
 import type { MenuItem } from '~/types/menu'
+import { useSettings } from '~/composables/useSettings'
 
 interface Props {
   items: MenuItem[]
@@ -21,7 +22,11 @@ const emit = defineEmits<{
   'item-click': [item: MenuItem]
 }>()
 
+const { settings } = useSettings()
+
 const activeSubmenuId = ref<string | null>(null)
+const blinkingItemId = ref<string | null>(null)
+const isBlinkingOn = ref(false)
 
 const hasAnyIcon = computed(() => props.items.some(item => !!item.icon))
 
@@ -33,13 +38,24 @@ function handleItemMouseEnter(item: MenuItem): void {
   }
 }
 
-function handleItemClick(item: MenuItem): void {
+async function handleItemClick(item: MenuItem): Promise<void> {
   if (item.disabled || item.isSeparator) return
 
   if (item.submenu && item.submenu.length > 0) {
     // If it's a submenu item, we might want to toggle it on mobile,
     // but on desktop it usually opens on hover.
     return
+  }
+
+  if (settings.value.menuBlinking) {
+    blinkingItemId.value = item.id
+    // Blink 3 times (on, off, on, off, on, off)
+    for (let i = 0; i < 6; i++) {
+      isBlinkingOn.value = !isBlinkingOn.value
+      await new Promise(resolve => setTimeout(resolve, 50))
+    }
+    blinkingItemId.value = null
+    isBlinkingOn.value = false
   }
 
   emit('item-click', item)
@@ -63,7 +79,7 @@ function handleSubItemClick(item: MenuItem): void {
         'menu-dropdown__item--separator': item.isSeparator,
         'menu-dropdown__item--disabled': item.disabled,
         'menu-dropdown__item--has-submenu': item.submenu && item.submenu.length > 0,
-        'menu-dropdown__item--active': activeSubmenuId === item.id
+        'menu-dropdown__item--active': (activeSubmenuId === item.id) || (blinkingItemId === item.id && isBlinkingOn)
       }"
       @mouseenter="handleItemMouseEnter(item)"
       @click.stop="handleItemClick(item)"
