@@ -1,0 +1,97 @@
+# Digital Ocean App Platform Configuration
+# m00-os-7 - Mac OS 7 Web Clone
+# https://docs.digitalocean.com/products/app-platform/reference/app-spec/
+
+name: m00-os-7
+region: nyc
+
+# Services configuration - THIS IS REQUIRED FOR DEPLOYMENT
+services:
+  - name: web
+    # Use Dockerfile for building
+    dockerfile_path: Dockerfile
+
+    # GitHub repository configuration
+    github:
+      repo: dizlexic/m00-os-7
+      branch: main
+      deploy_on_push: true
+
+    # HTTP configuration
+    http_port: 3000
+
+    # Instance configuration
+    instance_count: 1
+    instance_size_slug: basic-xxs
+
+    # Health check configuration
+    health_check:
+      http_path: /api/health
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 10
+      success_threshold: 1
+      failure_threshold: 3
+
+    # Environment variables
+    envs:
+      - key: NODE_ENV
+        scope: RUN_AND_BUILD_TIME
+        value: production
+      - key: NUXT_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: "0.0.0.0"
+      - key: NUXT_PORT
+        scope: RUN_AND_BUILD_TIME
+        value: "3000"
+      - key: NUXT_PUBLIC_APP_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: m00-os-7
+      - key: NUXT_PUBLIC_APP_VERSION
+        scope: RUN_AND_BUILD_TIME
+        value: "0.1.0"
+      - key: NUXT_SECRET_KEY
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: "${SECRET_KEY}"
+      - key: NUXT_SESSION_NAME
+        scope: RUN_AND_BUILD_TIME
+        value: m00-os-7-session
+      - key: NUXT_SESSION_EXPIRY
+        scope: RUN_AND_BUILD_TIME
+        value: "604800"
+      - key: NUXT_DB_TYPE
+        scope: RUN_AND_BUILD_TIME
+        value: sqlite
+      - key: NUXT_DB_PATH
+        scope: RUN_AND_BUILD_TIME
+        value: ./data/m00-os-7.db
+      - key: NUXT_FEATURE_CHAT
+        scope: RUN_AND_BUILD_TIME
+        value: "true"
+      - key: NUXT_FEATURE_GAMES
+        scope: RUN_AND_BUILD_TIME
+        value: "true"
+      - key: NUXT_FEATURE_BROWSER
+        scope: RUN_AND_BUILD_TIME
+        value: "false"
+      - key: NUXT_DEVTOOLS
+        scope: RUN_AND_BUILD_TIME
+        value: "false"
+      - key: NUXT_DEBUG
+        scope: RUN_AND_BUILD_TIME
+        value: "false"
+
+    # Routes configuration
+    routes:
+      - path: /
+
+# Domain configuration
+domains:
+  - domain: os7.moosolutions.io
+    type: PRIMARY
+
+# Alerts configuration
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
