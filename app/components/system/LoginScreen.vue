@@ -44,10 +44,6 @@ async function handleLogin() {
     // Proceed to desktop
     if (generatedGuestUser.value) {
       isLoading.value = true
-      await Promise.all([
-        fetchFilesFromServer(),
-        fetchSettingsFromServer()
-      ])
       setAuthenticatedUser(generatedGuestUser.value)
       isLoading.value = false
     }
@@ -85,10 +81,7 @@ async function handleLogin() {
   }
 
   if (success) {
-    await Promise.all([
-      fetchFilesFromServer(),
-      fetchSettingsFromServer()
-    ])
+    // success
   }
 
   isLoading.value = false

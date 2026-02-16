@@ -39,8 +39,30 @@ useSeoMeta({
 })
 
 const isBooting = ref(true);
+const isInitialDataLoaded = ref(false);
+
+// Initialize on app start
+onMounted(async () => {
+  await initialize();
+  await init();
+});
+
+// Load data when authenticated
+watch(isAuthenticated, async (isAuth) => {
+  if (isAuth) {
+    isInitialDataLoaded.value = false;
+    await Promise.all([
+      fetchFilesFromServer(),
+      fetchSettingsFromServer()
+    ]);
     restoreWindows();
     isInitialDataLoaded.value = true;
+  } else {
+    isInitialDataLoaded.value = false;
+    resetSettings();
+    closeAllWindows();
+  }
+}, { immediate: true });
 
 const currentAppName = computed(() => {
   if (activeWindow.value) {
@@ -49,19 +71,6 @@ const currentAppName = computed(() => {
     return type.charAt(0).toUpperCase() + type.slice(1);
   }
   return 'Finder';
-});
-
-// Initialize on app start
-onMounted(async () => {
-  const loggedIn = await init();
-  await initialize();
-
-  if (loggedIn) {
-    await Promise.all([
-      fetchFilesFromServer(),
-      fetchSettingsFromServer()
-    ]);
-  }
 });
 
 function onBootComplete() {
@@ -78,13 +87,20 @@ function onBootComplete() {
     <template v-else>
       <LoginScreen v-if="!isAuthenticated" />
 
-      <template v-else>
+      <template v-else-if="isInitialDataLoaded">
         <!-- Menu Bar -->
         <MenuBar :app-name="currentAppName" />
 
         <!-- Desktop Environment -->
         <Desktop />
       </template>
+
+      <!-- Loading screen while data is being fetched -->
+      <div v-else class="loading-screen">
+        <div class="mac-os-progress">
+          <div class="mac-os-progress-bar"></div>
+        </div>
+      </div>
     </template>
 
     <!-- System Alerts -->
@@ -107,5 +123,40 @@ function onBootComplete() {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+}
+
+.loading-screen {
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-gray-light, #CCCCCC);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mac-os-progress {
+  width: 200px;
+  height: 20px;
+  border: 1px solid black;
+  background-color: white;
+  padding: 2px;
+}
+
+.mac-os-progress-bar {
+  width: 50%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    #000,
+    #000 2px,
+    #fff 2px,
+    #fff 4px
+  );
+  animation: progress-move 2s linear infinite;
+}
+
+@keyframes progress-move {
+  from { background-position: 0 0; }
+  to { background-position: 40px 0; }
 }
 </style>
