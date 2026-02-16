@@ -25,7 +25,9 @@ const {
   getPathNodes,
   moveToTrash,
   createFolder,
-  updateNode
+  updateNode,
+  copyNode,
+  createAlias
 } = useFileSystem()
 const { openWindow, updateWindow } = useWindowManager()
 const { addRecentDoc } = useRecentItems()
@@ -464,6 +466,24 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
     },
     { id: 'sep1', label: '', isSeparator: true },
     {
+      id: 'duplicate',
+      label: 'Duplicate',
+      disabled: item.isSystem,
+      action: () => {
+        if (item.parentId) {
+          copyNode(item.id, item.parentId)
+        }
+      }
+    },
+    {
+      id: 'make-alias',
+      label: 'Make Alias',
+      action: () => {
+        if (item.parentId) {
+          createAlias(item.id, item.parentId)
+        }
+      }
+    },
     {
       id: 'label',
       label: 'Label',
