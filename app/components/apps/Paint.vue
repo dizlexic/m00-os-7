@@ -6,6 +6,8 @@ import { useWindowManager } from '~/composables/useWindowManager'
 import type { Menu } from '~/types/menu'
 
 interface Props {
+  fileId?: string
+  windowId?: string
   isActive?: boolean
 }
 
