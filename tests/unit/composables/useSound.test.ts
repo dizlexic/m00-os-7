@@ -72,7 +72,7 @@ describe('useSound', () => {
     const { playSystemSound } = useSound()
     playSystemSound('beep')
 
-    expect(global.Audio).toHaveBeenCalledWith('/assets/sounds/beep.mp3')
+    expect(global.Audio).toHaveBeenCalledWith('/assets/sounds/beep.wav')
     expect(mockAudio.play).toHaveBeenCalled()
   })
 
