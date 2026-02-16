@@ -11,7 +11,7 @@ import { useSharedDesktop } from '~/composables/useSharedDesktop'
 import { useAlert } from '~/composables/useAlert'
 import { useSettings } from '~/composables/useSettings'
 
-const { users, currentUser, fetchUsers, register, removeUser, updateUserProfile } = useUser()
+const { users, currentUser, fetchUsers, register, removeUser, updateUserProfile, updateProfile } = useUser()
 const { showConfirm } = useAlert()
 const { fetchSystemSettings, updateSystemSetting, systemSettings } = useSettings()
 const {
@@ -39,17 +39,27 @@ const isLoading = ref(false)
 const sessionName = ref('')
 
 // Profile edit state
-const editUsername = ref(currentUser.value?.username || '')
-const editPassword = ref('')
-const selectedAvatar = ref(currentUser.value?.avatar || '/assets/icons/system/document.png')
+const profileUsername = ref(currentUser.value?.username || '')
+const profilePassword = ref('')
+const profileAvatar = ref(currentUser.value?.avatar || '/assets/icons/system/document.png')
 const updateError = ref('')
 const updateSuccess = ref(false)
 
-const availableAvatars = [
+const personalAvatars = [
   { id: 'default', path: '/assets/icons/system/document.png' },
   { id: 'mac', path: '/assets/icons/avatars/avatar-mac.png' },
   { id: 'floppy', path: '/assets/icons/avatars/avatar-floppy.png' },
   { id: 'apple', path: '/assets/icons/avatars/avatar-apple.png' },
+]
+
+const availableAvatars = [
+  '/assets/icons/system/preferences.png',
+  '/assets/icons/system/finder.png',
+  '/assets/icons/system/hard-drive.png',
+  '/assets/icons/system/application.png',
+  '/assets/icons/apps/calculator.png',
+  '/assets/icons/apps/notepad.png',
+  '/assets/icons/system/help.png'
 ]
 
 // Computed
@@ -63,16 +73,6 @@ const allowGuestLogin = computed({
   get: () => systemSettings.value.allowGuestLogin,
   set: (val) => updateSystemSetting('allowGuestLogin', val)
 })
-
-const availableAvatars = [
-  '/assets/icons/system/preferences.png',
-  '/assets/icons/system/finder.png',
-  '/assets/icons/system/hard-drive.png',
-  '/assets/icons/system/application.png',
-  '/assets/icons/apps/calculator.png',
-  '/assets/icons/apps/notepad.png',
-  '/assets/icons/system/help.png'
-]
 
 // Fetch users and settings on mount
 onMounted(async () => {
@@ -118,14 +118,14 @@ async function handleCreateUser(): Promise<void> {
 }
 
 // Delete user
-async function handleDeleteUser(userId: number): Promise<void> {
+async function handleDeleteUser(userId: number | string): Promise<void> {
   const confirmed = await showConfirm('Are you sure you want to delete this user?')
   if (!confirmed) return
 
   isLoading.value = true
 
   try {
-    const success = await removeUser(userId)
+    const success = await removeUser(Number(userId))
     if (success) {
       await fetchUsers()
       if (view.value === 'detail' && editingUser.value?.id === userId) {
@@ -146,14 +146,14 @@ async function handleUpdateProfile() {
 
   try {
     const success = await updateProfile({
-      username: editUsername.value !== currentUser.value?.username ? editUsername.value : undefined,
-      password: editPassword.value || undefined,
-      avatar: selectedAvatar.value
+      username: profileUsername.value !== currentUser.value?.username ? profileUsername.value : undefined,
+      password: profilePassword.value || undefined,
+      avatar: profileAvatar.value
     })
 
     if (success) {
       updateSuccess.value = true
-      editPassword.value = ''
+      profilePassword.value = ''
     } else {
       updateError.value = 'Failed to update profile'
     }
@@ -264,36 +264,6 @@ function getUserAvatar(user: any) {
           </div>
         </div>
       </div>
-      <div class="users-settings__list">
-        <div v-if="users.length === 0" class="users-settings__empty">
-          No users found.
-        </div>
-        <div
-          v-for="user in users"
-          :key="user.id"
-          class="users-settings__user"
-        >
-          <div class="users-settings__user-icon">
-            <img :src="getUserAvatar(user)" alt="" draggable="false" />
-          </div>
-          <div class="users-settings__user-name">
-            {{ user.username }}
-            <span v-if="currentUser?.id === user.id" class="users-settings__current-badge">
-              (you)
-            </span>
-          </div>
-          <button
-            v-if="canDeleteUser(user.id)"
-            :data-testid="`delete-user-${user.id}`"
-            class="users-settings__delete-btn"
-            :disabled="isLoading"
-            @click="handleDeleteUser(user.id)"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
 
     <!-- My Account Section -->
     <div v-if="currentUser && !currentUser.isGuest" class="users-settings__section">
@@ -311,11 +281,11 @@ function getUserAvatar(user: any) {
           <label>Avatar:</label>
           <div class="users-settings__avatar-selection">
             <div
-              v-for="avatar in availableAvatars"
+              v-for="avatar in personalAvatars"
               :key="avatar.id"
               class="users-settings__avatar-option"
-              :class="{ 'users-settings__avatar-option--selected': selectedAvatar === avatar.path }"
-              @click="selectedAvatar = avatar.path"
+              :class="{ 'users-settings__avatar-option--selected': profileAvatar === avatar.path }"
+              @click="profileAvatar = avatar.path"
             >
               <img :src="avatar.path" alt="" draggable="false" />
             </div>
@@ -323,10 +293,10 @@ function getUserAvatar(user: any) {
         </div>
 
         <div class="users-settings__field">
-          <label for="edit-username">Username:</label>
+          <label for="profile-username">Username:</label>
           <input
-            id="edit-username"
-            v-model="editUsername"
+            id="profile-username"
+            v-model="profileUsername"
             type="text"
             class="mac-input"
             :disabled="isLoading"
@@ -334,10 +304,10 @@ function getUserAvatar(user: any) {
         </div>
 
         <div class="users-settings__field">
-          <label for="edit-password">New Password:</label>
+          <label for="profile-password">New Password:</label>
           <input
-            id="edit-password"
-            v-model="editPassword"
+            id="profile-password"
+            v-model="profilePassword"
             type="password"
             class="mac-input"
             placeholder="Keep current"
