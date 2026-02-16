@@ -71,4 +71,35 @@ describe('Window.vue', () => {
     })
     expect(wrapper.find('.window__resize-handle').exists()).toBe(false)
   })
+
+  it('stops propagation on mousedown to prevent desktop marquee selection', async () => {
+    const wrapper = mount(Window, {
+      props: {
+        window: defaultWindow
+      }
+    })
+    const event = {
+      stopPropagation: vi.fn(),
+      button: 0
+    }
+    // Root mousedown
+    await wrapper.trigger('mousedown', event)
+    expect(event.stopPropagation).toHaveBeenCalled()
+  })
+
+  it('stops propagation on title bar mousedown', async () => {
+    const wrapper = mount(Window, {
+      props: {
+        window: defaultWindow
+      }
+    })
+    const event = {
+      stopPropagation: vi.fn(),
+      preventDefault: vi.fn(),
+      button: 0
+    }
+    const titleBar = wrapper.findComponent({ name: 'WindowTitleBar' })
+    await titleBar.trigger('mousedown', event)
+    expect(event.stopPropagation).toHaveBeenCalled()
+  })
 })
