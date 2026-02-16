@@ -69,6 +69,16 @@ function handleClear() {
   waitingForOperand.value = false
 }
 
+function handleSquareRoot() {
+  const inputValue = parseFloat(display.value)
+  if (inputValue < 0) {
+    display.value = 'Error'
+  } else {
+    display.value = String(Math.sqrt(inputValue))
+  }
+  waitingForOperand.value = true
+}
+
 function handleMemory(action: string) {
   const value = parseFloat(display.value)
   switch (action) {
@@ -86,7 +96,8 @@ function handleKeyDown(event: KeyboardEvent) {
   else if (['+', '-', '*', '/'].includes(key)) handleOperator(key)
   else if (key === 'Enter' || key === '=') handleEquals()
   else if (key === 'Escape' || key === 'c' || key === 'C') handleClear()
-  else if (key === '%') handleOperator('%')
+  else if (key === '%' || key === 'p') handleOperator('%')
+  else if (key === 's' || key === 'r') handleSquareRoot()
 }
 
 onMounted(() => {
@@ -124,6 +135,7 @@ onUnmounted(() => {
 
       <button class="calculator__button calculator__button--zero" @click="handleNumber('0')" data-value="0">0</button>
       <button class="calculator__button" @click="handleDecimal" data-value=".">.</button>
+      <button class="calculator__button" @click="handleSquareRoot" data-value="sqrt">√</button>
 
       <button class="calculator__button calculator__button--memory" @click="handleMemory('MC')" data-value="MC">MC</button>
       <button class="calculator__button calculator__button--memory" @click="handleMemory('MR')" data-value="MR">MR</button>

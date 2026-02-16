@@ -66,4 +66,12 @@ describe('Calculator.vue', () => {
     await wrapper.find('[data-value="5"]').trigger('click')
     expect(wrapper.find('.calculator__display').text()).toBe('1.5')
   })
+
+  it('performs square root', async () => {
+    const wrapper = mount(Calculator)
+    await wrapper.find('[data-value="9"]').trigger('click')
+    // We'll need to add a button with data-value="sqrt"
+    await wrapper.find('[data-value="sqrt"]').trigger('click')
+    expect(wrapper.find('.calculator__display').text()).toBe('3')
+  })
 })
