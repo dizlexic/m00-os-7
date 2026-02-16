@@ -6,7 +6,7 @@
  */
 
 import type { Position, Size } from './desktop'
-import type { Menu } from './menu'
+import type { Menu, MenuItem } from './menu'
 
 /** Window state enumeration */
 export type WindowState = 'normal' | 'minimized' | 'maximized' | 'collapsed'
@@ -77,6 +77,8 @@ export interface WindowConfig {
   icon?: string
   /** Custom menus for this window */
   menus?: Menu[]
+  /** Application context menu items */
+  appMenu?: MenuItem[]
 }
 
 /** Window instance state */
@@ -123,6 +125,8 @@ export interface WindowInstance {
   createdAt: number
   /** Custom menus for this window */
   menus?: Menu[]
+  /** Application context menu items */
+  appMenu?: MenuItem[]
 }
 
 /** Window manager state */

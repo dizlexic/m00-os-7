@@ -23,7 +23,7 @@ import type { RecentItem } from '~/types/recent'
 import type { MenuItem, Menu } from '~/types/menu'
 
 const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash, getTrash, updateNode, copyNode, createAlias, getUniqueName } = useFileSystem()
-const { windowList, activeWindow, openWindow, updateWindow, bringToFront } = useWindowManager()
+const { windowList, activeWindow, openWindow, updateWindow, bringToFront, closeWindow } = useWindowManager()
 const { recentApps, recentDocs } = useRecentItems()
 const { clipboard, copy, cut, paste } = useClipboard()
 const { icons: desktopIcons, cleanUpDesktop, updateIcon, addIcon } = useDesktop()
