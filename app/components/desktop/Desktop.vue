@@ -6,7 +6,7 @@
  * icons, windows, and handles desktop-level interactions.
  */
 
-import { onMounted, onUnmounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { useDesktop } from '~/composables/useDesktop'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useSharedDesktop } from '~/composables/useSharedDesktop'
@@ -56,7 +56,9 @@ const {
   showContextMenu,
   hideContextMenu,
   initializeDesktop,
-  cleanUpDesktop
+  cleanUpDesktop,
+  addIcon,
+  updateIcon
 } = useDesktop()
 
 const {
@@ -65,7 +67,7 @@ const {
   openWindow
 } = useWindowManager()
 
-const { getRoot, getNodeByPath, createFolder, moveToTrash, copyNode, createAlias } = useFileSystem()
+const { getRoot, getNodeByPath, createFolder, moveToTrash, copyNode, createAlias, getUniqueName } = useFileSystem()
 const { clipboard, copy, cut, paste } = useClipboard()
 const { getLabelMenuItems } = useLabels()
 
@@ -157,7 +159,21 @@ function handleContextMenu(event: MouseEvent): void {
       id: 'new-folder',
       label: 'New Folder',
       action: () => {
-        createFolder('untitled folder', getRoot().id)
+        const root = getRoot()
+        const folderName = getUniqueName('untitled folder', root.id)
+        const newFolder = createFolder(folderName, root.id)
+
+        const newIcon = addIcon({
+          name: newFolder.name,
+          type: 'folder',
+          icon: '/assets/icons/system/folder.png',
+          position: { x: event.clientX - 16, y: event.clientY - 16 },
+          path: `Macintosh HD/${newFolder.name}`
+        })
+
+        nextTick(() => {
+          updateIcon(newIcon.id, { isRenaming: true })
+        })
       }
     },
     {

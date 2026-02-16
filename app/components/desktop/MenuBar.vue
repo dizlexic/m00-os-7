@@ -5,7 +5,7 @@
  * Mac OS 7 style menu bar with Apple menu, application menus, and clock.
  */
 
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import Clock from '~/components/system/Clock.vue'
 import SharingIndicator from '~/components/stc/SharingIndicator.vue'
 import MenuDropdown from '~/components/desktop/MenuDropdown.vue'
@@ -22,11 +22,11 @@ import type { WindowType } from '~/types/window'
 import type { RecentItem } from '~/types/recent'
 import type { MenuItem, Menu } from '~/types/menu'
 
-const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash, getTrash, updateNode, copyNode, createAlias } = useFileSystem()
+const { createFolder, getRoot, getNodeByPath, emptyTrash, getNode, moveToTrash, getTrash, updateNode, copyNode, createAlias, getUniqueName } = useFileSystem()
 const { windowList, activeWindow, openWindow, updateWindow, bringToFront } = useWindowManager()
 const { recentApps, recentDocs } = useRecentItems()
 const { clipboard, copy, cut, paste } = useClipboard()
-const { icons: desktopIcons, cleanUpDesktop, updateIcon } = useDesktop()
+const { icons: desktopIcons, cleanUpDesktop, updateIcon, addIcon } = useDesktop()
 const { showAlert } = useAlert()
 const { restoreItem, items: trashItems, emptyTrash: confirmEmptyTrash } = useTrash()
 const { logout, currentUser } = useUser()
@@ -572,6 +572,7 @@ function handleGoToFolder(): void {
 
 function handleNewFolder(): void {
   let parentId = getRoot().id
+  const isDesktop = !activeWindow.value
 
   if (activeWindow.value && activeWindow.value.type === 'finder') {
     const data = activeWindow.value.data as any
@@ -585,7 +586,23 @@ function handleNewFolder(): void {
     }
   }
 
-  createFolder('untitled folder', parentId)
+  const folderName = getUniqueName('untitled folder', parentId)
+  const newFolder = createFolder(folderName, parentId)
+
+  // If desktop is active (no window), add icon to desktop
+  if (isDesktop && parentId === getRoot().id) {
+    const newIcon = addIcon({
+      name: newFolder.name,
+      type: 'folder',
+      icon: '/assets/icons/system/folder.png',
+      position: { x: 50, y: 50 },
+      path: `Macintosh HD/${newFolder.name}`
+    })
+
+    nextTick(() => {
+      updateIcon(newIcon.id, { isRenaming: true })
+    })
+  }
 }
 
 function handlePutAway(): void {
