@@ -552,11 +552,11 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
   - [ ] Arc tool
 - [ ] `P2` Implement undo/redo functionality
 - [ ] `P2` Add zoom/magnification tool
-- [ ] `P2` Implement file operations:
-  - [ ] New document (with size selection)
-  - [ ] Open image file
-  - [ ] Save as PNG/BMP
-  - [ ] Export options
+- [x] `P2` Implement file operations:
+  - [x] New document (with size selection)
+  - [x] Open image file
+  - [x] Save as PNG/BMP
+  - [x] Export options
 - [ ] `P2` Add Edit menu integration:
   - [ ] Cut, Copy, Paste
   - [ ] Clear selection
@@ -870,7 +870,7 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ### 19.1 Context Menu Implementation
 - [ ] `P2` Implement context menus for each specific application
 - [ ] `P2` Add "Quit" option to all application context menus
-- [ ] `P2` Add "Save" and "Save As" options for Paint and SimpleText
+- [x] `P2` Add "Save" and "Save As" options for Paint and SimpleText
 - [ ] `P2` Add "New Game" option for game applications (Puzzle, Solitaire, etc.)
 
 ---

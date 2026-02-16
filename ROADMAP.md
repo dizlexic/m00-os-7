@@ -176,22 +176,22 @@ Implement the essential applications: Finder, SimpleText, Calculator, and Contro
 - [ ] Implement settings persistence
 
 #### 3.6 Paint Application (MacPaint-style)
-- [ ] Generate Paint application icon (PIL)
-- [ ] Create Paint.vue component with canvas
-- [ ] Implement tool palette UI (classic MacPaint layout)
-- [ ] Add core drawing tools:
-  - [ ] Pencil/freehand drawing
-  - [ ] Eraser
-  - [ ] Line tool
-  - [ ] Rectangle and oval (filled/outline)
-  - [ ] Paint bucket (flood fill)
-- [ ] Implement pattern/fill selector with classic Mac patterns
-- [ ] Add Mac OS 7 16-color palette
-- [ ] Implement line width selector
+- [x] Generate Paint application icon (PIL)
+- [x] Create Paint.vue component with canvas
+- [x] Implement tool palette UI (classic MacPaint layout)
+- [x] Add core drawing tools:
+  - [x] Pencil/freehand drawing
+  - [x] Eraser
+  - [x] Line tool
+  - [x] Rectangle and oval (filled/outline)
+  - [x] Paint bucket (flood fill)
+- [x] Implement pattern/fill selector with classic Mac patterns
+- [x] Add Mac OS 7 16-color palette
+- [x] Implement line width selector
 - [ ] Add selection tools (marquee, lasso)
 - [ ] Implement undo/redo functionality
-- [ ] Add file operations (new, open, save)
-- [ ] Integrate with menu bar (File, Edit, Tools menus)
+- [x] Add file operations (new, open, save)
+- [x] Integrate with menu bar (File, Edit, Tools menus)
 
 ### Deliverables
 - ✅ Working Finder with file management

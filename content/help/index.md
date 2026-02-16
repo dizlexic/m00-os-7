@@ -25,6 +25,13 @@ Welcome to the Mac OS 7 Help Center. Here you'll find everything you need to kno
 - **About This Macintosh**: Choose this from the Apple menu to see system information and memory usage.
 - **Calculator**: Use it for quick calculations. Supports keyboard input.
 - **Note Pad**: A simple place to jot down thoughts.
+- **Paint**: A MacPaint-style drawing application.
+    - **Drawing**: Use the tool palette on the left to select different drawing tools.
+    - **Patterns**: Select patterns from the bottom of the toolbar to fill shapes or use with the paint bucket.
+    - **Saving**: Choose **File > Save** (or press **Cmd + S**) to save your painting.
+    - **Loading**: Open existing image files from the Finder to continue working on them in Paint.
+- **SimpleText**: A basic text editor for reading and writing documents.
+    - **Saving**: Use **File > Save** to persist your changes to the virtual file system.
 
 ## Tips
 
