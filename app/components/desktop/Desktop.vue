@@ -287,6 +287,7 @@ onUnmounted(() => {
       <SimpleText
         v-else-if="win.type === 'simpletext'"
         :file-id="(win.data as any)?.fileId"
+        :window-id="win.id"
         :is-active="win.isActive"
       />
 
