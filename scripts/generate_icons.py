@@ -511,6 +511,57 @@ def generate_galaga_icon():
     img = add_shadow(img)
     save_icon(img, 'galaga', 'icons/apps')
 
+def generate_brickle_icon():
+    """Generate Brickle (breakout) game icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Border
+    draw.rectangle([3, 3, w - 4, h - 4], fill=COLORS['white'], outline=COLORS['black'])
+
+    # Bricks (top)
+    draw.rectangle([6, 6, 12, 10], fill=COLORS['red'], outline=COLORS['black'])
+    draw.rectangle([14, 6, 20, 10], fill=COLORS['blue'], outline=COLORS['black'])
+    draw.rectangle([22, 6, 28, 10], fill=COLORS['green'], outline=COLORS['black'])
+
+    draw.rectangle([6, 12, 12, 16], fill=COLORS['yellow'], outline=COLORS['black'])
+    draw.rectangle([14, 12, 20, 16], fill=COLORS['magenta'], outline=COLORS['black'])
+    draw.rectangle([22, 12, 28, 16], fill=COLORS['cyan'], outline=COLORS['black'])
+
+    # Paddle (bottom)
+    draw.rectangle([10, 24, 22, 28], fill=COLORS['black'])
+
+    # Ball
+    draw.ellipse([14, 18, 18, 22], fill=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'brickle', 'icons/apps')
+
+def generate_messenger_icon():
+    """Generate Messenger (AIM/IRC) app icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Screen body (computer monitor style)
+    draw.rectangle([4, 4, w - 5, h - 8], fill=COLORS['gray_light'], outline=COLORS['black'])
+    # Screen face
+    draw.rectangle([7, 7, w - 8, h - 12], fill=COLORS['white'], outline=COLORS['black'])
+
+    # Chat bubbles (stylized)
+    # Bubble 1
+    draw.rectangle([9, 9, 16, 13], fill=COLORS['blue'], outline=COLORS['black'])
+    draw.line([(10, 14), (12, 14)], fill=COLORS['black'])
+    # Bubble 2
+    draw.rectangle([14, 15, 21, 19], fill=COLORS['green'], outline=COLORS['black'])
+    draw.line([(18, 20), (20, 20)], fill=COLORS['black'])
+
+    # Monitor stand
+    draw.rectangle([w // 2 - 3, h - 8, w // 2 + 2, h - 5], fill=COLORS['gray_dark'], outline=COLORS['black'])
+    draw.rectangle([w // 2 - 6, h - 5, w // 2 + 5, h - 3], fill=COLORS['gray_light'], outline=COLORS['black'])
+
+    img = add_shadow(img)
+    save_icon(img, 'messenger', 'icons/apps')
+
 
 # ============================================
 # UI Elements
@@ -985,6 +1036,8 @@ def generate_app_icons():
     generate_chat_icon()
     generate_browser_icon()
     generate_galaga_icon()
+    generate_brickle_icon()
+    generate_minesweeper_icon()
     print('Application icons complete!')
 
 def generate_progress_bar_elements():
@@ -1081,6 +1134,34 @@ def generate_miscellaneous_graphics():
     save_icon(img, 'dialog-border-sample', 'icons/ui')
 
     print('Miscellaneous graphics complete!')
+
+def generate_minesweeper_icon():
+    """Generate Minesweeper game icon."""
+    img, draw = create_icon()
+    w, h = ICON_SIZE_STANDARD
+
+    # Border
+    draw.rectangle([3, 3, w - 4, h - 4], fill=COLORS['gray_light'], outline=COLORS['black'])
+
+    # Grid lines (simplified)
+    for i in range(1, 4):
+        offset = 3 + i * 6
+        draw.line([(offset, 3), (offset, h - 4)], fill=COLORS['gray_dark'])
+        draw.line([(3, offset), (w - 4, offset)], fill=COLORS['gray_dark'])
+
+    # Mine
+    draw.ellipse([10, 10, 22, 22], fill=COLORS['black'])
+    # Spikes
+    draw.line([(16, 8), (16, 24)], fill=COLORS['black'], width=2)
+    draw.line([(8, 16), (24, 16)], fill=COLORS['black'], width=2)
+    draw.line([(10, 10), (22, 22)], fill=COLORS['black'], width=2)
+    draw.line([(10, 22), (22, 10)], fill=COLORS['black'], width=2)
+
+    # Highlight
+    draw.point((14, 14), fill=COLORS['white'])
+
+    img = add_shadow(img)
+    save_icon(img, 'minesweeper', 'icons/apps')
 
 def generate_all_icons():
     """Generate all icons."""
