@@ -126,6 +126,7 @@ export function useWindowManager() {
       'simpletext',
       'calculator',
       'notepad',
+      'scrapbook',
       'control-panels'
     ]
 
@@ -134,6 +135,7 @@ export function useWindowManager() {
         simpletext: 'SimpleText',
         calculator: 'Calculator',
         notepad: 'Note Pad',
+        scrapbook: 'Scrapbook',
         'control-panels': 'Control Panels'
       }
 

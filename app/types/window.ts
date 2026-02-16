@@ -16,6 +16,7 @@ export type WindowType =
   | 'simpletext'
   | 'calculator'
   | 'notepad'
+  | 'scrapbook'
   | 'control-panel'
   | 'control-panels'
   | 'general-settings'
@@ -162,6 +163,9 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   simpletext: { width: 450, height: 400 },
   calculator: { width: 182, height: 281 },
   notepad: { width: 300, height: 400 },
+  scrapbook: { width: 350, height: 400 },
+  puzzle: { width: 200, height: 240 },
+  paint: { width: 700, height: 500 },
   'control-panel': { width: 400, height: 300 },
   'control-panels': { width: 400, height: 300 },
   'general-settings': { width: 400, height: 350 },

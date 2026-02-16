@@ -9,6 +9,7 @@ const APPS_FOLDER_ID = 'apps-folder'
 const DOCS_FOLDER_ID = 'docs-folder'
 const TRASH_FOLDER_ID = 'trash-folder'
 const NOTEPAD_FILE_ID = 'notepad-file'
+const SCRAPBOOK_FILE_ID = 'scrapbook-file'
 
 // Initial state
 const state = ref<FileSystemState>({
@@ -70,7 +71,7 @@ export function useFileSystem() {
   }
 
   const syncNode = async (node: FileNode) => {
-    if (isAuthenticated.value && (!node.isSystem || node.id === NOTEPAD_FILE_ID)) {
+    if (isAuthenticated.value && (!node.isSystem || node.id === NOTEPAD_FILE_ID || node.id === SCRAPBOOK_FILE_ID)) {
       try {
         await $fetch('/api/files', {
           method: 'POST',
@@ -213,6 +214,7 @@ export function useFileSystem() {
     createFolder('Extensions', systemFolder.id, { isSystem: true })
     createFolder('Preferences', systemFolder.id, { isSystem: true })
     createFile('Note Pad File', systemFolder.id, JSON.stringify(['']), { id: NOTEPAD_FILE_ID, isSystem: true })
+    createFile('Scrapbook File', systemFolder.id, JSON.stringify([]), { id: SCRAPBOOK_FILE_ID, isSystem: true })
 
     // Applications
     const appsFolder = createFolder('Applications', rootId, { id: APPS_FOLDER_ID, isSystem: true })

@@ -58,6 +58,16 @@ const appleMenuItems = computed<MenuItem[]>(() => [
     })
   },
   {
+    id: 'scrapbook',
+    label: 'Scrapbook',
+    action: () => openWindow({
+      type: 'scrapbook',
+      title: 'Scrapbook',
+      icon: '/assets/icons/apps/scrapbook.png',
+      size: { width: 350, height: 400 },
+      resizable: true,
+      maximizable: false
+    })
     id: 'control-panels',
     label: 'Control Panels',
     action: () => handleControlPanels(),

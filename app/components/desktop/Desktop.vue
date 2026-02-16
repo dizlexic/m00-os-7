@@ -17,6 +17,7 @@ import Finder from '~/components/apps/Finder.vue'
 import SimpleText from '~/components/apps/SimpleText.vue'
 import Calculator from '~/components/apps/Calculator.vue'
 import NotePad from '~/components/apps/NotePad.vue'
+import Scrapbook from '~/components/apps/Scrapbook.vue'
 import GetInfo from '~/components/apps/GetInfo.vue'
 import ControlPanels from '~/components/apps/ControlPanels.vue'
 import GeneralSettings from '~/components/apps/GeneralSettings.vue'
@@ -293,6 +294,9 @@ onUnmounted(() => {
         v-else-if="win.type === 'notepad'"
       />
 
+      <Scrapbook
+        v-else-if="win.type === 'scrapbook'"
+      />
       <GetInfo
         v-else-if="win.type === 'get-info'"
         :node-id="(win.data as any)?.nodeId"

@@ -282,6 +282,15 @@ function handleDoubleClick(item: FileNode) {
         resizable: true,
         maximizable: false
       })
+    } else if (item.name === 'Scrapbook') {
+      openWindow({
+        type: 'scrapbook',
+        title: 'Scrapbook',
+        icon: '/assets/icons/apps/scrapbook.png',
+        size: { width: 350, height: 400 },
+        resizable: true,
+        maximizable: false
+      })
     }
   } else if (item.type === 'file' || item.type === 'markdown' || item.type === 'image') {
     // Track recent doc
