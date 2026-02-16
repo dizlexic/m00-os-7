@@ -146,6 +146,21 @@ function handleSubItemClick(item: MenuItem): void {
   flex: 1;
 }
 
+.menu-dropdown__icon-container {
+  width: 20px;
+  height: 20px;
+  margin-right: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-dropdown__icon {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+
 .menu-dropdown__check {
   width: 20px;
   display: inline-block;
