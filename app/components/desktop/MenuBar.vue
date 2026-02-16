@@ -299,6 +299,7 @@ const fileMenuItems = computed<MenuItem[]>(() => [
   { id: 'close', label: 'Close Window', shortcut: '⌘W', action: () => {
     if (activeWindow.value) closeWindow(activeWindow.value.id)
   } },
+  { id: 'close-all', label: 'Close All', shortcut: '⌥⌘W', action: () => closeAllWindows() },
   { id: 'sep2', label: '', isSeparator: true },
   { id: 'get-info', label: 'Get Info', shortcut: '⌘I', action: () => handleGetInfo() },
   { id: 'sep3', label: '', isSeparator: true },
@@ -906,16 +907,21 @@ function handleKeyDown(event: KeyboardEvent) {
     if (findAndTriggerShortcut(menu.items, key, event)) return
   }
 
+  // Also check App menu
+  if (findAndTriggerShortcut(appMenuItems.value, key, event)) return
+
   // Also check Apple menu
-  if (findAndTriggerShortcut(appleMenuItems, key, event)) return
+  if (findAndTriggerShortcut(appleMenuItems.value, key, event)) return
 }
 
 function findAndTriggerShortcut(items: MenuItem[], key: string, event: KeyboardEvent): boolean {
   for (const item of items) {
     if (item.shortcut) {
-      // Extract key from shortcut (e.g., "⌘N" -> "n")
-      const shortcutKey = item.shortcut.replace('⌘', '').toLowerCase()
-      if (shortcutKey === key) {
+      // Extract key from shortcut (e.g., "⌘N" -> "n", "⌥⌘W" -> "w")
+      const shortcutKey = item.shortcut.replace('⌘', '').replace('⌥', '').toLowerCase()
+      const needsOption = item.shortcut.includes('⌥')
+
+      if (shortcutKey === key && event.altKey === needsOption) {
         if (!item.disabled && item.action) {
           event.preventDefault()
           item.action()
