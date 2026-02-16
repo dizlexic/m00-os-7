@@ -31,6 +31,7 @@ import MonitorsSettings from '~/components/apps/MonitorsSettings.vue'
 import AboutMac from '~/components/apps/AboutMac.vue'
 import ArticleViewer from '~/components/apps/ArticleViewer.vue'
 import ImageViewer from '~/components/apps/ImageViewer.vue'
+import Eliza from '~/components/apps/Eliza.vue'
 import RemoteCursor from '~/components/stc/RemoteCursor.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useClipboard } from '~/composables/useClipboard'
@@ -355,6 +356,10 @@ onUnmounted(() => {
         v-else-if="win.type === 'imageviewer'"
         :file-id="(win.data as any)?.fileId"
         :is-active="win.isActive"
+      />
+
+      <Eliza
+        v-else-if="win.type === 'eliza'"
       />
 
       <!-- Window content will be rendered based on window type -->

@@ -224,6 +224,7 @@ export function useFileSystem() {
     createNode('Scrapbook', 'application', appsFolder.id, { icon: 'scrapbook', isSystem: true })
     createNode('Puzzle', 'application', appsFolder.id, { icon: 'puzzle', isSystem: true })
     createNode('Paint', 'application', appsFolder.id, { icon: 'paint', isSystem: true })
+    createNode('Eliza', 'application', appsFolder.id, { icon: 'eliza', isSystem: true })
 
     // Documents
     const docsFolder = createFolder('Documents', rootId, { id: DOCS_FOLDER_ID, isSystem: true })

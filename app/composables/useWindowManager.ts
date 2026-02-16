@@ -128,6 +128,8 @@ export function useWindowManager() {
       'notepad',
       'scrapbook',
       'puzzle',
+      'paint',
+      'eliza',
       'control-panels'
     ]
 
@@ -138,6 +140,8 @@ export function useWindowManager() {
         notepad: 'Note Pad',
         scrapbook: 'Scrapbook',
         puzzle: 'Puzzle',
+        paint: 'Paint',
+        eliza: 'Eliza',
         'control-panels': 'Control Panels'
       }
 
