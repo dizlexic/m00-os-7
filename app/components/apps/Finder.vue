@@ -6,6 +6,7 @@ import { useRecentItems } from '~/composables/useRecentItems'
 import { useDesktop } from '~/composables/useDesktop'
 import { useTrash } from '~/composables/useTrash'
 import { useLabels } from '~/composables/useLabels'
+import { useClipboard } from '~/composables/useClipboard'
 import { LABEL_COLORS, LABEL_NAMES } from '~/types/filesystem'
 import type { FileNode, FolderNode } from '~/types/filesystem'
 
@@ -27,13 +28,15 @@ const {
   createFolder,
   updateNode,
   copyNode,
-  createAlias
+  createAlias,
+  paste
 } = useFileSystem()
 const { openWindow, updateWindow } = useWindowManager()
 const { addRecentDoc } = useRecentItems()
 const { showContextMenu } = useDesktop()
 const { restoreItem } = useTrash()
 const { getLabelMenuItems } = useLabels()
+const { clipboard } = useClipboard()
 
 const currentFolderId = ref(props.folderId)
 
@@ -524,6 +527,29 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
 
   showContextMenu({ x: event.clientX, y: event.clientY }, items)
 }
+
+function handleBackgroundContextMenu(event: MouseEvent) {
+  const { getTrash } = useFileSystem()
+  const trash = getTrash()
+  const isTrash = currentFolderId.value === trash?.id
+
+  const items = [
+    {
+      id: 'new-folder',
+      label: 'New Folder',
+      disabled: isTrash,
+      action: () => createNewFolder()
+    },
+    {
+      id: 'paste',
+      label: 'Paste',
+      disabled: !clipboard.value || isTrash,
+      action: () => paste(currentFolderId.value)
+    }
+  ]
+
+  showContextMenu({ x: event.clientX, y: event.clientY }, items)
+}
 </script>
 
 <template>
@@ -599,6 +625,7 @@ function handleItemContextMenu(event: MouseEvent, item: FileNode) {
         'finder__content--list': ['name', 'size', 'kind', 'date'].includes(viewMode),
         'finder__content--small-icon': viewMode === 'small-icon'
       }"
+      @contextmenu.prevent="handleBackgroundContextMenu($event)"
     >
       <template v-if="viewMode === 'icon'">
         <div

@@ -30,15 +30,18 @@ const { mockFileSystem, mockDesktop } = vi.hoisted(() => ({
     renameNode: vi.fn(),
     deleteNode: vi.fn(),
     moveToTrash: vi.fn(),
-    createFolder: vi.fn(),
+    createFolder: vi.fn((name) => ({ id: 'new-folder', name, type: 'folder' })),
     moveNode: vi.fn(),
-    updateNode: vi.fn()
+    updateNode: vi.fn(),
+    getUniqueName: vi.fn((name) => name),
+    paste: vi.fn()
   },
   mockDesktop: {
     showContextMenu: vi.fn(),
     hideContextMenu: vi.fn(),
     removeIcon: vi.fn(),
-    updateIcon: vi.fn()
+    updateIcon: vi.fn(),
+    addIcon: vi.fn(() => ({ id: 'new-icon' }))
   }
 }))
 
@@ -69,6 +72,15 @@ vi.mock('~/composables/useTrash', () => ({
   })
 }))
 
+vi.mock('~/composables/useClipboard', () => ({
+  useClipboard: () => ({
+    clipboard: ref(null),
+    copy: vi.fn(),
+    cut: vi.fn(),
+    paste: vi.fn()
+  })
+}))
+
 describe('Finder.vue', () => {
   it('renders correctly for a given folder', () => {
     const wrapper = mount(Finder, {
@@ -91,6 +103,29 @@ describe('Finder.vue', () => {
     })
 
     expect(wrapper.find('.finder__header-title').text()).toBe('Macintosh HD')
+  })
+
+  it('triggers context menu on background right click', async () => {
+    const wrapper = mount(Finder, {
+      props: {
+        folderId: 'root'
+      }
+    })
+
+    const content = wrapper.find('.finder__content')
+    await content.trigger('contextmenu', {
+      preventDefault: vi.fn(),
+      clientX: 100,
+      clientY: 100
+    })
+
+    expect(mockDesktop.showContextMenu).toHaveBeenCalledWith(
+      expect.objectContaining({ x: 100, y: 100 }),
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'new-folder', label: 'New Folder' }),
+        expect.objectContaining({ id: 'paste', label: 'Paste' })
+      ])
+    )
   })
 
   it('can navigate to a subfolder on double click', async () => {
