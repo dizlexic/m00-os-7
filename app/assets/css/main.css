@@ -195,6 +195,11 @@ a {
   cursor: pointer;
 }
 
+.mac-button:focus {
+  outline: 2px solid var(--color-highlight);
+  outline-offset: -3px;
+}
+
 .mac-button:active {
   background-color: var(--color-black);
   color: var(--color-white);

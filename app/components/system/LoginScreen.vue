@@ -180,7 +180,10 @@ function clearForm() {
               v-for="user in users"
               :key="user.id"
               class="user-item"
+              tabindex="0"
               @click="selectUser(user)"
+              @keydown.enter.prevent="selectUser(user)"
+              @keydown.space.prevent="selectUser(user)"
             >
               <div class="user-icon">
                 <img :src="user.avatar || '/assets/icons/system/document.png'" alt="" />
@@ -399,9 +402,11 @@ function clearForm() {
   cursor: pointer;
 }
 
-.user-item:hover {
+.user-item:hover,
+.user-item:focus {
   background-color: var(--color-highlight);
   color: var(--color-highlight-text);
+  outline: none;
 }
 
 .user-icon {
