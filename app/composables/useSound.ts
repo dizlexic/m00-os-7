@@ -5,15 +5,15 @@ export function useSound() {
 
   /**
    * Plays a system sound by name.
-   * Looks for the sound in /assets/sounds/[name].mp3
+   * Looks for the sound in /assets/sounds/[name].wav
    */
   const playSystemSound = (name: string) => {
     const volume = settings.value.soundVolume / 100
-    const audio = new Audio(`/assets/sounds/${name}.mp3`)
+    const audio = new Audio(`/assets/sounds/${name}.wav`)
     audio.volume = volume
     audio.play().catch((err) => {
       // If sound file fails to play (e.g. not found), fallback to beep
-      if (name === 'beep' || name === 'alert') {
+      if (name !== 'beep') {
         playBeep()
       }
       console.warn(`Failed to play sound "${name}":`, err)
