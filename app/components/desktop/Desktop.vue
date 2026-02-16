@@ -33,6 +33,9 @@ import AboutMac from '~/components/apps/AboutMac.vue'
 import ArticleViewer from '~/components/apps/ArticleViewer.vue'
 import ImageViewer from '~/components/apps/ImageViewer.vue'
 import Eliza from '~/components/apps/Eliza.vue'
+import Brickle from '~/components/games/Brickle.vue'
+import Minesweeper from '~/components/games/Minesweeper.vue'
+import Messenger from '~/components/apps/Messenger.vue'
 import RemoteCursor from '~/components/stc/RemoteCursor.vue'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useClipboard } from '~/composables/useClipboard'
@@ -366,6 +369,19 @@ onUnmounted(() => {
 
       <Eliza
         v-else-if="win.type === 'eliza'"
+      />
+
+      <Brickle
+        v-else-if="win.type === 'brickle'"
+        :is-active="win.isActive"
+      />
+
+      <Minesweeper
+        v-else-if="win.type === 'minesweeper'"
+      />
+
+      <Messenger
+        v-else-if="win.type === 'messenger'"
       />
 
       <!-- Window content will be rendered based on window type -->

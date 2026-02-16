@@ -364,6 +364,13 @@ export function useDesktop() {
         opensWith: 'article'
       },
       {
+        name: 'Messenger',
+        type: 'messenger',
+        icon: '/assets/icons/apps/chat.png',
+        position: { x: window.innerWidth - 100, y: 180 },
+        opensWith: 'messenger'
+      },
+      {
         name: 'Trash',
         type: 'trash',
         icon: '/assets/icons/system/trash-empty.png',

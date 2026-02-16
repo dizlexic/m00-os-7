@@ -131,6 +131,7 @@ export function useWindowManager() {
       'puzzle',
       'paint',
       'eliza',
+      'messenger',
       'control-panels'
     ]
 
@@ -143,6 +144,7 @@ export function useWindowManager() {
         puzzle: 'Puzzle',
         paint: 'Paint',
         eliza: 'Eliza',
+        messenger: 'Messenger',
         'control-panels': 'Control Panels'
       }
 

@@ -95,6 +95,43 @@ const appleMenuItems = computed<MenuItem[]>(() => [
     })
   },
   {
+    id: 'brickle',
+    label: 'Brickle',
+    action: () => openWindow({
+      type: 'brickle',
+      title: 'Brickle',
+      icon: '/assets/icons/apps/brickle.png',
+      size: { width: 400, height: 450 },
+      resizable: false,
+      maximizable: false
+    })
+  },
+  {
+    id: 'minesweeper',
+    label: 'Minesweeper',
+    action: () => openWindow({
+      type: 'minesweeper',
+      title: 'Minesweeper',
+      icon: '/assets/icons/apps/minesweeper.png',
+      size: { width: 240, height: 320 },
+      resizable: false,
+      maximizable: false
+    })
+  },
+  {
+    id: 'messenger',
+    label: 'Messenger',
+    action: () => openWindow({
+      type: 'messenger',
+      title: 'Messenger',
+      icon: '/assets/icons/apps/chat.png',
+      size: { width: 450, height: 400 },
+      resizable: true,
+      maximizable: true,
+      collapsible: true
+    })
+  },
+  {
     id: 'paint',
     label: 'Paint',
     action: () => openWindow({
