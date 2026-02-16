@@ -18,6 +18,7 @@ import SimpleText from '~/components/apps/SimpleText.vue'
 import Calculator from '~/components/apps/Calculator.vue'
 import NotePad from '~/components/apps/NotePad.vue'
 import Scrapbook from '~/components/apps/Scrapbook.vue'
+import Puzzle from '~/components/apps/Puzzle.vue'
 import Paint from '~/components/apps/Paint.vue'
 import GetInfo from '~/components/apps/GetInfo.vue'
 import ControlPanels from '~/components/apps/ControlPanels.vue'
@@ -298,6 +299,9 @@ onUnmounted(() => {
       <Scrapbook
         v-else-if="win.type === 'scrapbook'"
       />
+
+      <Puzzle
+        v-else-if="win.type === 'puzzle'"
       />
 
       <Paint

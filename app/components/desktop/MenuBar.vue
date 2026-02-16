@@ -68,6 +68,17 @@ const appleMenuItems = computed<MenuItem[]>(() => [
       resizable: true,
       maximizable: false
     })
+  },
+  {
+    id: 'puzzle',
+    label: 'Puzzle',
+    action: () => openWindow({
+      type: 'puzzle',
+      title: 'Puzzle',
+      icon: '/assets/icons/apps/puzzle.png',
+      size: { width: 200, height: 240 },
+      resizable: false,
+      maximizable: false
     id: 'control-panels',
     label: 'Control Panels',
     action: () => handleControlPanels(),

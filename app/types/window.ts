@@ -17,6 +17,7 @@ export type WindowType =
   | 'calculator'
   | 'notepad'
   | 'scrapbook'
+  | 'puzzle'
   | 'paint'
   | 'control-panel'
   | 'control-panels'

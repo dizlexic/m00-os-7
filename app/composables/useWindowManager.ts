@@ -127,6 +127,7 @@ export function useWindowManager() {
       'calculator',
       'notepad',
       'scrapbook',
+      'puzzle',
       'control-panels'
     ]
 
@@ -136,6 +137,7 @@ export function useWindowManager() {
         calculator: 'Calculator',
         notepad: 'Note Pad',
         scrapbook: 'Scrapbook',
+        puzzle: 'Puzzle',
         'control-panels': 'Control Panels'
       }
 

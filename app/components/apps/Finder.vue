@@ -291,6 +291,15 @@ function handleDoubleClick(item: FileNode) {
         resizable: true,
         maximizable: false
       })
+    } else if (item.name === 'Puzzle') {
+      openWindow({
+        type: 'puzzle',
+        title: 'Puzzle',
+        icon: '/assets/icons/apps/puzzle.png',
+        size: { width: 200, height: 240 },
+        resizable: false,
+        maximizable: false
+      })
     }
   } else if (item.type === 'file' || item.type === 'markdown' || item.type === 'image') {
     // Track recent doc
@@ -336,6 +345,7 @@ function getIcon(item: FileNode) {
     if (name.includes('notepad')) return '/assets/icons/apps/notepad.png'
     if (name.includes('simpletext')) return '/assets/icons/apps/simpletext.png'
     if (name.includes('scrapbook')) return '/assets/icons/apps/scrapbook.png'
+    if (name.includes('puzzle')) return '/assets/icons/apps/puzzle.png'
     if (name.includes('solitaire')) return '/assets/icons/apps/solitaire.png'
     return '/assets/icons/system/application.png'
   }

@@ -221,6 +221,7 @@ export function useFileSystem() {
     createNode('Calculator', 'application', appsFolder.id, { icon: 'calculator', isSystem: true })
     createNode('SimpleText', 'application', appsFolder.id, { icon: 'simpletext', isSystem: true })
     createNode('NotePad', 'application', appsFolder.id, { icon: 'notepad', isSystem: true })
+    createNode('Scrapbook', 'application', appsFolder.id, { icon: 'scrapbook', isSystem: true })
     createNode('Puzzle', 'application', appsFolder.id, { icon: 'puzzle', isSystem: true })
     createNode('Paint', 'application', appsFolder.id, { icon: 'paint', isSystem: true })
 
