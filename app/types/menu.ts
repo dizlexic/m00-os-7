@@ -20,6 +20,8 @@ export interface MenuItem {
   isSeparator?: boolean
   /** Submenu items */
   submenu?: MenuItem[]
+  /** Whether item is checked (shows checkmark) */
+  checked?: boolean
   /** Action handler */
   action?: () => void
 }
