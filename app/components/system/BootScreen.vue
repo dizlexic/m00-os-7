@@ -144,13 +144,13 @@ onUnmounted(() => {
       />
 
       <!-- Welcome Message / Error Code -->
-      <p
+      <h1
         v-if="!hasError && showWelcome"
         data-testid="welcome-message"
         class="boot-screen__message"
       >
         Welcome to Macintosh
-      </p>
+      </h1>
       <p
         v-if="!hasError"
         class="boot-screen__loading-text"
