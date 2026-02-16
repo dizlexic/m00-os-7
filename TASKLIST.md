@@ -446,8 +446,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P1` Add "New Folder" creation
 - [x] `P1` Implement rename functionality
 - [x] `P1` Add delete (move to trash)
-- [ ] `P2` Implement duplicate
-- [ ] `P2` Add "Make Alias" functionality
+- [x] `P2` Implement duplicate
+- [x] `P2` Add "Make Alias" functionality
 
 ### 8.4 Finder Menu Integration
 - [x] `P0` Implement File menu items
