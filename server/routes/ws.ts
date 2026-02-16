@@ -5,7 +5,7 @@
  */
 
 import { defineWebSocketHandler } from 'h3'
-import { parse } from 'cookie'
+import { parse } from 'cookie-es'
 import {
   registerPeer,
   unregisterPeer,
@@ -76,18 +76,31 @@ function sendError(peerId: string, code: string, message: string): void {
   sendToPeer(peerId, createMessage('error', { code, message }))
 }
 
+/** Get user ID from peer headers */
+function getUserIdFromPeer(peer: any): string | undefined {
+  const cookieHeader = peer.headers?.cookie || peer.headers?.Cookie || ''
+  if (!cookieHeader) return undefined
+
+  try {
+    const cookies = parse(Array.isArray(cookieHeader) ? cookieHeader[0] : cookieHeader)
+    return cookies.user_id
+  } catch (e) {
+    console.error('[STC] Failed to parse cookies:', e)
+    return undefined
+  }
+}
+
 export default defineWebSocketHandler({
   open(peer) {
     console.log(`[STC] WebSocket connection opened: ${peer.id}`)
 
-    // Check authentication via cookies in headers
-    const cookieHeader = peer.headers?.cookie || ''
-    const cookies = parse(cookieHeader)
-    const userId = cookies.user_id
+    const userId = getUserIdFromPeer(peer)
 
     if (!userId) {
-      console.warn(`[STC] Unauthenticated connection attempt from ${peer.id}`)
+      console.warn(`[STC] Unauthenticated connection attempt from ${peer.id}. Headers:`, JSON.stringify(peer.headers))
       // We don't close yet, wait for 'connect' message to verify
+    } else {
+      console.log(`[STC] Authenticated connection from ${peer.id}, userId: ${userId}`)
     }
   },
 
@@ -132,11 +145,10 @@ export default defineWebSocketHandler({
         const payload = message.payload as { username: string; cursor: CursorConfig }
 
         // Verify authentication
-        const cookieHeader = peer.headers?.cookie || ''
-        const cookies = parse(cookieHeader)
-        const authenticatedUserId = cookies.user_id
+        const authenticatedUserId = getUserIdFromPeer(peer)
 
         if (!authenticatedUserId) {
+          console.warn(`[STC] Connect failed: Unauthenticated peer ${peer.id}`)
           sendError(peer.id, 'UNAUTHENTICATED', 'You must be logged in to connect')
           peer.close(1008, 'Unauthenticated')
           return
