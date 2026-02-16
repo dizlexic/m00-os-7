@@ -1,14 +1,18 @@
 import { computed } from 'vue'
-import { LABEL_NAMES, LABEL_COLORS } from '~/types/filesystem'
 import { useFileSystem } from '~/composables/useFileSystem'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useDesktop } from '~/composables/useDesktop'
+import { useSettings } from '~/composables/useSettings'
 import type { MenuItem } from '~/types/menu'
 
 export function useLabels() {
   const { getNode, updateNode, getNodeByPath } = useFileSystem()
   const { activeWindow } = useWindowManager()
   const { icons: desktopIcons, updateIcon } = useDesktop()
+  const { settings } = useSettings()
+
+  const labelNames = computed(() => settings.value.labelNames)
+  const labelColors = computed(() => settings.value.labelColors)
 
   function getLabelMenuItems(targetNodeId?: string, targetIconId?: string): MenuItem[] {
     let currentLabel = 0
@@ -29,9 +33,10 @@ export function useLabels() {
       }
     }
 
-    return LABEL_NAMES.map((name, index) => ({
+    return labelNames.value.map((name, index) => ({
       id: `label-${index}`,
       label: name,
+      color: labelColors.value[index],
       checked: currentLabel === index,
       action: () => setLabel(index, targetNodeId, targetIconId)
     }))
@@ -69,7 +74,7 @@ export function useLabels() {
   return {
     getLabelMenuItems,
     setLabel,
-    LABEL_NAMES,
-    LABEL_COLORS
+    labelNames,
+    labelColors
   }
 }
