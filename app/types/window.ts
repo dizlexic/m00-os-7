@@ -42,6 +42,9 @@ export type WindowType =
   | 'alert'
   | 'imageviewer'
   | 'eliza'
+  | 'brickle'
+  | 'minesweeper'
+  | 'messenger'
   | 'generic'
 
 /** Window configuration for creating new windows */
@@ -196,6 +199,8 @@ export const DEFAULT_WINDOW_SIZES: Record<WindowType, Size> = {
   alert: { width: 350, height: 150 },
   imageviewer: { width: 400, height: 350 },
   eliza: { width: 450, height: 380 },
+  brickle: { width: 400, height: 450 },
+  minesweeper: { width: 240, height: 320 },
   generic: { width: 400, height: 300 }
 }
 
