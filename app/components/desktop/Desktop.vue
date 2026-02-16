@@ -349,6 +349,9 @@ onUnmounted(() => {
 
       <Paint
         v-else-if="win.type === 'paint'"
+        :file-id="(win.data as any)?.fileId"
+        :window-id="win.id"
+        :is-active="win.isActive"
       />
 
       <GetInfo

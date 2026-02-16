@@ -193,7 +193,7 @@ function handleDoubleClick(): void {
     'hard-drive': 'finder',
     'document': 'simpletext',
     'markdown': 'simpletext',
-    'image': 'imageviewer',
+    'image': 'paint',
     'application': 'generic',
     'trash': 'finder'
   }
@@ -207,7 +207,8 @@ function handleDoubleClick(): void {
     icon: props.icon.icon,
     data: {
       path: props.icon.path,
-      iconType: props.icon.type
+      iconType: props.icon.type,
+      fileId: props.icon.id
     }
   })
 }

@@ -385,7 +385,7 @@ function handleDoubleClick(item: FileNode) {
     const typeToWindow: Record<string, any> = {
       'file': 'simpletext',
       'markdown': 'simpletext',
-      'image': 'imageviewer'
+      'image': 'paint'
     }
 
     openWindow({
