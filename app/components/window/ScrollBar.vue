@@ -134,6 +134,7 @@ onUnmounted(() => {
     <button
       class="scrollbar__arrow scrollbar__arrow--start"
       :class="orientation === 'vertical' ? 'scrollbar__arrow--up' : 'scrollbar__arrow--left'"
+      :aria-label="orientation === 'vertical' ? 'Scroll up' : 'Scroll left'"
       @click="handleArrowClick(-1)"
     >
       <svg
@@ -159,6 +160,11 @@ onUnmounted(() => {
     <!-- Track -->
     <div
       class="scrollbar__track"
+      role="scrollbar"
+      :aria-orientation="orientation"
+      aria-valuemin="0"
+      :aria-valuemax="scrollMax"
+      :aria-valuenow="Math.round(modelValue)"
       @mousedown="handleTrackClick"
     >
       <!-- Thumb -->
@@ -176,6 +182,7 @@ onUnmounted(() => {
     <button
       class="scrollbar__arrow scrollbar__arrow--end"
       :class="orientation === 'vertical' ? 'scrollbar__arrow--down' : 'scrollbar__arrow--right'"
+      :aria-label="orientation === 'vertical' ? 'Scroll down' : 'Scroll right'"
       @click="handleArrowClick(1)"
     >
       <svg
