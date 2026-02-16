@@ -33,7 +33,7 @@ export type WindowType =
   | 'monitors-settings'
   | 'mouse-settings'
   | 'users-settings'
-  | 'stc-settings'
+  | 'network-settings'
   | 'startup-disk-settings'
   | 'get-info'
   | 'about'

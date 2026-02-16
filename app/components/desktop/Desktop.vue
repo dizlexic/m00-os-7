@@ -336,6 +336,9 @@ onUnmounted(() => {
       <NetworkSettings
         v-else-if="win.type === 'network-settings'"
       />
+
+      <MouseSettings
+        v-else-if="win.type === 'mouse-settings'"
       />
 
       <UsersSettings
