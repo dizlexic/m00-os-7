@@ -1,0 +1,351 @@
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+
+interface Props {
+  isActive?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  isActive: false
+})
+
+// Canvas refs
+const canvasRef = ref<HTMLCanvasElement | null>(null)
+const ctx = ref<CanvasRenderingContext2D | null>(null)
+
+// Tools state
+type Tool = 'pencil' | 'eraser' | 'line' | 'rect' | 'oval' | 'bucket'
+const currentTool = ref<Tool>('pencil')
+const currentColor = ref('#000000')
+const currentLineWidth = ref(1)
+const currentPattern = ref('solid')
+
+// Drawing state
+const isDrawing = ref(false)
+const startPos = ref({ x: 0, y: 0 })
+const snapshot = ref<ImageData | null>(null)
+
+// Mac OS 7 16-color palette
+const colors = [
+  '#000000', '#FFFFFF', '#CCCCCC', '#999999', '#666666', '#333333',
+  '#000080', '#0000FF', '#00FFFF', '#00FF00', '#FFFF00', '#FF0000',
+  '#FF00FF', '#800080', '#800000', '#008080'
+]
+
+const tools = [
+  { id: 'pencil', icon: '✎', name: 'Pencil' },
+  { id: 'eraser', icon: '□', name: 'Eraser' },
+  { id: 'line', icon: '/', name: 'Line' },
+  { id: 'rect', icon: '▭', name: 'Rectangle' },
+  { id: 'oval', icon: '○', name: 'Oval' },
+  { id: 'bucket', icon: '⧊', name: 'Paint Bucket' }
+]
+
+const lineWeights = [1, 2, 4, 8]
+
+function initCanvas() {
+  if (!canvasRef.value) return
+  ctx.value = canvasRef.value.getContext('2d', { willReadFrequently: true })
+  if (ctx.value) {
+    ctx.value.lineCap = 'round'
+    ctx.value.lineJoin = 'round'
+
+    // Set white background
+    ctx.value.fillStyle = '#FFFFFF'
+    ctx.value.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height)
+  }
+}
+
+function getMousePos(event: MouseEvent) {
+  if (!canvasRef.value) return { x: 0, y: 0 }
+  const rect = canvasRef.value.getBoundingClientRect()
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
+  }
+}
+
+function startDrawing(event: MouseEvent) {
+  if (!ctx.value || !canvasRef.value) return
+  isDrawing.value = true
+  const pos = getMousePos(event)
+  startPos.value = pos
+
+  // Save snapshot for previewing shapes
+  snapshot.value = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+
+  ctx.value.beginPath()
+  ctx.value.moveTo(pos.x, pos.y)
+  ctx.value.strokeStyle = currentColor.value
+  ctx.value.fillStyle = currentColor.value
+  ctx.value.lineWidth = currentLineWidth.value
+
+  if (currentTool.value === 'pencil') {
+    ctx.value.lineTo(pos.x, pos.y)
+    ctx.value.stroke()
+  } else if (currentTool.value === 'eraser') {
+    ctx.value.strokeStyle = '#FFFFFF'
+    ctx.value.lineTo(pos.x, pos.y)
+    ctx.value.stroke()
+  } else if (currentTool.value === 'bucket') {
+    floodFill(Math.round(pos.x), Math.round(pos.y), currentColor.value)
+    isDrawing.value = false
+  }
+}
+
+function draw(event: MouseEvent) {
+  if (!isDrawing.value || !ctx.value || !canvasRef.value || !snapshot.value) return
+  const pos = getMousePos(event)
+
+  if (currentTool.value === 'pencil') {
+    ctx.value.lineTo(pos.x, pos.y)
+    ctx.value.stroke()
+  } else if (currentTool.value === 'eraser') {
+    ctx.value.strokeStyle = '#FFFFFF'
+    ctx.value.lineTo(pos.x, pos.y)
+    ctx.value.stroke()
+  } else {
+    // For shapes, restore snapshot first to show preview
+    ctx.value.putImageData(snapshot.value, 0, 0)
+
+    if (currentTool.value === 'line') {
+      ctx.value.beginPath()
+      ctx.value.moveTo(startPos.value.x, startPos.value.y)
+      ctx.value.lineTo(pos.x, pos.y)
+      ctx.value.stroke()
+    } else if (currentTool.value === 'rect') {
+      ctx.value.beginPath()
+      const x = Math.min(pos.x, startPos.value.x)
+      const y = Math.min(pos.y, startPos.value.y)
+      const width = Math.abs(pos.x - startPos.value.x)
+      const height = Math.abs(pos.y - startPos.value.y)
+      ctx.value.strokeRect(x, y, width, height)
+    } else if (currentTool.value === 'oval') {
+      ctx.value.beginPath()
+      const x = Math.min(pos.x, startPos.value.x)
+      const y = Math.min(pos.y, startPos.value.y)
+      const width = Math.abs(pos.x - startPos.value.x)
+      const height = Math.abs(pos.y - startPos.value.y)
+      ctx.value.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, 2 * Math.PI)
+      ctx.value.stroke()
+    }
+  }
+}
+
+function stopDrawing() {
+  isDrawing.value = false
+}
+
+function floodFill(startX: number, startY: number, fillColor: string) {
+  if (!ctx.value || !canvasRef.value) return
+
+  const imageData = ctx.value.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
+  const data = imageData.data
+  const width = imageData.width
+  const height = imageData.height
+
+  const targetR = data[(startY * width + startX) * 4]
+  const targetG = data[(startY * width + startX) * 4 + 1]
+  const targetB = data[(startY * width + startX) * 4 + 2]
+  const targetA = data[(startY * width + startX) * 4 + 3]
+
+  const fillRGB = hexToRgb(fillColor)
+  if (!fillRGB) return
+
+  if (targetR === fillRGB.r && targetG === fillRGB.g && targetB === fillRGB.b && targetA === 255) return
+
+  const stack = [[startX, startY]]
+  while (stack.length > 0) {
+    const [x, y] = stack.pop()!
+    const offset = (y * width + x) * 4
+
+    if (x < 0 || x >= width || y < 0 || y >= height) continue
+    if (data[offset] !== targetR || data[offset + 1] !== targetG || data[offset + 2] !== targetB || data[offset + 3] !== targetA) continue
+
+    data[offset] = fillRGB.r
+    data[offset + 1] = fillRGB.g
+    data[offset + 2] = fillRGB.b
+    data[offset + 3] = 255
+
+    stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1])
+  }
+
+  ctx.value.putImageData(imageData, 0, 0)
+}
+
+function hexToRgb(hex: string) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null
+}
+
+onMounted(() => {
+  initCanvas()
+})
+
+watch(() => props.isActive, (active) => {
+  if (active) {
+    // Could refocus or re-init if needed
+  }
+})
+
+</script>
+
+<template>
+  <div class="paint">
+    <div class="paint__toolbar">
+      <div class="paint__tools">
+        <button
+          v-for="tool in tools"
+          :key="tool.id"
+          class="paint__tool-btn"
+          :class="{ 'paint__tool-btn--active': currentTool === tool.id }"
+          @click="currentTool = tool.id"
+          :title="tool.name"
+        >
+          {{ tool.icon }}
+        </button>
+      </div>
+
+      <div class="paint__line-weights">
+        <button
+          v-for="weight in lineWeights"
+          :key="weight"
+          class="paint__weight-btn"
+          :class="{ 'paint__weight-btn--active': currentLineWidth === weight }"
+          @click="currentLineWidth = weight"
+        >
+          <div :style="{ height: weight + 'px', width: '100%', backgroundColor: 'black' }"></div>
+        </button>
+      </div>
+
+      <div class="paint__colors">
+        <button
+          v-for="color in colors"
+          :key="color"
+          class="paint__color-btn"
+          :style="{ backgroundColor: color }"
+          :class="{ 'paint__color-btn--active': currentColor === color }"
+          @click="currentColor = color"
+        ></button>
+      </div>
+    </div>
+
+    <div class="paint__canvas-container">
+      <canvas
+        ref="canvasRef"
+        width="600"
+        height="400"
+        @mousedown="startDrawing"
+        @mousemove="draw"
+        @mouseup="stopDrawing"
+        @mouseleave="stopDrawing"
+      ></canvas>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.paint {
+  display: flex;
+  height: 100%;
+  background-color: var(--color-gray-light);
+  overflow: hidden;
+}
+
+.paint__toolbar {
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border-right: 1px solid var(--color-black);
+  gap: 8px;
+  background-color: var(--color-gray-light);
+  z-index: 10;
+}
+
+.paint__tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.paint__tool-btn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--color-black);
+  background-color: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.paint__tool-btn--active {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+.paint__line-weights {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid var(--color-black);
+  background-color: var(--color-white);
+  padding: 2px;
+}
+
+.paint__weight-btn {
+  height: 16px;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+}
+
+.paint__weight-btn--active {
+  border-color: var(--color-black);
+  background-color: var(--color-gray-light);
+}
+
+.paint__colors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.paint__color-btn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--color-black);
+  cursor: pointer;
+}
+
+.paint__color-btn--active {
+  outline: 2px solid var(--color-white);
+  outline-offset: -4px;
+}
+
+.paint__canvas-container {
+  flex: 1;
+  padding: 8px;
+  overflow: auto;
+  background-color: var(--color-gray-medium);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+canvas {
+  background-color: white;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  cursor: crosshair;
+  image-rendering: pixelated;
+}
+</style>

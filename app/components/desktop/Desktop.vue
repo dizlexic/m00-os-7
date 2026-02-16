@@ -18,6 +18,7 @@ import SimpleText from '~/components/apps/SimpleText.vue'
 import Calculator from '~/components/apps/Calculator.vue'
 import NotePad from '~/components/apps/NotePad.vue'
 import Scrapbook from '~/components/apps/Scrapbook.vue'
+import Paint from '~/components/apps/Paint.vue'
 import GetInfo from '~/components/apps/GetInfo.vue'
 import ControlPanels from '~/components/apps/ControlPanels.vue'
 import GeneralSettings from '~/components/apps/GeneralSettings.vue'
@@ -297,6 +298,12 @@ onUnmounted(() => {
       <Scrapbook
         v-else-if="win.type === 'scrapbook'"
       />
+      />
+
+      <Paint
+        v-else-if="win.type === 'paint'"
+      />
+
       <GetInfo
         v-else-if="win.type === 'get-info'"
         :node-id="(win.data as any)?.nodeId"
