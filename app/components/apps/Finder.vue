@@ -7,7 +7,6 @@ import { useDesktop } from '~/composables/useDesktop'
 import { useTrash } from '~/composables/useTrash'
 import { useLabels } from '~/composables/useLabels'
 import { useClipboard } from '~/composables/useClipboard'
-import { LABEL_COLORS, LABEL_NAMES } from '~/types/filesystem'
 import type { FileNode, FolderNode } from '~/types/filesystem'
 
 interface Props {
@@ -35,7 +34,7 @@ const { openWindow, updateWindow } = useWindowManager()
 const { addRecentDoc } = useRecentItems()
 const { showContextMenu } = useDesktop()
 const { restoreItem } = useTrash()
-const { getLabelMenuItems } = useLabels()
+const { getLabelMenuItems, labelNames, labelColors } = useLabels()
 const { clipboard } = useClipboard()
 
 const currentFolderId = ref(props.folderId)
@@ -437,7 +436,7 @@ function getKindLabel(item: FileNode): string {
 
 function getItemLabelStyle(item: FileNode) {
   if (selectedItemId.value === item.id || !item.label) return {}
-  const color = LABEL_COLORS[item.label]
+  const color = labelColors.value[item.label]
   return {
     backgroundColor: color,
     color: isDark(color) ? '#FFFFFF' : '#000000'
@@ -788,7 +787,7 @@ function handleBackgroundContextMenu(event: MouseEvent) {
             {{ getKindLabel(item) }}
           </div>
           <div class="finder__list-col finder__list-col--label">
-            {{ item.label ? LABEL_NAMES[item.label] : '--' }}
+            {{ item.label ? labelNames[item.label] : '--' }}
           </div>
           <div class="finder__list-col finder__list-col--date">
             {{ new Date(item.modifiedAt).toLocaleDateString() }}

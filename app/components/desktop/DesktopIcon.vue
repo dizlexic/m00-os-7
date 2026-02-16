@@ -9,7 +9,7 @@
 import { ref, computed, nextTick } from 'vue'
 import type { DesktopIcon } from '~/types/desktop'
 import type { WindowType } from '~/types/window'
-import { LABEL_COLORS } from '~/types/filesystem'
+import { useLabels } from '~/composables/useLabels'
 import { useDesktop } from '~/composables/useDesktop'
 import { useWindowManager } from '~/composables/useWindowManager'
 import { useTrash } from '~/composables/useTrash'
@@ -39,6 +39,8 @@ const {
   setDropTarget
 } = useDesktop()
 
+const { labelColors } = useLabels()
+
 const { openWindow } = useWindowManager()
 const { moveToTrash } = useTrash()
 const { addRecentDoc } = useRecentItems()
@@ -57,7 +59,7 @@ const iconStyle = computed(() => ({
 
 const labelBackgroundStyle = computed(() => {
   if (props.icon.isSelected || !props.icon.label) return {}
-  const color = LABEL_COLORS[props.icon.label]
+  const color = labelColors.value[props.icon.label]
   return {
     backgroundColor: color,
     color: isDark(color) ? '#FFFFFF' : '#000000'
