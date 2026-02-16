@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Finder from '~/components/apps/Finder.vue'
-import { LABEL_COLORS, LABEL_NAMES } from '~/types/filesystem'
+import { DEFAULT_LABEL_COLORS, DEFAULT_LABEL_NAMES } from '~/types/filesystem'
 
 // Mock useFileSystem
 const mockFileSystem = {

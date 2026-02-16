@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import DesktopIconComponent from '~/components/desktop/DesktopIcon.vue'
-import { LABEL_COLORS } from '~/types/filesystem'
+import { DEFAULT_LABEL_COLORS } from '~/types/filesystem'
 
 // Mock useDesktop
 vi.mock('~/composables/useDesktop', () => ({

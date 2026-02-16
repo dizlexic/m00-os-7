@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import MenuBar from '~/components/desktop/MenuBar.vue'
-import { LABEL_NAMES } from '~/types/filesystem'
+import { DEFAULT_LABEL_NAMES } from '~/types/filesystem'
 
 describe('MenuBar Label Menu', () => {
   it('shows Label menu when Finder is active', () => {
@@ -10,7 +10,7 @@ describe('MenuBar Label Menu', () => {
         appName: 'Finder'
       }
     })
-    
+
     expect(wrapper.text()).toContain('Label')
   })
 
@@ -26,7 +26,7 @@ describe('MenuBar Label Menu', () => {
     const labelMenu = menuItems.find(m => m.text().includes('Label'))
     await labelMenu?.trigger('click')
 
-    LABEL_NAMES.forEach(name => {
+    DEFAULT_LABEL_NAMES.forEach(name => {
       expect(wrapper.text()).toContain(name)
     })
   })
