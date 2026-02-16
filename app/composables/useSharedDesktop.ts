@@ -382,6 +382,15 @@ export function useSharedDesktop() {
     return currentSession.value.users.length
   })
 
+  // Watch for authentication changes
+  watch(isAuthenticated, (val) => {
+    if (val && settings.value.enabled) {
+      connect()
+    } else if (!val) {
+      disconnect()
+    }
+  }, { immediate: true })
+
   return {
     // State (readonly)
     connectionState: readonly(connectionState),
