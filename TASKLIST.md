@@ -364,8 +364,8 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [x] `P0` Create GeneralSettings.vue component
 - [x] `P0` Implement desktop pattern selection
 - [x] `P0` Add highlight color selection
-- [ ] `P1` Implement system font size setting
-- [ ] `P1` Add menu blinking option
+- [x] `P1` Implement system font size setting
+- [x] `P1` Add menu blinking option
 - [ ] `P2` Implement recent items count setting
 
 ### 7.3 Date & Time Panel
@@ -737,11 +737,11 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 ## 14. Accessibility
 
 ### 14.1 Keyboard Navigation
-- [ ] `P1` Implement focus management
+- [x] `P1` Implement focus management
 - [ ] `P1` Add keyboard shortcuts for common actions
-- [ ] `P1` Implement tab navigation
-- [ ] `P2` Add arrow key navigation in lists
-- [ ] `P2` Implement escape to close dialogs/menus
+- [x] `P1` Implement tab navigation
+- [x] `P2` Add arrow key navigation in lists
+- [x] `P2` Implement escape to close dialogs/menus
 
 ### 14.2 Screen Reader Support
 - [ ] `P1` Add ARIA labels to interactive elements
