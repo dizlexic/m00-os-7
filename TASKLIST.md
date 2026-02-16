@@ -574,21 +574,21 @@ A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks ar
 - [ ] `P3` Implement print preview (mock)
 
 ### 9.8 Eliza (Computer Therapist)
-- [ ] `P2` Create Eliza.vue component
-- [ ] `P2` Implement classic terminal-style chat interface
-- [ ] `P2` Add Eliza conversation engine:
-  - [ ] Implement pattern matching for user input
-  - [ ] Create response templates (Rogerian psychotherapist style)
-  - [ ] Add keyword detection and transformation rules
-  - [ ] Implement reflection (e.g., "I" → "you", "my" → "your")
-- [ ] `P2` Style interface to match classic Mac Eliza:
-  - [ ] Monospaced font display
-  - [ ] Scrolling conversation history
-  - [ ] Input field at bottom
-- [ ] `P2` Add conversation starters and greetings
-- [ ] `P2` Implement "How does that make you feel?" type responses
+- [x] `P2` Create Eliza.vue component
+- [x] `P2` Implement classic terminal-style chat interface
+- [x] `P2` Add Eliza conversation engine:
+  - [x] Implement pattern matching for user input
+  - [x] Create response templates (Rogerian psychotherapist style)
+  - [x] Add keyword detection and transformation rules
+  - [x] Implement reflection (e.g., "I" → "you", "my" → "your")
+- [x] `P2` Style interface to match classic Mac Eliza:
+  - [x] Monospaced font display
+  - [x] Scrolling conversation history
+  - [x] Input field at bottom
+- [x] `P2` Add conversation starters and greetings
+- [x] `P2` Implement "How does that make you feel?" type responses
 - [ ] `P2` Add session persistence (save/load conversations)
-- [ ] `P3` Implement typing delay for realistic response timing
+- [x] `P3` Implement typing delay for realistic response timing
 - [ ] `P3` Add conversation export functionality
 - [ ] `P3` Implement multiple therapist personalities/modes
 - [ ] `P3` Add Easter eggs and special responses
