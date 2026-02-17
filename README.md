@@ -1,51 +1,48 @@
 # m00-os-7
 
-A nostalgic single-page web application that recreates the classic Apple Macintosh System 7 experience in the browser. Built with Nuxt 4 and Vue 3, this project aims to be a faithful visual clone of the legendary Mac OS 7, complete with movable windows, customizable desktop, and classic applications.
+A silly, nostalgic web-based operating system inspired by late 90s Apple Macintosh design. Built with Nuxt 4 and Vue 3, this project combines classic aesthetics with modern multi-user features, real-time chat, and a collection of retro-style games. It's less of a strict clone and more of a playful reimagining of the classic OS experience for the modern web.
 
-![Mac OS 7 Clone](docs/images/preview.png)
+![m00-os-7 Preview](docs/images/preview.png)
 
 ## ✨ Features
 
-### Core Desktop Environment
+### Core Desktop Experience
 - **Window Management** - Movable, resizable, and stackable application windows with classic title bars
 - **Desktop Icons** - Rearrangeable icons with drag-and-drop functionality
-- **Menu Bar** - Classic Apple menu bar with dropdown menus and application context menu
+- **Menu Bar** - Late 90s inspired Apple menu bar with dropdown menus and application context menu
 - **Finder** - File and folder explorer for navigating the virtual filesystem
 - **Trash** - Functional trash can for deleting files
-- **Control Panels** - System settings and preferences
+- **Control Panels** - Playful system settings and preferences
 
-### System Features
+### Multi-User & Social
+- **User Accounts** - Full multi-user support with a nostalgic login screen
+- **Guest Mode** - Jump in instantly with auto-generated unique friendly guest names
+- **Share the Computer** - Toggle collaborative mode to share your desktop with other users in real-time
+- **Real-time Chat** - Built-in Messenger for instant messaging with other online users
+- **User Presence** - See who else is online and interacting with the shared environment
+
+### Retro Games & Fun
+- **Brickle** - Classic Breakout-style brick breaker game
+- **Puzzle** - Challenging sliding tile puzzle game
+- **Minesweeper** - The classic mine-clearing strategy game
+- **Tetris** - Block-stacking puzzle action
+- **Solitaire** - The timeless Klondike card game
+- **Eliza** - Chat with the classic computer therapist
+
+### Classic Utilities
+- **Paint** - MacPaint-style drawing application with classic dither patterns
+- **SimpleText** - View and edit text files and README articles
+- **Note Pad** - Quick multi-page notes application
+- **Scrapbook** - Retro image and text clipboard manager
+- **Calculator** - Faithful recreation of the classic calculator
+- **About This Macintosh** - System information with a nostalgic touch
+
+### System & Customization
 - **Boot Sequence** - Simulated startup with classic "Welcome to Macintosh" screen
-- **User Accounts** - Multi-user support with login screen or guest mode
-- **Guest Usernames** - Auto-generated unique friendly names for guest users
-- **Share the Computer** - Toggle collaborative mode to share your desktop with other users post-login
-- **Persistent Storage** - Application and user data persistence
-- **Clock & Date** - Menu bar clock with timezone settings
-- **Sound Effects** - Classic Mac system sounds (optional)
-
-### Settings & Customization
-- **Desktop Patterns** - Classic background textures and patterns
-- **Font Size** - Adjustable system font size
-- **Color Schemes** - Classic monochrome and color options
-- **Window Appearance** - Classic platinum appearance
-- **Timezone Settings** - Configurable clock timezone
-
-### Built-in Applications
-- **Finder** - Navigate folders and launch applications
-- **SimpleText** - View and edit text files, README articles
-- **Control Panels** - System preferences and settings
-- **Calculator** - Classic Mac calculator
-- **Note Pad** - Quick notes application
-- **Scrapbook** - Image and text clipboard manager
-- **About This Mac** - System information dialog
-
-### Planned Applications
-- **Solitaire** - Classic card game
-- **Tetris** - Block-stacking puzzle game
-- **Galaga** - Space shooter arcade game
-- **Chat** - Real-time WebSocket instant messaging (AIM/ICQ style)
-- **Browser** - Simple embedded web browser
-- **Edutainment** - Fun educational mini-applications
+- **Desktop Patterns** - Dozens of classic background textures and patterns
+- **Appearance Settings** - Adjustable fonts, colors, and system-wide styles
+- **Persistent Storage** - All your files and settings are saved to your user account
+- **Sound Effects** - Optional classic system beeps and UI sounds
 
 ## 🛠 Tech Stack
 
