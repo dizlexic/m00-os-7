@@ -161,9 +161,40 @@ function getMousePos(event: MouseEvent) {
   }
 }
 
+function getTouchPos(event: TouchEvent) {
+  if (!canvasRef.value || event.touches.length === 0) return { x: 0, y: 0 }
+  const rect = canvasRef.value.getBoundingClientRect()
+  const touch = event.touches[0]
+  return {
+    x: touch.clientX - rect.left,
+    y: touch.clientY - rect.top
+  }
+}
+
 function startDrawing(event: MouseEvent) {
+  startDrawingAt(getMousePos(event))
+}
+
+let lastTapTime = 0
+function handleTouchStart(event: TouchEvent) {
+  event.preventDefault()
+  if (event.touches.length !== 1) return
+  const pos = getTouchPos(event)
+
+  // Double tap to finish polygon
+  const currentTime = Date.now()
+  if (currentTime - lastTapTime < 300 && (currentTool.value === 'polygon' || currentTool.value === 'polygon-filled')) {
+    finishPolygon()
+    lastTapTime = 0
+    return
+  }
+  lastTapTime = currentTime
+
+  startDrawingAt(pos)
+}
+
+function startDrawingAt(pos: { x: number, y: number }) {
   if (!ctx.value || !canvasRef.value) return
-  const pos = getMousePos(event)
 
   // Handle moving existing selection
   if (selectionActive.value && selectionRect.value && isInsideRect(pos, selectionRect.value)) {
@@ -271,9 +302,23 @@ function finalizeSelection() {
 }
 
 function draw(event: MouseEvent) {
+  drawAt(getMousePos(event))
+}
+
+function handleTouchMove(event: TouchEvent) {
+  event.preventDefault()
+  if (event.touches.length !== 1) return
+  drawAt(getTouchPos(event))
+}
+
+function handleTouchEnd(event: TouchEvent) {
+  event.preventDefault()
+  stopDrawing()
+}
+
+function drawAt(pos: { x: number, y: number }) {
   if (!ctx.value || !canvasRef.value || !snapshot.value) return
   if (!isDrawing.value && !isMovingSelection.value) return
-  const pos = getMousePos(event)
 
   if (isMovingSelection.value && selectionRect.value && selectionSnapshot.value) {
     ctx.value.putImageData(snapshot.value, 0, 0)
@@ -916,6 +961,9 @@ watch(() => props.fileId, () => {
         @mousemove="draw"
         @mouseup="stopDrawing"
         @mouseleave="stopDrawing"
+        @touchstart="handleTouchStart"
+        @touchmove="handleTouchMove"
+        @touchend="handleTouchEnd"
         @dblclick="finishPolygon"
       ></canvas>
     </div>
