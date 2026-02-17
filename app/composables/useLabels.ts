@@ -11,8 +11,8 @@ export function useLabels() {
   const { icons: desktopIcons, updateIcon } = useDesktop()
   const { settings } = useSettings()
 
-  const labelNames = computed(() => settings.value.labelNames)
-  const labelColors = computed(() => settings.value.labelColors)
+  const labelNames = computed(() => settings.value?.labelNames || [])
+  const labelColors = computed(() => settings.value?.labelColors || [])
 
   function getLabelMenuItems(targetNodeId?: string, targetIconId?: string): MenuItem[] {
     let currentLabel = 0
