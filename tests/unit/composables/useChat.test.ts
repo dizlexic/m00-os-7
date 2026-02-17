@@ -61,4 +61,21 @@ describe('useChat', () => {
       text: 'Hello world'
     })
   })
+
+  it('sends friend request', () => {
+    const chat = useChat()
+    chat.sendFriendRequest('otheruser')
+    expect(mockSend).toHaveBeenCalledWith('friend-request', {
+      username: 'otheruser'
+    })
+  })
+
+  it('creates room with privacy', () => {
+    const chat = useChat()
+    chat.createRoom('My Private Room', true)
+    expect(mockSend).toHaveBeenCalledWith('session-create', {
+      sessionName: 'My Private Room',
+      isPrivate: true
+    })
+  })
 })
