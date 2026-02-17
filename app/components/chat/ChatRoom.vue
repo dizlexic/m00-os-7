@@ -7,9 +7,14 @@ interface Props {
   roomName: string
   messages: ChatMessage[]
   currentUserId: string
+  members?: string[]
+  memberNames?: Record<string, string>
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  members: () => [],
+  memberNames: () => ({})
+})
 const emit = defineEmits<{
   'send-message': [text: string]
 }>()
@@ -42,15 +47,23 @@ onMounted(() => {
     <div class="chat-room__header">
       {{ roomName }}
     </div>
-    <div class="chat-room__messages" ref="scrollContainer">
-      <div
-        v-for="msg in messages"
-        :key="msg.id"
-        class="chat-room__message"
-        :class="{ 'chat-room__message--own': msg.senderId === currentUserId }"
-      >
-        <div class="chat-room__sender">{{ msg.senderId === currentUserId ? 'Me' : msg.senderId }}:</div>
-        <div class="chat-room__text">{{ msg.text }}</div>
+    <div class="chat-room__body">
+      <div class="chat-room__messages" ref="scrollContainer">
+        <div
+          v-for="msg in messages"
+          :key="msg.id"
+          class="chat-room__message"
+          :class="{ 'chat-room__message--own': msg.senderId === currentUserId }"
+        >
+          <div class="chat-room__sender">{{ msg.senderId === currentUserId ? 'Me' : (msg.senderName || msg.senderId) }}:</div>
+          <div class="chat-room__text">{{ msg.text }}</div>
+        </div>
+      </div>
+      <div v-if="members.length > 0" class="chat-room__sidebar">
+        <div class="chat-room__sidebar-title">Members ({{ members.length }})</div>
+        <div v-for="memberId in members" :key="memberId" class="chat-room__member">
+          {{ memberNames[memberId] || memberId }}
+        </div>
       </div>
     </div>
     <div class="chat-room__input-area">
@@ -83,6 +96,12 @@ onMounted(() => {
   font-weight: bold;
 }
 
+.chat-room__body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
 .chat-room__messages {
   flex: 1;
   overflow-y: auto;
@@ -90,6 +109,26 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.chat-room__sidebar {
+  width: 150px;
+  border-left: 1px solid var(--color-black);
+  background-color: var(--color-gray-light);
+  display: flex;
+  flex-direction: column;
+  font-size: var(--font-size-sm);
+}
+
+.chat-room__sidebar-title {
+  padding: 4px;
+  font-weight: bold;
+  border-bottom: 1px solid var(--color-black);
+  background-color: var(--color-gray-medium);
+}
+
+.chat-room__member {
+  padding: 2px 4px;
 }
 
 .chat-room__message {
