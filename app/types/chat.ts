@@ -11,6 +11,7 @@ export interface ChatUser {
 export interface ChatMessage {
   id: string
   senderId: string
+  senderName?: string
   text: string
   timestamp: number
   roomId?: string // If present, it's a room message
@@ -22,6 +23,8 @@ export interface ChatRoom {
   name: string
   ownerId: string
   members: string[] // User IDs
+  memberNames?: Record<string, string> // Map of UserID -> Username
+  isPrivate?: boolean
 }
 
 export interface ChatState {
