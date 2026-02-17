@@ -23,6 +23,7 @@ vi.stubGlobal('$fetch', mockFetch)
 describe('useSettings', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useFakeTimers()
     mockIsAuthenticated.value = true
     mockFetch.mockReset()
     // Reset settings to defaults before each test
@@ -32,6 +33,7 @@ describe('useSettings', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    vi.useRealTimers()
   })
 
   describe('initialization', () => {
@@ -193,14 +195,17 @@ describe('useSettings', () => {
 
       updateSetting('theme', 'dark')
 
-      // Wait for async operation
-      await vi.waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith('/api/settings', {
-          method: 'POST',
-          body: expect.objectContaining({
-            settings: expect.objectContaining({
-              theme: 'dark'
-            })
+      // Fast-forward time
+      vi.advanceTimersByTime(1000)
+
+      // Wait for any pending promises
+      await Promise.resolve()
+
+      expect(mockFetch).toHaveBeenCalledWith('/api/settings', {
+        method: 'POST',
+        body: expect.objectContaining({
+          settings: expect.objectContaining({
+            theme: 'dark'
           })
         })
       })
@@ -212,8 +217,9 @@ describe('useSettings', () => {
 
       updateSetting('theme', 'dark')
 
-      // Give time for any async operations
-      await new Promise(resolve => setTimeout(resolve, 10))
+      // Fast-forward time
+      vi.advanceTimersByTime(1000)
+      await Promise.resolve()
 
       expect(mockFetch).not.toHaveBeenCalled()
     })
@@ -228,10 +234,12 @@ describe('useSettings', () => {
       // Setting should still be updated locally
       expect(settings.value.theme).toBe('dark')
 
-      // Wait for async error handling
-      await vi.waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith('Failed to save settings:', expect.any(Error))
-      })
+      // Fast-forward time
+      vi.advanceTimersByTime(1000)
+      await Promise.resolve()
+      await Promise.resolve() // Extra tick for catch block
+
+      expect(consoleSpy).toHaveBeenCalledWith('Failed to save settings:', expect.any(Error))
 
       consoleSpy.mockRestore()
     })
