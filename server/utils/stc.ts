@@ -179,6 +179,18 @@ export function getPeerByUserId(userId: string): ConnectedPeer | undefined {
 }
 
 /**
+ * Get a peer by username
+ */
+export function getPeerByUsername(username: string): ConnectedPeer | undefined {
+  for (const peer of peers.values()) {
+    if (peer.username === username) {
+      return peer
+    }
+  }
+  return undefined
+}
+
+/**
  * Get all peers in a session
  */
 export function getSessionPeers(sessionId: string): ConnectedPeer[] {
@@ -190,6 +202,14 @@ export function getSessionPeers(sessionId: string): ConnectedPeer[] {
   }
   return result
 }
+
+/**
+ * Get all peers in a room
+ */
+export function getRoomPeers(roomId: string): ConnectedPeer[] {
+  const result: ConnectedPeer[] = []
+  for (const peer of peers.values()) {
+    if (peer.chatRoomIds.has(roomId)) {
       result.push(peer)
     }
   }
@@ -360,6 +380,18 @@ export function leaveRoom(peerId: string, roomId: string): ChatRoom | null {
 
 /**
  * Get a room by ID
+ */
+export function getChatRoom(roomId: string): ChatRoom | undefined {
+  return rooms.get(roomId)
+}
+
+/**
+ * Get all active rooms
+ */
+export function getAllRooms(): ChatRoom[] {
+  return Array.from(rooms.values()).filter(r => r.isActive)
+}
+
 /**
  * Get a session by ID
  */
@@ -460,6 +492,21 @@ export function broadcastToSession(
   }
 }
 
+/**
+ * Broadcast a message to all peers in a room except the sender
+ */
+export function broadcastToRoom(
+  roomId: string,
+  message: unknown,
+  excludePeerId?: string
+): void {
+  const roomPeers = getRoomPeers(roomId)
+  const messageStr = JSON.stringify(message)
+
+  for (const connectedPeer of roomPeers) {
+    // Skip the sender
+    if (excludePeerId && connectedPeer.peer.id === excludePeerId) continue
+
     try {
       connectedPeer.peer.send(messageStr)
     } catch (error) {
@@ -491,6 +538,22 @@ export function getSessionUsersArray(sessionId: string): RemoteUser[] {
   const session = sessions.get(sessionId)
   if (!session) return []
   return Array.from(session.users.values())
+}
+
+/**
+ * Get room members as array of usernames (for serialization)
+ */
+export function getRoomMembersArray(roomId: string): Array<{id: string, username: string}> {
+  const room = rooms.get(roomId)
+  if (!room) return []
+  const result: Array<{id: string, username: string}> = []
+  for (const userId of room.members) {
+    const peer = getPeerByUserId(userId)
+    if (peer) {
+      result.push({ id: peer.userId, username: peer.username })
+    }
+  }
+  return result
 }
 
 /**
