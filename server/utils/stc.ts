@@ -5,6 +5,7 @@
  */
 
 import type { Peer } from 'crossws'
+import { generateUUID } from './uuid'
 
 /** Cursor configuration */
 export interface CursorConfig {
@@ -100,14 +101,14 @@ export function initGlobals() {
  * Generate a unique session ID
  */
 export function generateSessionId(): string {
-  return `stc-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  return `stc-${generateUUID()}`
 }
 
 /**
  * Generate a unique user ID
  */
 export function generateUserId(): string {
-  return `user-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  return `user-${generateUUID()}`
 }
 
 /**
@@ -264,7 +265,7 @@ export function createChatRoom(peerId: string, roomName: string, isPrivate: bool
   const peer = peers.get(peerId)
   if (!peer) return null
 
-  const roomId = `room-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  const roomId = `room-${generateUUID()}`
   const room: ChatRoom = {
     id: roomId,
     name: roomName,

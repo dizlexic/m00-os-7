@@ -1,4 +1,5 @@
 import { ref, computed, readonly } from 'vue'
+import { generateUUID } from '~/utils/uuid'
 import { useUser } from '~/composables/useUser'
 import { useWebSocket } from '~/composables/useWebSocket'
 import type { ChatStatus, ChatUser, ChatMessage, ChatRoom } from '~/types/chat'
@@ -34,7 +35,7 @@ function handleMessage(message: any) {
     case 'chat-message':
     case 'chat-private-message':
       messages.value.push({
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+        id: generateUUID(),
         senderId: String(payload.senderId),
         senderName: payload.senderName,
         text: payload.text,
@@ -68,7 +69,7 @@ function handleMessage(message: any) {
           id: r.id,
           name: r.name,
           ownerId: r.ownerId,
-          members: [], 
+          members: [],
           isPrivate: r.isPrivate
         }))
       }
@@ -225,7 +226,7 @@ export function useChat() {
     activeChatId,
     status,
     customStatus,
-    connect: () => {}, 
+    connect: () => {},
     sendMessage,
     updateStatus,
     addFriend,

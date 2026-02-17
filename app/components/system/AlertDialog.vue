@@ -7,6 +7,7 @@
  */
 
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { generateUUID } from '~/utils/uuid'
 import { useSettings } from '~/composables/useSettings'
 import { useSound } from '~/composables/useSound'
 
@@ -57,7 +58,7 @@ const emit = defineEmits<{
 }>()
 
 // Generate unique IDs for accessibility
-const dialogId = ref(`alert-dialog-${Math.random().toString(36).substr(2, 9)}`)
+const dialogId = ref(`alert-dialog-${generateUUID()}`)
 const titleId = computed(() => `${dialogId.value}-title`)
 const messageId = computed(() => `${dialogId.value}-message`)
 

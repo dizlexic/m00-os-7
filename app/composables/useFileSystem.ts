@@ -1,4 +1,5 @@
 import { ref, readonly } from 'vue'
+import { generateUUID } from '~/utils/uuid'
 import type { FileNode, FolderNode, FileSystemState, FileNodeType } from '~/types/filesystem'
 import { useUser } from '~/composables/useUser'
 
@@ -35,9 +36,7 @@ export function useFileSystem() {
   const { isAuthenticated } = useUser()
 
   const generateId = (): string => {
-    return typeof crypto !== 'undefined' && crypto.randomUUID
-      ? crypto.randomUUID()
-      : Math.random().toString(36).substring(2, 11)
+    return generateUUID()
   }
 
   const convertFromDb = (dbNode: any): FileNode => {

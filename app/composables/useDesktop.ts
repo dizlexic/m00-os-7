@@ -5,6 +5,7 @@
  */
 
 import { ref, computed, readonly, watch } from 'vue'
+import { generateUUID } from '~/utils/uuid'
 import type {
   DesktopIcon,
   DesktopPattern,
@@ -19,7 +20,7 @@ import { useSettings } from '~/composables/useSettings'
 
 /** Generate unique ID */
 function generateId(): string {
-  return `icon-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  return generateUUID()
 }
 
 /** Snap position to grid */
@@ -302,7 +303,7 @@ export function useDesktop() {
         const typeOrder = ['hard-drive', 'folder', 'application', 'messenger', 'document', 'markdown', 'image', 'alias', 'trash']
         const aIndex = typeOrder.indexOf(a.type)
         const bIndex = typeOrder.indexOf(b.type)
-        
+
         // If one type is not in list, it goes to the end
         if (aIndex !== bIndex) {
           if (aIndex === -1) return 1
@@ -310,7 +311,7 @@ export function useDesktop() {
           return aIndex - bIndex
         }
       }
-      
+
       return a.name.localeCompare(b.name)
     })
 
@@ -354,17 +355,17 @@ export function useDesktop() {
     watch(() => settings.value.highlightColor, (newColor) => {
       if (typeof document !== 'undefined') {
         document.documentElement.style.setProperty('--color-highlight', newColor)
-        
+
         // Calculate contrast text color
         // Simple luminance check
         const hex = newColor.replace('#', '')
         const r = parseInt(hex.substring(0, 2), 16)
         const g = parseInt(hex.substring(2, 4), 16)
         const b = parseInt(hex.substring(4, 6), 16)
-        
+
         const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
         const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF'
-        
+
         document.documentElement.style.setProperty('--color-highlight-text', textColor)
       }
     }, { immediate: true })

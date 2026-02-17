@@ -6,6 +6,7 @@
  */
 
 import { ref, computed, readonly, watch } from 'vue'
+import { generateUUID } from '~/utils/uuid'
 import { useRecentItems } from '~/composables/useRecentItems'
 import { useSettings } from '~/composables/useSettings'
 import type { Position, Size } from '~/types/desktop'
@@ -28,7 +29,7 @@ import {
 
 /** Generate unique window ID */
 function generateWindowId(): string {
-  return `window-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  return generateUUID()
 }
 
 // State

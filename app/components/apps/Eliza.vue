@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
+import { generateUUID } from '~/utils/uuid'
 import { getElizaResponse } from '~/utils/eliza'
 
 interface Message {
-  id: number
+  id: string | number
   text: string
   sender: 'user' | 'eliza'
 }
@@ -29,7 +30,7 @@ function handleSend() {
 
   // Add user message
   messages.value.push({
-    id: Date.now(),
+    id: generateUUID(),
     text: input,
     sender: 'user'
   })
@@ -41,7 +42,7 @@ function handleSend() {
   setTimeout(() => {
     const response = getElizaResponse(input)
     messages.value.push({
-      id: Date.now() + 1,
+      id: generateUUID(),
       text: response,
       sender: 'eliza'
     })
