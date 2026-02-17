@@ -10,17 +10,28 @@ import {
   registerPeer,
   unregisterPeer,
   getPeer,
+  getSTCSession,
+  getChatRoom,
   createSession,
+  createChatRoom,
   joinSession,
+  joinRoom,
   leaveSession,
+  leaveRoom,
   getAllSessions,
+  getAllRooms,
   updateUserPosition,
   updateUserCursor,
   broadcastToSession,
+  broadcastToRoom,
   broadcastToAll,
   sendToPeer,
   getSessionUsersArray,
-  getPeerByUserId
+  getRoomMembersArray,
+  getPeerByUserId,
+  getPeerByUsername,
+  GLOBAL_STC_SESSION_ID,
+  GLOBAL_CHAT_ROOM_ID
 } from '../utils/stc'
 import type { CursorConfig, Position } from '../utils/stc'
 
@@ -49,9 +60,13 @@ type MessageType =
   | 'session-create'
   | 'session-join'
   | 'session-leave'
-  | 'session-list'
   | 'session-state'
   | 'session-users'
+  | 'room-create'
+  | 'room-join'
+  | 'room-leave'
+  | 'room-list'
+  | 'room-state'
   | 'chat-message'
   | 'chat-private-message'
   | 'chat-status-update'
@@ -123,14 +138,26 @@ export default defineWebSocketHandler({
     console.log(`[STC] WebSocket connection closed: ${peer.id}`)
 
     const connectedPeer = getPeer(peer.id)
-    if (connectedPeer && connectedPeer.sessionId) {
-      const result = leaveSession(peer.id)
-      if (result) {
-        // Notify other users in the session
-        broadcastToSession(
-          result.session.id,
-          createMessage('user-left', { user: result.user }, connectedPeer.userId)
-        )
+    if (connectedPeer) {
+      if (connectedPeer.stcSessionId) {
+        const result = leaveSession(peer.id)
+        if (result) {
+          // Notify other users in the session
+          broadcastToSession(
+            result.session.id,
+            createMessage('user-left', { user: result.user }, connectedPeer.userId)
+          )
+        }
+      }
+
+      for (const roomId of connectedPeer.chatRoomIds) {
+        const room = leaveRoom(peer.id, roomId)
+        if (room) {
+          broadcastToRoom(
+            roomId,
+            createMessage('user-left', { user: { id: connectedPeer.userId, username: connectedPeer.username } }, connectedPeer.userId)
+          )
+        }
       }
     }
 
@@ -191,6 +218,39 @@ export default defineWebSocketHandler({
           }
         }, newPeer.userId))
 
+        // Send initial state for global session and room
+        const globalSession = getSTCSession(GLOBAL_STC_SESSION_ID)
+        if (globalSession) {
+          sendToPeer(peer.id, createMessage('session-state', {
+            session: {
+              id: globalSession.id,
+              name: globalSession.name,
+              hostId: globalSession.hostId,
+              users: getSessionUsersArray(globalSession.id),
+              isActive: globalSession.isActive,
+              createdAt: globalSession.createdAt
+            }
+          }, newPeer.userId))
+        }
+
+        const globalRoom = getChatRoom(GLOBAL_CHAT_ROOM_ID)
+        if (globalRoom) {
+          sendToPeer(peer.id, createMessage('room-state', {
+            room: {
+              id: globalRoom.id,
+              name: globalRoom.name,
+              ownerId: globalRoom.ownerId,
+              members: Array.from(globalRoom.members),
+              memberNames: getRoomMembersArray(globalRoom.id).reduce((acc: any, m) => {
+                acc[m.id] = m.username
+                return acc
+              }, {}),
+              isActive: globalRoom.isActive,
+              createdAt: globalRoom.createdAt
+            }
+          }, newPeer.userId))
+        }
+
         console.log(`[STC] User connected: ${newPeer.username} (${newPeer.userId})`)
         break
       }
@@ -220,7 +280,7 @@ export default defineWebSocketHandler({
             )
           } else {
             // Room message
-            broadcastToSession(
+            broadcastToRoom(
               payload.roomId,
               createMessage('chat-message', {
                 roomId: payload.roomId,
@@ -293,7 +353,7 @@ export default defineWebSocketHandler({
         if (!payload.username) return
 
         // Find the peer with this username
-        const targetPeer = Array.from(peers.values()).find(p => p.username === payload.username)
+        const targetPeer = getPeerByUsername(payload.username)
         if (targetPeer) {
           sendToPeer(targetPeer.peer.id, createMessage('friend-request', {
             senderId: connectedPeer.userId,
@@ -302,6 +362,129 @@ export default defineWebSocketHandler({
         } else {
           sendError(peer.id, 'USER_NOT_FOUND', `User ${payload.username} not found`)
         }
+        break
+      }
+
+      case 'room-create': {
+        if (!connectedPeer) {
+          sendError(peer.id, 'NOT_CONNECTED', 'Must connect first')
+          return
+        }
+
+        const payload = message.payload as { roomName: string; isPrivate?: boolean }
+        if (!payload?.roomName) {
+          sendError(peer.id, 'INVALID_PAYLOAD', 'Room name is required')
+          return
+        }
+
+        const isPrivate = payload.isPrivate || false
+        const room = createChatRoom(peer.id, payload.roomName, isPrivate)
+
+        if (!room) {
+          sendError(peer.id, 'ROOM_CREATE_FAILED', 'Failed to create room')
+          return
+        }
+
+        // Send room state to the creator
+        sendToPeer(peer.id, createMessage('room-state', {
+          room: {
+            id: room.id,
+            name: room.name,
+            ownerId: room.ownerId,
+            members: Array.from(room.members),
+            memberNames: getRoomMembersArray(room.id).reduce((acc: any, m) => {
+              acc[m.id] = m.username
+              return acc
+            }, {}),
+            isActive: room.isActive,
+            isPrivate: room.isPrivate,
+            createdAt: room.createdAt
+          }
+        }, connectedPeer.userId))
+
+        console.log(`[STC] Room created: ${room.name} (${room.id}) by ${connectedPeer.username}`)
+        break
+      }
+
+      case 'room-join': {
+        if (!connectedPeer) {
+          sendError(peer.id, 'NOT_CONNECTED', 'Must connect first')
+          return
+        }
+
+        const payload = message.payload as { roomId: string }
+        if (!payload?.roomId) {
+          sendError(peer.id, 'INVALID_PAYLOAD', 'Room ID is required')
+          return
+        }
+
+        const room = joinRoom(peer.id, payload.roomId)
+        if (!room) {
+          sendError(peer.id, 'ROOM_JOIN_FAILED', 'Failed to join room')
+          return
+        }
+
+        // Send room state to the joining user
+        sendToPeer(peer.id, createMessage('room-state', {
+          room: {
+            id: room.id,
+            name: room.name,
+            ownerId: room.ownerId,
+            members: Array.from(room.members),
+            memberNames: getRoomMembersArray(room.id).reduce((acc: any, m) => {
+              acc[m.id] = m.username
+              return acc
+            }, {}),
+            isActive: room.isActive,
+            isPrivate: room.isPrivate,
+            createdAt: room.createdAt
+          }
+        }, connectedPeer.userId))
+
+        // Notify other users in the room
+        broadcastToRoom(
+          room.id,
+          createMessage('user-joined', { 
+            user: { id: connectedPeer.userId, username: connectedPeer.username } 
+          }, connectedPeer.userId),
+          peer.id
+        )
+
+        console.log(`[STC] User ${connectedPeer.username} joined room ${room.name}`)
+        break
+      }
+
+      case 'room-leave': {
+        const payload = message.payload as { roomId: string }
+        if (!connectedPeer || !payload?.roomId) return
+
+        const room = leaveRoom(peer.id, payload.roomId)
+        if (room) {
+          // Notify other users
+          broadcastToRoom(
+            payload.roomId,
+            createMessage('user-left', { 
+              user: { id: connectedPeer.userId, username: connectedPeer.username } 
+            }, connectedPeer.userId)
+          )
+
+          sendToPeer(peer.id, createMessage('room-leave', { success: true, roomId: payload.roomId }, connectedPeer.userId))
+          console.log(`[STC] User ${connectedPeer.username} left room ${room.name}`)
+        }
+        break
+      }
+
+      case 'room-list': {
+        const rooms = getAllRooms().map(r => ({
+          id: r.id,
+          name: r.name,
+          ownerId: r.ownerId,
+          memberCount: r.members.size,
+          isPrivate: r.isPrivate,
+          createdAt: r.createdAt
+        }))
+
+        sendToPeer(peer.id, createMessage('room-list', { rooms }))
         break
       }
 
@@ -382,7 +565,7 @@ export default defineWebSocketHandler({
       }
 
       case 'session-leave': {
-        if (!connectedPeer || !connectedPeer.sessionId) {
+        if (!connectedPeer || !connectedPeer.stcSessionId) {
           sendError(peer.id, 'NOT_IN_SESSION', 'Not in a session')
           return
         }
@@ -425,7 +608,7 @@ export default defineWebSocketHandler({
       }
 
       case 'cursor-move': {
-        if (!connectedPeer || !connectedPeer.sessionId) return
+        if (!connectedPeer || !connectedPeer.stcSessionId) return
 
         const payload = message.payload as { position: Position }
         if (!payload?.position) return
@@ -433,7 +616,7 @@ export default defineWebSocketHandler({
         const user = updateUserPosition(peer.id, payload.position)
         if (user) {
           broadcastToSession(
-            connectedPeer.sessionId,
+            connectedPeer.stcSessionId,
             createMessage('cursor-move', {
               userId: connectedPeer.userId,
               position: payload.position
@@ -451,9 +634,9 @@ export default defineWebSocketHandler({
         if (!payload?.cursor) return
 
         const user = updateUserCursor(peer.id, payload.cursor)
-        if (user && connectedPeer.sessionId) {
+        if (user && connectedPeer.stcSessionId) {
           broadcastToSession(
-            connectedPeer.sessionId,
+            connectedPeer.stcSessionId,
             createMessage('cursor-config-update', {
               userId: connectedPeer.userId,
               cursor: payload.cursor
@@ -479,11 +662,11 @@ export default defineWebSocketHandler({
       case 'window-maximize':
       case 'key-press':
       case 'text-input': {
-        if (!connectedPeer || !connectedPeer.sessionId) return
+        if (!connectedPeer || !connectedPeer.stcSessionId) return
 
         // Broadcast the action to all other users in the session
         broadcastToSession(
-          connectedPeer.sessionId,
+          connectedPeer.stcSessionId,
           createMessage(message.type, message.payload, connectedPeer.userId),
           peer.id
         )
