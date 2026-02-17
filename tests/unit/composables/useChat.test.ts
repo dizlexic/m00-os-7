@@ -73,8 +73,8 @@ describe('useChat', () => {
   it('creates room with privacy', () => {
     const chat = useChat()
     chat.createRoom('My Private Room', true)
-    expect(mockSend).toHaveBeenCalledWith('session-create', {
-      sessionName: 'My Private Room',
+    expect(mockSend).toHaveBeenCalledWith('room-create', {
+      roomName: 'My Private Room',
       isPrivate: true
     })
   })
@@ -90,16 +90,16 @@ describe('useChat', () => {
   it('leaves a room', () => {
     const chat = useChat()
     chat.leaveRoom('room1')
-    expect(mockSend).toHaveBeenCalledWith('session-leave', {
-      sessionId: 'room1'
+    expect(mockSend).toHaveBeenCalledWith('room-leave', {
+      roomId: 'room1'
     })
   })
 
   it('invites a user to a room', () => {
     const chat = useChat()
     chat.inviteToRoom('room1', 'user1')
-    expect(mockSend).toHaveBeenCalledWith('session-invite', {
-      sessionId: 'room1',
+    expect(mockSend).toHaveBeenCalledWith('room-invite', {
+      roomId: 'room1',
       userId: 'user1'
     })
   })
@@ -107,8 +107,8 @@ describe('useChat', () => {
   it('removes a user from a room', () => {
     const chat = useChat()
     chat.removeFromRoom('room1', 'user1')
-    expect(mockSend).toHaveBeenCalledWith('session-kick', {
-      sessionId: 'room1',
+    expect(mockSend).toHaveBeenCalledWith('room-kick', {
+      roomId: 'room1',
       userId: 'user1'
     })
   })
