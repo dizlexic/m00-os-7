@@ -39,6 +39,17 @@ export interface STCSession {
   createdAt: number
 }
 
+/** Chat room */
+export interface ChatRoom {
+  id: string
+  name: string
+  ownerId: string
+  members: Set<string> // User IDs
+  isActive: boolean
+  isPrivate?: boolean
+  createdAt: number
+}
+
 /** Connected peer with user info */
 export interface ConnectedPeer {
   peer: Peer
@@ -49,9 +60,41 @@ export interface ConnectedPeer {
   cursor: CursorConfig
 }
 
-// In-memory storage for sessions and peers
+// In-memory storage for sessions, rooms and peers
 const sessions = new Map<string, STCSession>()
+const rooms = new Map<string, ChatRoom>()
 const peers = new Map<string, ConnectedPeer>()
+
+// Global constants
+export const GLOBAL_STC_SESSION_ID = 'stc-global'
+export const GLOBAL_CHAT_ROOM_ID = 'lobby' // Keep 'lobby' as the ID for compatibility
+
+/**
+ * Initialize global session and room
+ */
+export function initGlobals() {
+  if (!sessions.has(GLOBAL_STC_SESSION_ID)) {
+    sessions.set(GLOBAL_STC_SESSION_ID, {
+      id: GLOBAL_STC_SESSION_ID,
+      name: 'Global Desktop',
+      hostId: 'system',
+      users: new Map(),
+      isActive: true,
+      createdAt: Date.now()
+    })
+  }
+
+  if (!rooms.has(GLOBAL_CHAT_ROOM_ID)) {
+    rooms.set(GLOBAL_CHAT_ROOM_ID, {
+      id: GLOBAL_CHAT_ROOM_ID,
+      name: 'System Lobby',
+      ownerId: 'system',
+      members: new Set(),
+      isActive: true,
+      createdAt: Date.now()
+    })
+  }
+}
 
 /**
  * Generate a unique session ID
@@ -77,6 +120,9 @@ export function registerPeer(
   cursor: CursorConfig,
   userId?: string
 ): ConnectedPeer {
+  // Ensure globals are initialized
+  initGlobals()
+
   const connectedPeer: ConnectedPeer = {
     peer,
     userId: userId || generateUserId(),
@@ -86,6 +132,11 @@ export function registerPeer(
     cursor
   }
   peers.set(peerId, connectedPeer)
+
+  // Join global session and room by default
+  joinSession(peerId, GLOBAL_STC_SESSION_ID)
+  joinRoom(peerId, GLOBAL_CHAT_ROOM_ID)
+
   return connectedPeer
 }
 
