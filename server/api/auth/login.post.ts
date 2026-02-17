@@ -3,7 +3,7 @@ import { getUserByName, validatePassword } from '../../utils/users';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { username, password } = body;
+  let { username, password } = body;
 
   if (!username || !password) {
     throw createError({
@@ -11,6 +11,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Username and password are required',
     });
   }
+
+  username = String(username).trim();
+  password = String(password);
 
   const user = getUserByName(username);
 

@@ -50,7 +50,7 @@ async function handleLogin() {
     return
   }
 
-  const loginUsername = selectedUser.value ? selectedUser.value.username : username.value
+  const loginUsername = (selectedUser.value ? selectedUser.value.username : username.value).trim()
 
   if (!loginUsername || !password.value) {
     error.value = 'Please enter both username and password.'
@@ -70,6 +70,9 @@ async function handleLogin() {
     success = await register(loginUsername, password.value)
     if (success) {
       success = await login(loginUsername, password.value)
+      if (!success) {
+        error.value = 'Registration successful, but login failed. Please try logging in manually.'
+      }
     } else {
       error.value = 'Registration failed. Username might be taken.'
     }
