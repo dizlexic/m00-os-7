@@ -96,8 +96,12 @@ export function unregisterPeer(peerId: string): ConnectedPeer | undefined {
   const peer = peers.get(peerId)
   if (peer) {
     // Remove from session if in one
-    if (peer.sessionId) {
+    if (peer.stcSessionId) {
       leaveSession(peerId)
+    }
+    // Remove from all rooms
+    for (const roomId of peer.chatRoomIds) {
+      leaveRoom(peerId, roomId)
     }
     peers.delete(peerId)
   }
@@ -257,19 +261,24 @@ export function joinRoom(peerId: string, roomId: string): ChatRoom | null {
  */
 export function leaveSession(peerId: string): { session: STCSession; user: RemoteUser } | null {
   const peer = peers.get(peerId)
-  if (!peer || !peer.sessionId) return null
+  if (!peer || !peer.stcSessionId) return null
 
-  const session = sessions.get(peer.sessionId)
+  const session = sessions.get(peer.stcSessionId)
   if (!session) return null
 
   const user = session.users.get(peer.userId)
   if (!user) return null
 
   session.users.delete(peer.userId)
-  peer.sessionId = null
 
-  // If no users left or host left, close the session
-  if (session.users.size === 0 || session.hostId === peer.userId) {
+  // If leaving a private session, go back to global session
+  if (peer.stcSessionId !== GLOBAL_STC_SESSION_ID) {
+    peer.stcSessionId = GLOBAL_STC_SESSION_ID
+    joinSession(peerId, GLOBAL_STC_SESSION_ID)
+  }
+
+  // If no users left or host left (and not global session), close the session
+  if (session.id !== GLOBAL_STC_SESSION_ID && (session.users.size === 0 || session.hostId === peer.userId)) {
     session.isActive = false
     sessions.delete(session.id)
   }
@@ -277,6 +286,29 @@ export function leaveSession(peerId: string): { session: STCSession; user: Remot
   return { session, user }
 }
 
+/**
+ * Leave a room
+ */
+export function leaveRoom(peerId: string, roomId: string): ChatRoom | null {
+  const peer = peers.get(peerId)
+  const room = rooms.get(roomId)
+
+  if (!peer || !room) return null
+
+  room.members.delete(peer.userId)
+  peer.chatRoomIds.delete(roomId)
+
+  // If no members left and not global room, close it
+  if (room.id !== GLOBAL_CHAT_ROOM_ID && room.members.size === 0) {
+    room.isActive = false
+    rooms.delete(room.id)
+  }
+
+  return room
+}
+
+/**
+ * Get a room by ID
 /**
  * Get a session by ID
  */
