@@ -1,11 +1,13 @@
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, onMounted } from 'vue'
 import { useUser } from '~/composables/useUser'
+import { useWebSocket } from '~/composables/useWebSocket'
 import type { ChatStatus, ChatUser, ChatMessage, ChatRoom } from '~/types/chat'
 
 export function useChat() {
   const { currentUser: authUser } = useUser()
+  const { send, subscribe, connectionState } = useWebSocket()
   
-  const isConnected = ref(false)
+  const isConnected = computed(() => connectionState.value === 'connected')
   const messages = ref<ChatMessage[]>([])
   const friends = ref<ChatUser[]>([])
   const blocked = ref<string[]>([])
@@ -14,71 +16,45 @@ export function useChat() {
   const status = ref<ChatStatus>('online')
   const customStatus = ref('')
   
-  let ws: WebSocket | null = null
+  let unsubscribe: (() => void) | null = null
 
-  function connect() {
-    if (ws || isConnected.value) return
+  onMounted(() => {
+    unsubscribe = subscribe(handleMessage)
+  })
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${protocol}//${window.location.host}/ws`
-
-    ws = new WebSocket(wsUrl)
-
-    ws.onopen = () => {
-      isConnected.value = true
-      // Send initial connect message
-      send('connect', {
-        username: authUser.value?.username || 'Guest',
-      })
-      
-      // Request initial state if needed
-      updateStatus(status.value, customStatus.value)
-    }
-
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        handleMessage(data)
-      } catch (e) {
-        console.error('[Chat] Failed to parse message', e)
-      }
-    }
-
-    ws.onclose = () => {
-      isConnected.value = false
-      ws = null
-    }
-  }
+  onUnmounted(() => {
+    if (unsubscribe) unsubscribe()
+  })
 
   function handleMessage(message: any) {
     const { type, payload } = message
     
     switch (type) {
+      case 'connect':
+        // If we just connected, sync status
+        if (isConnected.value) {
+          updateStatus(status.value, customStatus.value)
+        }
+        break
       case 'chat-message':
       case 'chat-private-message':
         messages.value.push({
           id: Date.now().toString(),
-          senderId: payload.senderId,
+          senderId: String(payload.senderId),
           text: payload.text,
           timestamp: Date.now(),
-          roomId: payload.roomId,
-          recipientId: payload.recipientId
+          roomId: payload.roomId ? String(payload.roomId) : undefined,
+          recipientId: payload.recipientId ? String(payload.recipientId) : undefined
         })
         break
       case 'chat-status-update':
         // Update buddy status in list
-        const friend = friends.value.find(f => f.id === payload.userId)
+        const friend = friends.value.find(f => f.id === String(payload.userId))
         if (friend) {
           friend.status = payload.status
           friend.customStatus = payload.customStatus
         }
         break
-    }
-  }
-
-  function send(type: string, payload: any) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type, payload }))
     }
   }
 
@@ -124,13 +100,6 @@ export function useChat() {
     send('session-join', { sessionId: roomId })
   }
 
-  onUnmounted(() => {
-    if (ws) {
-      ws.close()
-      ws = null
-    }
-  })
-
   return {
     isConnected,
     messages,
@@ -140,7 +109,7 @@ export function useChat() {
     activeChatId,
     status,
     customStatus,
-    connect,
+    connect: () => {}, // Handled by useWebSocket auto-connect
     sendMessage,
     updateStatus,
     addFriend,
