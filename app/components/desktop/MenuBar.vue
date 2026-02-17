@@ -798,7 +798,7 @@ function handleOpenRecentApp(app: RecentItem): void {
 }
 
 function handleOpenRecentDoc(doc: RecentItem): void {
-  // Most docs open in SimpleText in this clone
+  // Most docs open in SimpleText in this OS
   openWindow({
     type: 'simpletext',
     title: doc.name,

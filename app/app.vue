@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 /**
  * Root Application Component
  *
- * Main entry point for the Mac OS 7 web clone.
+ * Main entry point for the m00-os-7 Silly Web OS.
  * Renders the menu bar and desktop environment.
  */
 import Desktop from "~/components/desktop/Desktop.vue";

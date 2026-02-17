@@ -140,7 +140,7 @@ describe('Finder.vue', () => {
 
     // In this implementation, opening a folder might either change current view or open new window
     // For classic Mac OS, it usually opens a new window unless specified otherwise.
-    // However, for this web clone, we'll follow what's most practical.
+    // However, for this web OS, we'll follow what's most practical.
     // Let's assume for now it emits an event or calls a method to open a new window.
   })
 
