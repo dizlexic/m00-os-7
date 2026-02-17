@@ -570,6 +570,9 @@ export function getRoomMembersArray(roomId: string): Array<{id: string, username
 export function cleanupInactiveSessions(maxInactiveMs: number = 30 * 60 * 1000): void {
   const now = Date.now()
   for (const [sessionId, session] of sessions) {
+    // Never clean up the global session
+    if (sessionId === GLOBAL_STC_SESSION_ID) continue
+
     // Check if all users are inactive
     let allInactive = true
     for (const user of session.users.values()) {
