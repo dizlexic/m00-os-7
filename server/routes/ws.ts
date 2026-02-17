@@ -277,6 +277,24 @@ export default defineWebSocketHandler({
         break
       }
 
+      case 'friend-request': {
+        if (!connectedPeer) return
+        const payload = message.payload as { username: string }
+        if (!payload.username) return
+
+        // Find the peer with this username
+        const targetPeer = Array.from(peers.values()).find(p => p.username === payload.username)
+        if (targetPeer) {
+          sendToPeer(targetPeer.peer.id, createMessage('friend-request', {
+            senderId: connectedPeer.userId,
+            senderName: connectedPeer.username
+          }))
+        } else {
+          sendError(peer.id, 'USER_NOT_FOUND', `User ${payload.username} not found`)
+        }
+        break
+      }
+
       case 'session-create': {
         if (!connectedPeer) {
           sendError(peer.id, 'NOT_CONNECTED', 'Must connect first')
