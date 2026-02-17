@@ -109,6 +109,45 @@ function handleMouseDown(event: MouseEvent): void {
   window.addEventListener('mouseup', handleGlobalMouseUp)
 }
 
+let lastTapTime = 0
+function handleTouchStart(event: TouchEvent): void {
+  if (event.touches.length !== 1) return
+  if (props.icon.isRenaming) return
+
+  event.stopPropagation()
+
+  const currentTime = Date.now()
+  const tapInterval = currentTime - lastTapTime
+  if (tapInterval < 300 && tapInterval > 0) {
+    // Double tap
+    handleDoubleClick()
+    lastTapTime = 0
+    // Prevent dragging on double tap
+    return
+  }
+  lastTapTime = currentTime
+
+  const touch = event.touches[0]
+  // Calculate drag offset from icon position
+  dragOffset.value = {
+    x: touch.clientX - props.icon.position.x,
+    y: touch.clientY - props.icon.position.y
+  }
+
+  // Handle selection
+  if (!props.icon.isSelected) {
+    selectIcon(props.icon.id)
+  }
+
+  // Start drag tracking
+  isDragging.value = true
+  setDragging(true)
+
+  // Add global touch event listeners
+  window.addEventListener('touchmove', handleGlobalTouchMove, { passive: false })
+  window.addEventListener('touchend', handleGlobalTouchEnd)
+}
+
 function handleGlobalMouseMove(event: MouseEvent): void {
   if (!isDragging.value) return
 
@@ -118,6 +157,32 @@ function handleGlobalMouseMove(event: MouseEvent): void {
   }
 
   moveIcon(props.icon.id, newPosition)
+}
+
+function handleGlobalTouchMove(event: TouchEvent): void {
+  if (!isDragging.value || event.touches.length !== 1) return
+
+  const touch = event.touches[0]
+  const newPosition = {
+    x: touch.clientX - dragOffset.value.x,
+    y: touch.clientY - dragOffset.value.y
+  }
+
+  moveIcon(props.icon.id, newPosition)
+
+  // Touch move doesn't have mouseenter/mouseleave, we need to manually find the drop target
+  const element = document.elementFromPoint(touch.clientX, touch.clientY)
+  const dropTarget = element?.closest('.desktop-icon') as HTMLElement
+  if (dropTarget) {
+    const id = dropTarget.dataset.iconId
+    if (id && id !== props.icon.id) {
+      setDropTarget(id)
+    } else {
+      setDropTarget(null)
+    }
+  } else {
+    setDropTarget(null)
+  }
 }
 
 function handleGlobalMouseUp(): void {
@@ -138,6 +203,26 @@ function handleGlobalMouseUp(): void {
 
   window.removeEventListener('mousemove', handleGlobalMouseMove)
   window.removeEventListener('mouseup', handleGlobalMouseUp)
+}
+
+function handleGlobalTouchEnd(): void {
+  if (isDragging.value) {
+    isDragging.value = false
+    setDragging(false)
+
+    // Handle drop if we have a target
+    if (dropTargetId.value && dropTargetId.value !== props.icon.id) {
+      const targetIcon = getIconById(dropTargetId.value)
+      if (targetIcon?.type === 'trash') {
+        moveToTrash(props.icon.id)
+      }
+      // Reset drop target
+      setDropTarget(null)
+    }
+  }
+
+  window.removeEventListener('touchmove', handleGlobalTouchMove)
+  window.removeEventListener('touchend', handleGlobalTouchEnd)
 }
 
 function handleMouseEnter(): void {
@@ -278,10 +363,12 @@ function handleContextMenu(event: MouseEvent): void {
       'desktop-icon--drop-target': dropTargetId === icon.id
     }"
     :style="iconStyle"
+    :data-icon-id="icon.id"
     tabindex="0"
     role="button"
     :aria-label="icon.name"
     @mousedown="handleMouseDown"
+    @touchstart="handleTouchStart"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
     @click="handleClick"
