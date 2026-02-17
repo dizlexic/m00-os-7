@@ -59,10 +59,17 @@ export function getUserByName(username: string, database?: Database): User | nul
 /**
  * Get a user by ID.
  */
-export function getUserById(id: number, database?: Database): User | null {
+export function getUserById(id: number | string, database?: Database): User | null {
+  if (typeof id === 'string' && id.startsWith('user-')) {
+    return null;
+  }
+  const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+  if (isNaN(numericId)) {
+    return null;
+  }
   const db = database || getDb();
   const stmt = db.prepare('SELECT * FROM users WHERE id = ?');
-  return (stmt.get(id) as User) || null;
+  return (stmt.get(numericId) as User) || null;
 }
 
 /**

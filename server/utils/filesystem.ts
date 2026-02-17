@@ -7,7 +7,7 @@ export interface FileNode {
   name: string;
   type: string;
   content: string | null;
-  owner_id: number | null;
+  owner_id: number | string | null;
   size: number;
   is_system: number;
   permissions: string | null;
@@ -42,7 +42,7 @@ export function saveFile(file: FileNode, database?: Database): void {
     file.name,
     file.type,
     file.content,
-    file.owner_id,
+    file.owner_id === null ? null : String(file.owner_id),
     file.size || 0,
     file.is_system || 0,
     file.permissions
@@ -55,8 +55,19 @@ export function saveFile(file: FileNode, database?: Database): void {
 export function getFile(id: string, database?: Database): FileNode | null {
   const db = database || getDb();
   const stmt = db.prepare('SELECT * FROM filesystem WHERE id = ?');
-  const result = stmt.get(id) as FileNode | undefined;
-  return result || null;
+  const result = stmt.get(id) as any | undefined;
+
+  if (!result) return null;
+
+  // Convert owner_id back to number if it's numeric and not a guest ID
+  if (typeof result.owner_id === 'string' && !result.owner_id.startsWith('user-')) {
+    const num = parseInt(result.owner_id, 10);
+    if (!isNaN(num)) {
+      result.owner_id = num;
+    }
+  }
+
+  return result as FileNode;
 }
 
 /**
@@ -64,13 +75,26 @@ export function getFile(id: string, database?: Database): FileNode | null {
  */
 export function getFilesByParent(parentId: string | null, database?: Database): FileNode[] {
   const db = database || getDb();
+  let results: any[];
+
   if (parentId === null) {
     const stmt = db.prepare('SELECT * FROM filesystem WHERE parent_id IS NULL');
-    return stmt.all() as FileNode[];
+    results = stmt.all();
   } else {
     const stmt = db.prepare('SELECT * FROM filesystem WHERE parent_id = ?');
-    return stmt.all(parentId) as FileNode[];
+    results = stmt.all(parentId);
   }
+
+  // Convert owner_id for all results
+  return results.map(result => {
+    if (typeof result.owner_id === 'string' && !result.owner_id.startsWith('user-')) {
+      const num = parseInt(result.owner_id, 10);
+      if (!isNaN(num)) {
+        result.owner_id = num;
+      }
+    }
+    return result as FileNode;
+  });
 }
 
 /**

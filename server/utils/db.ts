@@ -53,11 +53,10 @@ export function initDb(database?: Database.Database): void {
     );
 
     CREATE TABLE IF NOT EXISTS user_settings (
-      user_id INTEGER PRIMARY KEY,
+      user_id TEXT PRIMARY KEY,
       settings_json TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS filesystem (
@@ -66,13 +65,12 @@ export function initDb(database?: Database.Database): void {
       name TEXT NOT NULL,
       type TEXT NOT NULL,
       content TEXT,
-      owner_id INTEGER,
+      owner_id TEXT,
       size INTEGER DEFAULT 0,
       is_system INTEGER DEFAULT 0,
       permissions TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS system_settings (

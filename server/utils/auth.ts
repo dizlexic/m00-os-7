@@ -5,10 +5,10 @@ import { getUserById } from './users';
  * Get the current user ID from the session cookie.
  *
  * @param event - The H3 event
- * @returns The user ID
+ * @returns The user ID (number for registered users, string for guests)
  * @throws {Error} if the user is not authenticated
  */
-export function requireUserId(event: H3Event): number {
+export function requireUserId(event: H3Event): number | string {
   const userId = getCookie(event, 'user_id');
 
   if (!userId) {
@@ -16,6 +16,11 @@ export function requireUserId(event: H3Event): number {
       statusCode: 401,
       statusMessage: 'Not authenticated',
     });
+  }
+
+  // Handle guest IDs
+  if (userId.startsWith('user-')) {
+    return userId;
   }
 
   return parseInt(userId, 10);
