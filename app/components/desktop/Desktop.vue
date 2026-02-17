@@ -528,6 +528,7 @@ onUnmounted(() => {
 
       <Messenger
         v-else-if="win.type === 'messenger'"
+        :window-id="win.id"
       />
 
       <!-- Window content will be rendered based on window type -->

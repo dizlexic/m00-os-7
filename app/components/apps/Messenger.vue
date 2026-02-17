@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useChat } from '~/composables/useChat'
 import { useUser } from '~/composables/useUser'
+import { useWindowManager } from '~/composables/useWindowManager'
+import { useDesktop } from '~/composables/useDesktop'
+import type { MenuItem } from '~/types/menu'
 import BuddyList from '~/components/chat/BuddyList.vue'
 import ChatRoom from '~/components/chat/ChatRoom.vue'
+
+interface Props {
+  windowId?: string
+}
+
+const props = defineProps<Props>()
 
 const { currentUser: authUser } = useUser()
 const {
@@ -36,9 +45,56 @@ const {
   sendFriendRequest
 } = useChat()
 
+const { updateWindow } = useWindowManager()
+const { showContextMenu } = useDesktop()
+
 const newRoomName = ref('')
 const isPrivateRoom = ref(false)
 const friendRequestUsername = ref('')
+
+// Messenger Menus
+const appMenu = computed<MenuItem[]>(() => [
+  { id: 'status', label: 'Status', submenu: [
+    { id: 'online', label: 'Online', checked: status.value === 'online', action: () => updateStatus('online') },
+    { id: 'away', label: 'Away', checked: status.value === 'away', action: () => updateStatus('away') },
+    { id: 'busy', label: 'Busy', checked: status.value === 'busy', action: () => updateStatus('busy') },
+    { id: 'offline', label: 'Offline', checked: status.value === 'offline', action: () => updateStatus('offline') }
+  ]},
+  { id: 'sep1', label: '', isSeparator: true },
+  { id: 'refresh', label: 'Refresh All', action: () => {
+    refreshRooms()
+    refreshUsers()
+  }}
+])
+
+const messengerMenus = computed(() => [
+  {
+    id: 'friend',
+    label: 'Friend',
+    items: [
+      { id: 'add-friend', label: 'Add Friend...', action: () => { /* focus input in future */ } },
+      { id: 'refresh-friends', label: 'Refresh Friends', action: () => refreshUsers() }
+    ]
+  },
+  {
+    id: 'room',
+    label: 'Room',
+    items: [
+      { id: 'create-room', label: 'Create Room...', action: () => { /* focus input in future */ } },
+      { id: 'join-room', label: 'Join Room...', action: () => refreshRooms() }
+    ]
+  }
+])
+
+// Update window with menus
+watch([appMenu, messengerMenus], () => {
+  if (props.windowId) {
+    updateWindow(props.windowId, {
+      appMenu: appMenu.value,
+      menus: messengerMenus.value
+    })
+  }
+}, { immediate: true })
 
 onMounted(() => {
   connect()
