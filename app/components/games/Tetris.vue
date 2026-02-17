@@ -216,6 +216,11 @@ function stopGameTimer() {
   }
 }
 
+function hardDrop() {
+  if (gameState.value !== 'playing') return
+  while (movePiece(0, 1));
+}
+
 function handleKeydown(e: KeyboardEvent) {
   if (gameState.value !== 'playing') return
   switch (e.key) {
@@ -224,7 +229,7 @@ function handleKeydown(e: KeyboardEvent) {
     case 'ArrowDown': movePiece(0, 1); break
     case 'ArrowUp': rotatePiece(); break
     case ' ':
-      while(movePiece(0, 1)); // Hard drop
+      hardDrop()
       break
     case 'p': togglePause(); break
   }
@@ -359,6 +364,19 @@ const displayGrid = computed(() => {
     <div class="tetris__controls mt-md">
       Arrows to move & rotate • Space to drop
     </div>
+
+    <!-- On-screen controls for touch devices -->
+    <div class="tetris__on-screen-controls mt-md">
+      <div class="tetris__control-row">
+        <button class="tetris__control-btn mac-button" @mousedown.prevent="movePiece(-1, 0)">←</button>
+        <button class="tetris__control-btn mac-button" @mousedown.prevent="rotatePiece()">↻</button>
+        <button class="tetris__control-btn mac-button" @mousedown.prevent="movePiece(1, 0)">→</button>
+        <button class="tetris__control-btn mac-button" @mousedown.prevent="movePiece(0, 1)">↓</button>
+      </div>
+      <div class="tetris__control-row mt-xs">
+        <button class="tetris__control-btn mac-button mac-button--wide" @mousedown.prevent="hardDrop">SPACE (DROP)</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -473,5 +491,29 @@ const displayGrid = computed(() => {
   font-size: 9px;
   text-align: center;
   color: var(--color-gray-dark);
+}
+.tetris__on-screen-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tetris__control-row {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.tetris__control-btn {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.tetris__control-btn.mac-button--wide {
+  width: 100%;
+  max-width: 176px;
 }
 </style>
