@@ -71,21 +71,36 @@ function handleMessage(message: STCMessage): void {
       break
     }
 
-      case 'user-joined': {
-        const payload = message.payload as UserPresencePayload
-        if (payload.user && payload.user.id !== localUserId.value) {
-          remoteUsers.value.set(payload.user.id, payload.user)
+    case 'user-joined': {
+      const payload = message.payload as UserPresencePayload
+      if (payload.user && payload.user.id !== localUserId.value) {
+        remoteUsers.value.set(payload.user.id, payload.user)
+        
+        // Also update currentSession users array to keep userCount in sync
+        if (currentSession.value) {
+          const users = [...currentSession.value.users]
+          if (!users.find(u => u.id === payload.user.id)) {
+            users.push(payload.user)
+            currentSession.value = { ...currentSession.value, users }
+          }
         }
-        break
       }
+      break
+    }
 
-      case 'user-left': {
-        const payload = message.payload as UserPresencePayload
-        if (payload.user) {
-          remoteUsers.value.delete(payload.user.id)
+    case 'user-left': {
+      const payload = message.payload as UserPresencePayload
+      if (payload.user) {
+        remoteUsers.value.delete(payload.user.id)
+        
+        // Also update currentSession users array
+        if (currentSession.value) {
+          const users = currentSession.value.users.filter(u => u.id !== payload.user.id)
+          currentSession.value = { ...currentSession.value, users }
         }
-        break
       }
+      break
+    }
 
     case 'cursor-move': {
       const payload = message.payload as CursorMovePayload & { userId: string }
