@@ -56,6 +56,8 @@ type MessageType =
   | 'chat-private-message'
   | 'chat-status-update'
   | 'chat-buddy-update'
+  | 'friend-request'
+  | 'user-list'
   | 'error'
 
 /** Base message structure */
