@@ -19,7 +19,7 @@ import { useWindowManager } from "~/composables/useWindowManager";
 
 const { alertState, hideAlert } = useAlert();
 const { initialize, fetchFilesFromServer } = useFileSystem();
-const { isAuthenticated, init, user } = useUser();
+const { isAuthenticated, init, currentUser } = useUser();
 const { fetchSettingsFromServer, resetSettings, settings } = useSettings();
 const { activeWindow, restoreWindows, closeAllWindows } = useWindowManager();
 
@@ -51,16 +51,24 @@ onMounted(async () => {
   await init();
 });
 
-// Load data when authenticated
-watch(isAuthenticated, async (isAuth) => {
-  if (isAuth) {
-    isInitialDataLoaded.value = false;
-    await Promise.all([
-      fetchFilesFromServer(),
-      fetchSettingsFromServer()
-    ]);
-    restoreWindows();
-    isInitialDataLoaded.value = true;
+// Load data when authenticated or user changes
+watch(currentUser, async (newUser, oldUser) => {
+  if (newUser) {
+    // If user changed (e.g. from guest to real user), we should re-fetch
+    if (oldUser && newUser.id !== oldUser.id) {
+      isInitialDataLoaded.value = false;
+      closeAllWindows();
+    }
+
+    if (!isInitialDataLoaded.value) {
+      isInitialDataLoaded.value = false;
+      await Promise.all([
+        fetchFilesFromServer(),
+        fetchSettingsFromServer()
+      ]);
+      restoreWindows();
+      isInitialDataLoaded.value = true;
+    }
   } else {
     isInitialDataLoaded.value = false;
     resetSettings();

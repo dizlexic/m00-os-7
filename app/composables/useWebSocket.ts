@@ -143,9 +143,13 @@ function notifySubscribers(message: WebSocketMessage) {
 
 // Initialize global watcher (outside of composable to prevent disposal)
 if (import.meta.client) {
-  const { isAuthenticated } = useUser()
-  watch(isAuthenticated, (authenticated) => {
-    if (authenticated) {
+  const { currentUser } = useUser()
+  watch(currentUser, (user, oldUser) => {
+    if (user) {
+      // Reconnect if user ID changed (e.g. from guest to real user)
+      if (oldUser && user.id !== oldUser.id) {
+        disconnect()
+      }
       connect()
     } else {
       disconnect()
