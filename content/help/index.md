@@ -1,17 +1,32 @@
 ---
-title: Mac OS Help
-description: Learn how to use your Mac OS 7 web clone.
+title: Help Center
+description: Learn how to use your silly late 90s inspired web OS.
 ---
 
-# Mac OS Help
+# Help Center
 
-Welcome to the Mac OS 7 Help Center. Here you'll find everything you need to know about navigating your desktop and using system features.
+Welcome to the m00-os-7 Help Center. Here you'll find everything you need to know about navigating your silly desktop and using the multi-user and gaming features.
 
 ## Desktop Basics
 
 - **Icons**: Represent files, folders, and disks. Double-click to open.
 - **Menu Bar**: Always at the top. Contains the Apple menu, File, Edit, and other app-specific menus.
 - **Trash**: Drag icons here to delete them. Choose **Special > Empty Trash** to permanently remove items.
+
+## Multi-User & Chat
+
+- **Guest Mode**: Jump in instantly with a fun guest name.
+- **Messenger**: Open the Messenger app to chat with other online users in real-time.
+- **Share the Computer**: Use the "Collaborate" toggle to share your desktop with other users.
+
+## Retro Games
+
+- **Brickle**: Break blocks and clear levels in this classic arcade-style game.
+- **Puzzle**: Solve the sliding tile puzzle.
+- **Minesweeper**: Flag mines and clear the grid.
+- **Tetris**: Stack blocks and clear lines.
+- **Solitaire**: Play the classic Klondike card game.
+- **Eliza**: Chat with the world's first computer therapist.
 
 ## Window Management
 
