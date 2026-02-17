@@ -50,18 +50,15 @@ export function useChat() {
           recipientId: payload.recipientId ? String(payload.recipientId) : undefined
         })
         break
-      case 'session-state':
-        if (payload.session) {
+      case 'room-state':
+        if (payload.room) {
           const room: ChatRoom = {
-            id: payload.session.id,
-            name: payload.session.name,
-            ownerId: payload.session.hostId,
-            members: payload.session.users.map((u: any) => u.id),
-            memberNames: payload.session.users.reduce((acc: any, u: any) => {
-              acc[u.id] = u.username
-              return acc
-            }, {}),
-            isPrivate: payload.session.isPrivate
+            id: payload.room.id,
+            name: payload.room.name,
+            ownerId: payload.room.ownerId,
+            members: payload.room.members,
+            memberNames: payload.room.memberNames,
+            isPrivate: payload.room.isPrivate
           }
           const existingIndex = rooms.value.findIndex(r => r.id === room.id)
           if (existingIndex >= 0) {
@@ -72,14 +69,14 @@ export function useChat() {
           activeChatId.value = room.id
         }
         break
-      case 'session-list':
-        if (payload.sessions) {
-          rooms.value = payload.sessions.map((s: any) => ({
-            id: s.id,
-            name: s.name,
-            ownerId: s.hostId,
+      case 'room-list':
+        if (payload.rooms) {
+          rooms.value = payload.rooms.map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            ownerId: r.ownerId,
             members: [], // We don't have members in the list
-            isPrivate: s.isPrivate
+            isPrivate: r.isPrivate
           }))
         }
         break
@@ -175,15 +172,15 @@ export function useChat() {
   }
 
   function createRoom(name: string, isPrivate: boolean = false) {
-    send('session-create', { sessionName: name, isPrivate })
+    send('room-create', { roomName: name, isPrivate })
   }
 
   function joinRoom(roomId: string) {
-    send('session-join', { sessionId: roomId })
+    send('room-join', { roomId })
   }
 
   function leaveRoom(roomId: string) {
-    send('session-leave', { sessionId: roomId })
+    send('room-leave', { roomId })
     if (activeChatId.value === roomId) {
       activeChatId.value = 'lobby'
     }
@@ -194,15 +191,15 @@ export function useChat() {
   }
 
   function inviteToRoom(roomId: string, userId: string) {
-    send('session-invite', { sessionId: roomId, userId })
+    send('room-invite', { roomId, userId })
   }
 
   function removeFromRoom(roomId: string, userId: string) {
-    send('session-kick', { sessionId: roomId, userId })
+    send('room-kick', { roomId, userId })
   }
 
   function refreshRooms() {
-    send('session-list')
+    send('room-list')
   }
 
   function refreshUsers() {
