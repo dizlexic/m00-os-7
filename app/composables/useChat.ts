@@ -43,6 +43,8 @@ function handleMessage(message: any) {
         send('chat-status-update', { status: status.value, customStatus: customStatus.value })
       }
       break
+        roomId: payload.roomId ? String(payload.roomId) : undefined,
+        recipientId: payload.recipientId ? String(payload.recipientId) : undefined
     case 'room-state':
       if (payload.room) {
         const room: ChatRoom = {

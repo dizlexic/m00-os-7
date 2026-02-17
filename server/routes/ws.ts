@@ -315,7 +315,8 @@ export default defineWebSocketHandler({
           sendToPeer(recipientPeer.peerId, createMessage('chat-private-message', {
             text: payload.text,
             senderId: connectedPeer.userId,
-            senderName: connectedPeer.username
+            senderName: connectedPeer.username,
+            recipientId: payload.recipientId
           }, connectedPeer.userId))
 
           // Also send back to sender for confirmation/sync
