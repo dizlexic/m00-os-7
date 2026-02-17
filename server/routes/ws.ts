@@ -283,10 +283,11 @@ export default defineWebSocketHandler({
           return
         }
 
-        const payload = message.payload as { sessionName: string }
+        const payload = message.payload as { sessionName: string, isPrivate?: boolean }
         const sessionName = payload?.sessionName || `${connectedPeer.username}'s Desktop`
+        const isPrivate = payload?.isPrivate || false
 
-        const session = createSession(peer.id, sessionName)
+        const session = createSession(peer.id, sessionName, isPrivate)
         if (!session) {
           sendError(peer.id, 'SESSION_CREATE_FAILED', 'Failed to create session')
           return
@@ -299,11 +300,12 @@ export default defineWebSocketHandler({
             hostId: session.hostId,
             users: getSessionUsersArray(session.id),
             isActive: session.isActive,
+            isPrivate: session.isPrivate,
             createdAt: session.createdAt
           }
         }, connectedPeer.userId))
 
-        console.log(`[STC] Session created: ${session.name} (${session.id}) by ${connectedPeer.username}`)
+        console.log(`[STC] Session created: ${session.name} (${session.id}) by ${connectedPeer.username} (Private: ${isPrivate})`)
         break
       }
 
@@ -335,6 +337,7 @@ export default defineWebSocketHandler({
             hostId: session.hostId,
             users: getSessionUsersArray(session.id),
             isActive: session.isActive,
+            isPrivate: session.isPrivate,
             createdAt: session.createdAt
           }
         }, connectedPeer.userId))
@@ -376,6 +379,7 @@ export default defineWebSocketHandler({
           name: s.name,
           hostId: s.hostId,
           userCount: s.users.size,
+          isPrivate: s.isPrivate,
           createdAt: s.createdAt
         }))
 

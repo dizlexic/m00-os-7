@@ -35,6 +35,7 @@ export interface STCSession {
   hostId: string
   users: Map<string, RemoteUser>
   isActive: boolean
+  isPrivate?: boolean
   createdAt: number
 }
 
@@ -136,7 +137,7 @@ export function getSessionPeers(sessionId: string): ConnectedPeer[] {
 /**
  * Create a new STC session
  */
-export function createSession(peerId: string, sessionName: string): STCSession | null {
+export function createSession(peerId: string, sessionName: string, isPrivate: boolean = false): STCSession | null {
   const peer = peers.get(peerId)
   if (!peer) return null
 
@@ -147,6 +148,7 @@ export function createSession(peerId: string, sessionName: string): STCSession |
     hostId: peer.userId,
     users: new Map(),
     isActive: true,
+    isPrivate,
     createdAt: Date.now()
   }
 
