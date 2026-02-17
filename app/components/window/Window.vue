@@ -114,6 +114,14 @@ function handleMouseDown(event: MouseEvent): void {
   }
 }
 
+function handleTouchStart(event: TouchEvent): void {
+  event.stopPropagation()
+  // Activate window on any touch
+  if (!props.window.isActive) {
+    activateWindow(props.window.id)
+  }
+}
+
 function handleTitleBarMouseDown(event: MouseEvent): void {
   if (event.button !== 0) return
 
@@ -130,6 +138,23 @@ function handleTitleBarMouseDown(event: MouseEvent): void {
   window.addEventListener('mouseup', handleDragEnd)
 }
 
+function handleTitleBarTouchStart(event: TouchEvent): void {
+  if (event.touches.length !== 1) return
+
+  event.preventDefault()
+  event.stopPropagation()
+  isDragging.value = true
+
+  const touch = event.touches[0]
+  dragOffset.value = {
+    x: touch.clientX - props.window.position.x,
+    y: touch.clientY - props.window.position.y
+  }
+
+  window.addEventListener('touchmove', handleTouchMove, { passive: false })
+  window.addEventListener('touchend', handleTouchEnd)
+}
+
 function handleDragMove(event: MouseEvent): void {
   if (!isDragging.value) return
 
@@ -139,10 +164,26 @@ function handleDragMove(event: MouseEvent): void {
   })
 }
 
+function handleTouchMove(event: TouchEvent): void {
+  if (!isDragging.value || event.touches.length !== 1) return
+
+  const touch = event.touches[0]
+  moveWindow(props.window.id, {
+    x: touch.clientX - dragOffset.value.x,
+    y: touch.clientY - dragOffset.value.y
+  })
+}
+
 function handleDragEnd(): void {
   isDragging.value = false
   window.removeEventListener('mousemove', handleDragMove)
   window.removeEventListener('mouseup', handleDragEnd)
+}
+
+function handleTouchEnd(): void {
+  isDragging.value = false
+  window.removeEventListener('touchmove', handleTouchMove)
+  window.removeEventListener('touchend', handleTouchEnd)
 }
 
 function handleResizeMouseDown(event: MouseEvent): void {
@@ -165,6 +206,27 @@ function handleResizeMouseDown(event: MouseEvent): void {
   window.addEventListener('mouseup', handleResizeEnd)
 }
 
+function handleResizeTouchStart(event: TouchEvent): void {
+  if (event.touches.length !== 1) return
+  if (!props.window.resizable) return
+  if (props.window.state === 'collapsed') return
+
+  event.preventDefault()
+  event.stopPropagation()
+
+  isResizing.value = true
+  const touch = event.touches[0]
+  resizeStart.value = {
+    x: touch.clientX,
+    y: touch.clientY,
+    width: props.window.size.width,
+    height: props.window.size.height
+  }
+
+  window.addEventListener('touchmove', handleResizeTouchMove, { passive: false })
+  window.addEventListener('touchend', handleResizeTouchEnd)
+}
+
 function handleResizeMove(event: MouseEvent): void {
   if (!isResizing.value) return
 
@@ -177,10 +239,29 @@ function handleResizeMove(event: MouseEvent): void {
   })
 }
 
+function handleResizeTouchMove(event: TouchEvent): void {
+  if (!isResizing.value || event.touches.length !== 1) return
+
+  const touch = event.touches[0]
+  const deltaX = touch.clientX - resizeStart.value.x
+  const deltaY = touch.clientY - resizeStart.value.y
+
+  resizeWindow(props.window.id, {
+    width: resizeStart.value.width + deltaX,
+    height: resizeStart.value.height + deltaY
+  })
+}
+
 function handleResizeEnd(): void {
   isResizing.value = false
   window.removeEventListener('mousemove', handleResizeMove)
   window.removeEventListener('mouseup', handleResizeEnd)
+}
+
+function handleResizeTouchEnd(): void {
+  isResizing.value = false
+  window.removeEventListener('touchmove', handleResizeTouchMove)
+  window.removeEventListener('touchend', handleResizeTouchEnd)
 }
 
 function handleClose(): void {
@@ -219,6 +300,7 @@ function handleTitleBarDoubleClick(): void {
     }"
     :style="windowStyle"
     @mousedown="handleMouseDown"
+    @touchstart="handleTouchStart"
   >
     <!-- Title Bar -->
     <WindowTitleBar
@@ -230,6 +312,7 @@ function handleTitleBarDoubleClick(): void {
       :collapsible="window.collapsible"
       :is-collapsed="window.state === 'collapsed'"
       @mousedown="handleTitleBarMouseDown"
+      @touchstart="handleTitleBarTouchStart"
       @dblclick="handleTitleBarDoubleClick"
       @close="handleClose"
       @minimize="handleMinimize"
@@ -279,6 +362,7 @@ function handleTitleBarDoubleClick(): void {
       v-if="window.resizable && window.state !== 'collapsed'"
       class="window__resize-handle"
       @mousedown="handleResizeMouseDown"
+      @touchstart="handleResizeTouchStart"
     >
       <div class="window__resize-lines" />
     </div>
