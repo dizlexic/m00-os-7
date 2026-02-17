@@ -141,6 +141,11 @@ export function createSession(peerId: string, sessionName: string, isPrivate: bo
   const peer = peers.get(peerId)
   if (!peer) return null
 
+  // If already in a session that is NOT the global one, leave it
+  if (peer.stcSessionId && peer.stcSessionId !== GLOBAL_STC_SESSION_ID) {
+    leaveSession(peerId)
+  }
+
   const sessionId = generateSessionId()
   const session: STCSession = {
     id: sessionId,
@@ -164,10 +169,35 @@ export function createSession(peerId: string, sessionName: string, isPrivate: bo
   session.users.set(peer.userId, hostUser)
 
   // Update peer's session
-  peer.sessionId = sessionId
+  peer.stcSessionId = sessionId
 
   sessions.set(sessionId, session)
   return session
+}
+
+/**
+ * Create a new Chat Room
+ */
+export function createChatRoom(peerId: string, roomName: string, isPrivate: boolean = false): ChatRoom | null {
+  const peer = peers.get(peerId)
+  if (!peer) return null
+
+  const roomId = `room-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  const room: ChatRoom = {
+    id: roomId,
+    name: roomName,
+    ownerId: peer.userId,
+    members: new Set(),
+    isActive: true,
+    isPrivate,
+    createdAt: Date.now()
+  }
+
+  room.members.add(peer.userId)
+  peer.chatRoomIds.add(roomId)
+
+  rooms.set(roomId, room)
+  return room
 }
 
 /**
@@ -178,6 +208,11 @@ export function joinSession(peerId: string, sessionId: string): STCSession | nul
   const session = sessions.get(sessionId)
 
   if (!peer || !session || !session.isActive) return null
+
+  // If already in a session that is NOT the global one, leave it
+  if (peer.stcSessionId && peer.stcSessionId !== sessionId && peer.stcSessionId !== GLOBAL_STC_SESSION_ID) {
+    leaveSession(peerId)
+  }
 
   // Create user entry
   const user: RemoteUser = {
@@ -190,9 +225,24 @@ export function joinSession(peerId: string, sessionId: string): STCSession | nul
   }
 
   session.users.set(peer.userId, user)
-  peer.sessionId = sessionId
+  peer.stcSessionId = sessionId
 
   return session
+}
+
+/**
+ * Join an existing room
+ */
+export function joinRoom(peerId: string, roomId: string): ChatRoom | null {
+  const peer = peers.get(peerId)
+  const room = rooms.get(roomId)
+
+  if (!peer || !room || !room.isActive) return null
+
+  room.members.add(peer.userId)
+  peer.chatRoomIds.add(roomId)
+
+  return room
 }
 
 /**
