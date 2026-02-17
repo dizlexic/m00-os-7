@@ -132,6 +132,14 @@ function handleMessage(message: STCMessage): void {
   emitMessage(message)
 }
 
+// Initialize on the client as soon as the module is loaded
+// This ensures we don't miss early WebSocket messages like 'session-state'
+if (import.meta.client) {
+  const { subscribe } = useWebSocket()
+  subscribe(handleMessage as any)
+  initialized = true
+}
+
 // Cursor position throttling
 let cursorThrottleTimeout: ReturnType<typeof setTimeout> | null = null
 const CURSOR_THROTTLE_MS = 16

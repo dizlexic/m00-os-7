@@ -121,6 +121,14 @@ function handleMessage(message: any) {
   }
 }
 
+// Initialize on the client as soon as the module is loaded
+// This ensures we don't miss early WebSocket messages like 'room-state'
+if (import.meta.client) {
+  const { subscribe } = useWebSocket()
+  subscribe(handleMessage)
+  initialized = true
+}
+
 export function useChat() {
   const { currentUser: authUser } = useUser()
   const { send, subscribe, connectionState } = useWebSocket()
