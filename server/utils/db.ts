@@ -25,7 +25,7 @@ export function getDb(path?: string): Database.Database {
     }
   }
 
-  const instance = new Database(dbPath);
+  const instance = new Database(dbPath, { timeout: 5000 });
 
   // Only cache if it's the default path
   if (!path) {
