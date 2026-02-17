@@ -1,6 +1,6 @@
 # m00-os-7 Development Roadmap
 
-A phased development plan for building a faithful Mac OS 7 web clone. This roadmap outlines the major milestones, features, and timeline for the project.
+A phased development plan for building a silly, nostalgic web-based OS inspired by late 90s Apple Macintosh design. This roadmap outlines the major milestones, features, and timeline for the project's evolution.
 
 ## Overview
 

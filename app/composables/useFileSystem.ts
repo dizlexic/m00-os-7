@@ -234,7 +234,7 @@ export function useFileSystem() {
 
     // Documents
     const docsFolder = createFolder('Documents', rootId, { id: DOCS_FOLDER_ID, isSystem: true })
-    createFile('Read Me', docsFolder.id, 'Welcome to Mac OS 7 Web Clone!', { isSystem: true })
+    createFile('Read Me', docsFolder.id, 'Welcome to m00-os-7 Silly Web OS!', { isSystem: true })
 
     // Trash
     createFolder('Trash', rootId, { id: TRASH_FOLDER_ID, isSystem: true })

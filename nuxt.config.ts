@@ -24,11 +24,11 @@ export default defineNuxtConfig({
   // App configuration
   app: {
     head: {
-      title: 'm00-os-7 - Mac OS 7 Web Clone',
+      title: 'm00-os-7 - The Silly Web OS',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'A faithful recreation of Apple Macintosh System 7 as a web application' },
+        { name: 'description', content: 'A silly, nostalgic web OS inspired by late 90s Apple Macintosh design' },
         { name: 'format-detection', content: 'telephone=no' },
         { name: 'theme-color', content: '#CCCCCC' }
       ],

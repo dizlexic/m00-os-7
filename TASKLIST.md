@@ -1,6 +1,6 @@
 # m00-os-7 Task List
 
-A comprehensive task breakdown for implementing the Mac OS 7 web clone. Tasks are organized by category and priority.
+A comprehensive task breakdown for building a silly, nostalgic web-based OS inspired by late 90s Apple Macintosh design. Tasks are organized by category and priority.
 
 ## Legend
 
