@@ -26,10 +26,10 @@ const { activeWindow, restoreWindows, closeAllWindows } = useWindowManager();
 const url = useRequestURL()
 
 useSeoMeta({
-  title: 'm00-os-7 - Mac OS 7 Web Clone',
-  ogTitle: 'm00-os-7 - Mac OS 7 Web Clone',
-  description: 'A faithful recreation of Apple Macintosh System 7 as a web application',
-  ogDescription: 'A faithful recreation of Apple Macintosh System 7 as a web application',
+  title: 'm00-os-7 - The Silly Web OS',
+  ogTitle: 'm00-os-7 - The Silly Web OS',
+  description: 'A silly, nostalgic web OS inspired by late 90s Apple Macintosh design',
+  ogDescription: 'A silly, nostalgic web OS inspired by late 90s Apple Macintosh design',
   ogImage: `${url.origin}/og-image.png`,
   ogImageWidth: 2730,
   ogImageHeight: 1506,
@@ -37,8 +37,8 @@ useSeoMeta({
   ogLocale: 'en_US',
   ogSiteName: 'm00-os-7',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'm00-os-7 - Mac OS 7 Web Clone',
-  twitterDescription: 'A faithful recreation of Apple Macintosh System 7 as a web application',
+  twitterTitle: 'm00-os-7 - The Silly Web OS',
+  twitterDescription: 'A silly, nostalgic web OS inspired by late 90s Apple Macintosh design',
   twitterImage: `${url.origin}/og-image.png`,
 })
 
