@@ -44,7 +44,8 @@ export interface ConnectedPeer {
   peer: Peer
   userId: string
   username: string
-  sessionId: string | null
+  stcSessionId: string | null
+  chatRoomIds: Set<string>
   cursor: CursorConfig
 }
 
@@ -80,7 +81,8 @@ export function registerPeer(
     peer,
     userId: userId || generateUserId(),
     username,
-    sessionId: null,
+    stcSessionId: null,
+    chatRoomIds: new Set(),
     cursor
   }
   peers.set(peerId, connectedPeer)
@@ -127,7 +129,12 @@ export function getPeerByUserId(userId: string): ConnectedPeer | undefined {
 export function getSessionPeers(sessionId: string): ConnectedPeer[] {
   const result: ConnectedPeer[] = []
   for (const peer of peers.values()) {
-    if (peer.sessionId === sessionId) {
+    if (peer.stcSessionId === sessionId) {
+      result.push(peer)
+    }
+  }
+  return result
+}
       result.push(peer)
     }
   }
@@ -289,9 +296,9 @@ export function getAllSessions(): STCSession[] {
  */
 export function updateUserPosition(peerId: string, position: Position): RemoteUser | null {
   const peer = peers.get(peerId)
-  if (!peer || !peer.sessionId) return null
+  if (!peer || !peer.stcSessionId) return null
 
-  const session = sessions.get(peer.sessionId)
+  const session = sessions.get(peer.stcSessionId)
   if (!session) return null
 
   const user = session.users.get(peer.userId)
@@ -312,8 +319,8 @@ export function updateUserCursor(peerId: string, cursor: CursorConfig): RemoteUs
 
   peer.cursor = cursor
 
-  if (peer.sessionId) {
-    const session = sessions.get(peer.sessionId)
+  if (peer.stcSessionId) {
+    const session = sessions.get(peer.stcSessionId)
     if (session) {
       const user = session.users.get(peer.userId)
       if (user) {
@@ -361,6 +368,14 @@ export function broadcastToSession(
   for (const connectedPeer of sessionPeers) {
     // Skip the sender
     if (excludePeerId && connectedPeer.peer.id === excludePeerId) continue
+
+    try {
+      connectedPeer.peer.send(messageStr)
+    } catch (error) {
+      console.error(`Failed to send message to peer ${connectedPeer.peer.id}:`, error)
+    }
+  }
+}
 
     try {
       connectedPeer.peer.send(messageStr)
