@@ -78,4 +78,38 @@ describe('useChat', () => {
       isPrivate: true
     })
   })
+
+  it('mutes and unmutes users', () => {
+    const chat = useChat()
+    chat.muteUser('user1')
+    expect(chat.muted.value).toContain('user1')
+    chat.unmuteUser('user1')
+    expect(chat.muted.value).not.toContain('user1')
+  })
+
+  it('leaves a room', () => {
+    const chat = useChat()
+    chat.leaveRoom('room1')
+    expect(mockSend).toHaveBeenCalledWith('session-leave', {
+      sessionId: 'room1'
+    })
+  })
+
+  it('invites a user to a room', () => {
+    const chat = useChat()
+    chat.inviteToRoom('room1', 'user1')
+    expect(mockSend).toHaveBeenCalledWith('session-invite', {
+      sessionId: 'room1',
+      userId: 'user1'
+    })
+  })
+
+  it('removes a user from a room', () => {
+    const chat = useChat()
+    chat.removeFromRoom('room1', 'user1')
+    expect(mockSend).toHaveBeenCalledWith('session-kick', {
+      sessionId: 'room1',
+      userId: 'user1'
+    })
+  })
 })

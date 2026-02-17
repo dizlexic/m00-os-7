@@ -11,6 +11,7 @@ export function useChat() {
   const messages = ref<ChatMessage[]>([])
   const friends = ref<ChatUser[]>([])
   const blocked = ref<string[]>([])
+  const muted = ref<string[]>([])
   const rooms = ref<ChatRoom[]>([])
   const allUsers = ref<Record<string, string>>({})
   const activeChatId = ref<string | null>(null)
@@ -163,12 +164,41 @@ export function useChat() {
     blocked.value = blocked.value.filter(id => id !== userId)
   }
 
+  function muteUser(userId: string) {
+    if (!muted.value.includes(userId)) {
+      muted.value.push(userId)
+    }
+  }
+
+  function unmuteUser(userId: string) {
+    muted.value = muted.value.filter(id => id !== userId)
+  }
+
   function createRoom(name: string, isPrivate: boolean = false) {
     send('session-create', { sessionName: name, isPrivate })
   }
 
   function joinRoom(roomId: string) {
     send('session-join', { sessionId: roomId })
+  }
+
+  function leaveRoom(roomId: string) {
+    send('session-leave', { sessionId: roomId })
+    if (activeChatId.value === roomId) {
+      activeChatId.value = 'lobby'
+    }
+    // Remove from local rooms list if it's not the lobby
+    if (roomId !== 'lobby') {
+      rooms.value = rooms.value.filter(r => r.id !== roomId)
+    }
+  }
+
+  function inviteToRoom(roomId: string, userId: string) {
+    send('session-invite', { sessionId: roomId, userId })
+  }
+
+  function removeFromRoom(roomId: string, userId: string) {
+    send('session-kick', { sessionId: roomId, userId })
   }
 
   function refreshRooms() {
@@ -188,6 +218,7 @@ export function useChat() {
     messages,
     friends,
     blocked,
+    muted,
     rooms,
     allUsers,
     activeChatId,
@@ -200,8 +231,13 @@ export function useChat() {
     removeFriend,
     blockUser,
     unblockUser,
+    muteUser,
+    unmuteUser,
     createRoom,
     joinRoom,
+    leaveRoom,
+    inviteToRoom,
+    removeFromRoom,
     refreshRooms,
     refreshUsers,
     sendFriendRequest
