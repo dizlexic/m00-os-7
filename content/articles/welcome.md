@@ -1,19 +1,21 @@
 ---
 title: Welcome to m00-os-7
-description: A faithful recreation of Apple Macintosh System 7 as a web application.
+description: A silly, nostalgic web OS inspired by late 90s Apple Macintosh design.
 date: 2026-02-15
 author: Daniel
 ---
 
 # Welcome to m00-os-7
 
-This project is a nostalgic journey back to the early 90s, recreating the experience of using **Macintosh System 7**.
+This project is a silly, nostalgic journey back to the late 90s, reimagining the experience of using a classic Macintosh-style OS for the modern web.
 
-## Project Goals
+## Project Features
 
-- **Visual Authenticity**: Every pixel should feel like it belongs in 1991.
-- **Interactive Experience**: Drag-and-drop windows, functional menus, and classic apps.
-- **Modern Tech Stack**: Built with Nuxt 3, Vue 3, and TypeScript.
+- **Multi-User Collaboration**: Share your desktop and interact with others in real-time.
+- **Retro Games**: Play classic-style games like Tetris, Solitaire, and Brickle.
+- **Real-time Chat**: Connect with other users through the built-in Messenger.
+- **Playful Design**: A whimsical take on late 90s Apple aesthetics.
+- **Modern Tech Stack**: Built with Nuxt 4, Vue 3, and TypeScript.
 
 ## How to use
 
