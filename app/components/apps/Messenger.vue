@@ -80,7 +80,7 @@ onMounted(() => {
           :room-id="activeChatId"
           :room-name="activeChatId === 'lobby' ? 'System Lobby' : 'Private Chat'"
           :messages="filteredMessages"
-          :current-user-id="authUser?.id || 'guest'"
+          :current-user-id="String(authUser?.id || 'guest')"
           @send-message="handleSendMessage"
         />
       </template>
