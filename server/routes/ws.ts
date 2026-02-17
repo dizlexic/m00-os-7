@@ -211,8 +211,25 @@ export default defineWebSocketHandler({
           cursor: newPeer.cursor
         }, newPeer.userId))
 
-        // Notify everyone that a new user joined
-        broadcastToAll(createMessage('user-joined', {
+        // Notify session users that a new user joined and send current state
+        const globalSession = getSTCSession(GLOBAL_STC_SESSION_ID)
+        if (globalSession) {
+          const sessionStateMessage = createMessage('session-state', {
+            session: {
+              id: globalSession.id,
+              name: globalSession.name,
+              hostId: globalSession.hostId,
+              users: getSessionUsersArray(globalSession.id),
+              isActive: globalSession.isActive,
+              createdAt: globalSession.createdAt
+            }
+          }, newPeer.userId)
+          
+          broadcastToSession(GLOBAL_STC_SESSION_ID, sessionStateMessage)
+        }
+
+        // Notify room members that a new user joined
+        broadcastToRoom(GLOBAL_CHAT_ROOM_ID, createMessage('user-joined', {
           user: {
             id: newPeer.userId,
             username: newPeer.username,
@@ -223,21 +240,7 @@ export default defineWebSocketHandler({
           }
         }, newPeer.userId))
 
-        // Send initial state for global session and room
-        const globalSession = getSTCSession(GLOBAL_STC_SESSION_ID)
-        if (globalSession) {
-          sendToPeer(peer.id, createMessage('session-state', {
-            session: {
-              id: globalSession.id,
-              name: globalSession.name,
-              hostId: globalSession.hostId,
-              users: getSessionUsersArray(globalSession.id),
-              isActive: globalSession.isActive,
-              createdAt: globalSession.createdAt
-            }
-          }, newPeer.userId))
-        }
-
+        // Send room state to the joining peer
         const globalRoom = getChatRoom(GLOBAL_CHAT_ROOM_ID)
         if (globalRoom) {
           sendToPeer(peer.id, createMessage('room-state', {
