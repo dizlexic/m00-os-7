@@ -18,9 +18,21 @@ describe('useDesktop', () => {
     vi.clearAllMocks()
   })
 
-  it('initializes with default state', () => {
-    const { icons, contextMenu, marquee } = useDesktop()
+  it('initializes with default state and icons', () => {
+    const { icons, contextMenu, marquee, initializeDesktop } = useDesktop()
+    initializeDesktop()
+
     expect(icons.value).toBeDefined()
+    expect(icons.value.length).toBeGreaterThan(0)
+
+    const hdIcon = icons.value.find(i => i.type === 'hard-drive')
+    const trashIcon = icons.value.find(i => i.type === 'trash')
+
+    expect(hdIcon).toBeDefined()
+    expect(hdIcon?.name).toBe('Macintosh HD')
+    expect(trashIcon).toBeDefined()
+    expect(trashIcon?.name).toBe('Trash')
+
     expect(contextMenu.value.isVisible).toBe(false)
     expect(marquee.value.isActive).toBe(false)
   })
