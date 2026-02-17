@@ -32,6 +32,90 @@ const remoteUsers = ref<Map<string, RemoteUser>>(new Map())
 const localUserId = ref<string | null>(null)
 const availableSessions = ref<Array<{ id: string; name: string; hostId: string; userCount: number }>>([])
 const lastError = ref<{ code: string; message: string } | null>(null)
+let initialized = false
+
+/**
+ * Handle incoming WebSocket messages
+ */
+function handleMessage(message: STCMessage): void {
+  switch (message.type) {
+    case 'connect': {
+      const payload = message.payload as { userId: string; username: string; cursor: CursorConfig }
+      localUserId.value = payload.userId
+      console.log(`[STC] Connected as ${payload.username} (${payload.userId})`)
+      break
+    }
+
+    case 'session-state': {
+      const payload = message.payload as SessionStatePayload
+      currentSession.value = payload.session
+
+      remoteUsers.value.clear()
+      for (const user of payload.session.users) {
+        if (user.id !== localUserId.value) {
+          remoteUsers.value.set(user.id, user)
+        }
+      }
+      break
+    }
+
+    case 'session-list': {
+      const payload = message.payload as { sessions: Array<{ id: string; name: string; hostId: string; userCount: number }> }
+      availableSessions.value = payload.sessions
+      break
+    }
+
+    case 'session-leave': {
+      currentSession.value = null
+      remoteUsers.value.clear()
+      break
+    }
+
+      case 'user-joined': {
+        const payload = message.payload as UserPresencePayload
+        if (payload.user && payload.user.id !== localUserId.value) {
+          remoteUsers.value.set(payload.user.id, payload.user)
+        }
+        break
+      }
+
+      case 'user-left': {
+        const payload = message.payload as UserPresencePayload
+        if (payload.user) {
+          remoteUsers.value.delete(payload.user.id)
+        }
+        break
+      }
+
+    case 'cursor-move': {
+      const payload = message.payload as CursorMovePayload & { userId: string }
+      const user = remoteUsers.value.get(payload.userId)
+      if (user) {
+        user.position = payload.position
+        user.lastActivity = Date.now()
+      }
+      break
+    }
+
+    case 'cursor-config-update': {
+      const payload = message.payload as CursorConfigPayload & { userId: string }
+      const user = remoteUsers.value.get(payload.userId)
+      if (user) {
+        user.cursor = payload.cursor
+      }
+      break
+    }
+
+    case 'error': {
+      const payload = message.payload as ErrorPayload
+      lastError.value = payload
+      console.error(`[STC] Error: ${payload.code} - ${payload.message}`)
+      break
+    }
+  }
+
+  emitMessage(message)
+}
 
 // Cursor position throttling
 let cursorThrottleTimeout: ReturnType<typeof setTimeout> | null = null
@@ -79,99 +163,17 @@ export function useSharedDesktop() {
   const { send, subscribe, connectionState, connect: wsConnect, disconnect: wsDisconnect } = useWebSocket()
   const { isAuthenticated } = useUser()
 
-  let unsubscribe: (() => void) | null = null
-
-  onMounted(() => {
-    unsubscribe = subscribe(handleMessage as any)
-  })
+  if (!initialized) {
+    subscribe(handleMessage as any)
+    initialized = true
+  }
 
   onUnmounted(() => {
-    if (unsubscribe) unsubscribe()
     if (cursorThrottleTimeout) {
       clearTimeout(cursorThrottleTimeout)
       cursorThrottleTimeout = null
     }
   })
-
-  function handleMessage(message: STCMessage): void {
-    switch (message.type) {
-      case 'connect': {
-        const payload = message.payload as { userId: string; username: string; cursor: CursorConfig }
-        localUserId.value = payload.userId
-        console.log(`[STC] Connected as ${payload.username} (${payload.userId})`)
-        break
-      }
-
-      case 'session-state': {
-        const payload = message.payload as SessionStatePayload
-        currentSession.value = payload.session
-
-        remoteUsers.value.clear()
-        for (const user of payload.session.users) {
-          if (user.id !== localUserId.value) {
-            remoteUsers.value.set(user.id, user)
-          }
-        }
-        break
-      }
-
-      case 'session-list': {
-        const payload = message.payload as { sessions: Array<{ id: string; name: string; hostId: string; userCount: number }> }
-        availableSessions.value = payload.sessions
-        break
-      }
-
-      case 'session-leave': {
-        currentSession.value = null
-        remoteUsers.value.clear()
-        break
-      }
-
-      case 'user-joined': {
-        const payload = message.payload as UserPresencePayload
-        if (payload.user && payload.user.id !== localUserId.value) {
-          remoteUsers.value.set(payload.user.id, payload.user)
-        }
-        break
-      }
-
-      case 'user-left': {
-        const payload = message.payload as UserPresencePayload
-        if (payload.user) {
-          remoteUsers.value.delete(payload.user.id)
-        }
-        break
-      }
-
-      case 'cursor-move': {
-        const payload = message.payload as CursorMovePayload & { userId: string }
-        const user = remoteUsers.value.get(payload.userId)
-        if (user) {
-          user.position = payload.position
-          user.lastActivity = Date.now()
-        }
-        break
-      }
-
-      case 'cursor-config-update': {
-        const payload = message.payload as CursorConfigPayload & { userId: string }
-        const user = remoteUsers.value.get(payload.userId)
-        if (user) {
-          user.cursor = payload.cursor
-        }
-        break
-      }
-
-      case 'error': {
-        const payload = message.payload as ErrorPayload
-        lastError.value = payload
-        console.error(`[STC] Error: ${payload.code} - ${payload.message}`)
-        break
-      }
-    }
-
-    emitMessage(message)
-  }
 
   function sendMessage(type: STCMessageType, payload?: unknown): boolean {
     return send(type, payload)
