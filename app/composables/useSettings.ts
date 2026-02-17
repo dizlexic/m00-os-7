@@ -48,6 +48,8 @@ const systemSettings = ref<SystemSettings>({
   allowGuestLogin: true
 })
 
+let saveTimeout: ReturnType<typeof setTimeout> | null = null
+
 export function useSettings() {
   const { isAuthenticated, user } = useUser()
 
@@ -78,16 +80,25 @@ export function useSettings() {
     }
   }
 
-  const saveSettingsToServer = async () => {
+  const saveSettingsToServer = () => {
     if (!isAuthenticated.value) return
-    try {
-      await $fetch('/api/settings', {
-        method: 'POST',
-        body: { settings: settings.value }
-      })
-    } catch (e) {
-      console.error('Failed to save settings:', e)
+
+    if (saveTimeout) {
+      clearTimeout(saveTimeout)
     }
+
+    saveTimeout = setTimeout(async () => {
+      try {
+        await $fetch('/api/settings', {
+          method: 'POST',
+          body: { settings: settings.value }
+        })
+      } catch (e) {
+        console.error('Failed to save settings:', e)
+      } finally {
+        saveTimeout = null
+      }
+    }, 1000)
   }
 
   const fetchSettingsFromServer = async () => {
