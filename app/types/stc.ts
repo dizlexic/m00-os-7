@@ -333,6 +333,43 @@ export interface SessionUsersPayload {
   users: RemoteUser[]
 }
 
+/** Room create payload */
+export interface RoomCreatePayload {
+  roomName: string
+  isPrivate?: boolean
+}
+
+/** Room join payload */
+export interface RoomJoinPayload {
+  roomId: string
+}
+
+/** Room state payload */
+export interface RoomStatePayload {
+  room: {
+    id: string
+    name: string
+    ownerId: string
+    members: string[]
+    memberNames?: Record<string, string>
+    isActive: boolean
+    isPrivate?: boolean
+    createdAt: number
+  }
+}
+
+/** Room list payload */
+export interface RoomListPayload {
+  rooms: Array<{
+    id: string
+    name: string
+    ownerId: string
+    memberCount: number
+    isPrivate?: boolean
+    createdAt: number
+  }>
+}
+
 /** Error payload */
 export interface ErrorPayload {
   code: string
