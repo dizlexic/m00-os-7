@@ -10,6 +10,7 @@ import {
   registerPeer,
   unregisterPeer,
   getPeer,
+  getAllPeers,
   getSTCSession,
   getChatRoom,
   createSession,
@@ -611,7 +612,7 @@ export default defineWebSocketHandler({
       }
 
       case 'user-list': {
-        const users = Array.from(peers.values()).map(p => ({
+        const users = getAllPeers().map(p => ({
           id: p.userId,
           username: p.username
         }))

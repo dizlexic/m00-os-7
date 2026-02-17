@@ -161,6 +161,13 @@ export function unregisterPeer(peerId: string): ConnectedPeer | undefined {
 }
 
 /**
+ * Get all connected peers
+ */
+export function getAllPeers(): ConnectedPeer[] {
+  return Array.from(peers.values())
+}
+
+/**
  * Get a peer by ID
  */
 export function getPeer(peerId: string): ConnectedPeer | undefined {
