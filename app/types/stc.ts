@@ -171,12 +171,25 @@ export type STCMessageType =
   // Input messages
   | 'key-press'
   | 'text-input'
-  // Session messages
+  // Session messages (STC)
   | 'session-create'
   | 'session-join'
   | 'session-leave'
   | 'session-state'
   | 'session-users'
+  // Room messages (Chat)
+  | 'room-create'
+  | 'room-join'
+  | 'room-leave'
+  | 'room-list'
+  | 'room-state'
+  // Chat messages
+  | 'chat-message'
+  | 'chat-private-message'
+  | 'chat-status-update'
+  | 'chat-buddy-update'
+  | 'friend-request'
+  | 'user-list'
   // Error messages
   | 'error'
 
