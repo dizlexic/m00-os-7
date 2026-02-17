@@ -23,18 +23,6 @@ function handleMessage(message: any) {
   const { connectionState } = useWebSocket()
   const isConnected = connectionState.value === 'connected'
 
-      case 'chat-message':
-      case 'chat-private-message':
-        messages.value.push({
-          id: Date.now().toString(),
-          senderId: String(payload.senderId),
-          senderName: payload.senderName,
-          text: payload.text,
-          timestamp: Date.now(),
-          roomId: payload.roomId ? String(payload.roomId) : undefined,
-          recipientId: payload.recipientId ? String(payload.recipientId) : undefined
-        })
-        break
   switch (type) {
     case 'connect':
       // If we just connected, sync status
@@ -43,8 +31,18 @@ function handleMessage(message: any) {
         send('chat-status-update', { status: status.value, customStatus: customStatus.value })
       }
       break
+    case 'chat-message':
+    case 'chat-private-message':
+      messages.value.push({
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+        senderId: String(payload.senderId),
+        senderName: payload.senderName,
+        text: payload.text,
+        timestamp: Date.now(),
         roomId: payload.roomId ? String(payload.roomId) : undefined,
         recipientId: payload.recipientId ? String(payload.recipientId) : undefined
+      })
+      break
     case 'room-state':
       if (payload.room) {
         const room: ChatRoom = {
