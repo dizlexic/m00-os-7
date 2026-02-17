@@ -84,6 +84,23 @@ function handleTrackClick(event: MouseEvent): void {
   }
 }
 
+function handleTrackTouchStart(event: TouchEvent): void {
+  if (event.touches.length !== 1) return
+  event.stopPropagation()
+
+  const touch = event.touches[0]
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  const touchPos = props.orientation === 'vertical'
+    ? touch.clientY - rect.top
+    : touch.clientX - rect.left
+
+  if (touchPos < thumbPosition.value) {
+    updateScroll(props.modelValue - props.viewportSize)
+  } else if (touchPos > thumbPosition.value + thumbSize.value) {
+    updateScroll(props.modelValue + props.viewportSize)
+  }
+}
+
 function handleThumbMouseDown(event: MouseEvent): void {
   if (event.button !== 0) return
   event.stopPropagation()
@@ -94,6 +111,20 @@ function handleThumbMouseDown(event: MouseEvent): void {
 
   window.addEventListener('mousemove', handleThumbMouseMove)
   window.addEventListener('mouseup', handleThumbMouseUp)
+}
+
+function handleThumbTouchStart(event: TouchEvent): void {
+  if (event.touches.length !== 1) return
+  event.stopPropagation()
+  event.preventDefault()
+
+  isDragging.value = true
+  const touch = event.touches[0]
+  dragStartPosition.value = props.orientation === 'vertical' ? touch.clientY : touch.clientX
+  dragStartScrollValue.value = props.modelValue
+
+  window.addEventListener('touchmove', handleThumbTouchMove, { passive: false })
+  window.addEventListener('touchend', handleThumbTouchEnd)
 }
 
 function handleThumbMouseMove(event: MouseEvent): void {
@@ -109,10 +140,30 @@ function handleThumbMouseMove(event: MouseEvent): void {
   updateScroll(dragStartScrollValue.value + scrollDelta)
 }
 
+function handleThumbTouchMove(event: TouchEvent): void {
+  if (!isDragging.value || event.touches.length !== 1) return
+
+  const touch = event.touches[0]
+  const currentPos = props.orientation === 'vertical' ? touch.clientY : touch.clientX
+  const delta = currentPos - dragStartPosition.value
+
+  const trackRange = trackSize.value - thumbSize.value
+  if (trackRange <= 0) return
+
+  const scrollDelta = (delta / trackRange) * scrollMax.value
+  updateScroll(dragStartScrollValue.value + scrollDelta)
+}
+
 function handleThumbMouseUp(): void {
   isDragging.value = false
   window.removeEventListener('mousemove', handleThumbMouseMove)
   window.removeEventListener('mouseup', handleThumbMouseUp)
+}
+
+function handleThumbTouchEnd(): void {
+  isDragging.value = false
+  window.removeEventListener('touchmove', handleThumbTouchMove)
+  window.removeEventListener('touchend', handleThumbTouchEnd)
 }
 
 function updateScroll(value: number): void {
@@ -122,6 +173,7 @@ function updateScroll(value: number): void {
 
 onUnmounted(() => {
   handleThumbMouseUp()
+  handleThumbTouchEnd()
 })
 </script>
 
@@ -166,6 +218,7 @@ onUnmounted(() => {
       :aria-valuemax="scrollMax"
       :aria-valuenow="Math.round(modelValue)"
       @mousedown="handleTrackClick"
+      @touchstart="handleTrackTouchStart"
     >
       <!-- Thumb -->
       <div
@@ -173,6 +226,7 @@ onUnmounted(() => {
         class="scrollbar__thumb"
         :style="thumbStyle"
         @mousedown="handleThumbMouseDown"
+        @touchstart="handleThumbTouchStart"
       >
         <div class="scrollbar__thumb-pattern" />
       </div>
