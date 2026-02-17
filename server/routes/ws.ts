@@ -17,6 +17,7 @@ import {
   updateUserPosition,
   updateUserCursor,
   broadcastToSession,
+  broadcastToAll,
   sendToPeer,
   getSessionUsersArray,
   getPeerByUserId
@@ -82,7 +83,15 @@ function sendError(peerId: string, code: string, message: string): void {
 
 /** Get user ID from peer headers */
 function getUserIdFromPeer(peer: any): string | undefined {
-  const cookieHeader = peer.headers?.cookie || peer.headers?.Cookie || ''
+  const headers = peer.headers || peer.request?.headers || {}
+  let cookieHeader = ''
+
+  if (typeof (headers as any).get === 'function') {
+    cookieHeader = (headers as any).get('cookie') || (headers as any).get('Cookie') || ''
+  } else {
+    cookieHeader = (headers as any).cookie || (headers as any).Cookie || ''
+  }
+
   if (!cookieHeader) return undefined
 
   try {
@@ -164,7 +173,7 @@ export default defineWebSocketHandler({
         }
 
         const cursor: CursorConfig = payload.cursor || { style: 'arrow', color: '#FF0000' }
-        const newPeer = registerPeer(peer.id, peer, payload.username, cursor)
+        const newPeer = registerPeer(peer.id, peer, payload.username, cursor, authenticatedUserId)
 
         sendToPeer(peer.id, createMessage('connect', {
           userId: newPeer.userId,
@@ -189,16 +198,28 @@ export default defineWebSocketHandler({
         }
 
         if (payload.roomId) {
-          // Room message
-          broadcastToSession(
-            payload.roomId,
-            createMessage('chat-message', {
-              roomId: payload.roomId,
-              text: payload.text,
-              senderId: connectedPeer.userId,
-              senderName: connectedPeer.username
-            }, connectedPeer.userId)
-          )
+          if (payload.roomId === 'lobby') {
+            // Global lobby message
+            broadcastToAll(
+              createMessage('chat-message', {
+                roomId: 'lobby',
+                text: payload.text,
+                senderId: connectedPeer.userId,
+                senderName: connectedPeer.username
+              }, connectedPeer.userId)
+            )
+          } else {
+            // Room message
+            broadcastToSession(
+              payload.roomId,
+              createMessage('chat-message', {
+                roomId: payload.roomId,
+                text: payload.text,
+                senderId: connectedPeer.userId,
+                senderName: connectedPeer.username
+              }, connectedPeer.userId)
+            )
+          }
         }
         break
       }
@@ -222,7 +243,7 @@ export default defineWebSocketHandler({
             senderId: connectedPeer.userId,
             senderName: connectedPeer.username
           }, connectedPeer.userId))
-          
+
           // Also send back to sender for confirmation/sync
           sendToPeer(peer.id, createMessage('chat-private-message', {
             recipientId: payload.recipientId,
@@ -240,18 +261,14 @@ export default defineWebSocketHandler({
         if (!connectedPeer) return
 
         const payload = message.payload as { status: string; customStatus?: string }
-        // For now just log and maybe broadcast to everyone if they are friends
-        // Simpler: broadcast to all sessions this user is in
-        if (connectedPeer.sessionId) {
-          broadcastToSession(
-            connectedPeer.sessionId,
-            createMessage('chat-status-update', {
-              userId: connectedPeer.userId,
-              status: payload.status,
-              customStatus: payload.customStatus
-            }, connectedPeer.userId)
-          )
-        }
+        // Broadcast status update to everyone
+        broadcastToAll(
+          createMessage('chat-status-update', {
+            userId: connectedPeer.userId,
+            status: payload.status,
+            customStatus: payload.customStatus
+          }, connectedPeer.userId)
+        )
         break
       }
 

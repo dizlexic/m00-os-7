@@ -72,11 +72,12 @@ export function registerPeer(
   peerId: string,
   peer: Peer,
   username: string,
-  cursor: CursorConfig
+  cursor: CursorConfig,
+  userId?: string
 ): ConnectedPeer {
   const connectedPeer: ConnectedPeer = {
     peer,
-    userId: generateUserId(),
+    userId: userId || generateUserId(),
     username,
     sessionId: null,
     cursor
@@ -271,6 +272,27 @@ export function updateUserCursor(peerId: string, cursor: CursorConfig): RemoteUs
   }
 
   return null
+}
+
+/**
+ * Broadcast a message to all connected peers except the sender
+ */
+export function broadcastToAll(
+  message: unknown,
+  excludePeerId?: string
+): void {
+  const messageStr = JSON.stringify(message)
+
+  for (const [peerId, connectedPeer] of peers) {
+    // Skip the sender
+    if (excludePeerId && peerId === excludePeerId) continue
+
+    try {
+      connectedPeer.peer.send(messageStr)
+    } catch (error) {
+      console.error(`Failed to send message to peer ${peerId}:`, error)
+    }
+  }
 }
 
 /**
