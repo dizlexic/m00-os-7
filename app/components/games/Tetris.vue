@@ -2,7 +2,7 @@
 /**
  * Tetris Game Component
  *
- * A classic Tetris clone for Mac OS 7.
+ * A classic Tetris game for m00-os-7.
  */
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useWindowManager } from '~/composables/useWindowManager'

@@ -2,7 +2,7 @@
 /**
  * Brickle (Breakout) Game Component
  *
- * A classic Breakout clone for Mac OS 7.
+ * A classic Breakout game for m00-os-7.
  */
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useWindowManager } from '~/composables/useWindowManager'

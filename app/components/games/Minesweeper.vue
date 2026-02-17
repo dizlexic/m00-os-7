@@ -2,7 +2,7 @@
 /**
  * Minesweeper Game Component
  *
- * A classic Minesweeper clone for Mac OS 7.
+ * A classic Minesweeper game for m00-os-7.
  */
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { useWindowManager } from '~/composables/useWindowManager'
