@@ -214,7 +214,11 @@ export default defineWebSocketHandler({
         broadcastToAll(createMessage('user-joined', {
           user: {
             id: newPeer.userId,
-            username: newPeer.username
+            username: newPeer.username,
+            position: { x: 0, y: 0 },
+            cursor: newPeer.cursor,
+            isActive: true,
+            lastActivity: Date.now()
           }
         }, newPeer.userId))
 
@@ -444,8 +448,15 @@ export default defineWebSocketHandler({
         // Notify other users in the room
         broadcastToRoom(
           room.id,
-          createMessage('user-joined', { 
-            user: { id: connectedPeer.userId, username: connectedPeer.username } 
+          createMessage('user-joined', {
+            user: {
+              id: connectedPeer.userId,
+              username: connectedPeer.username,
+              position: { x: 0, y: 0 }, // Default position
+              cursor: connectedPeer.cursor,
+              isActive: true,
+              lastActivity: Date.now()
+            }
           }, connectedPeer.userId),
           peer.id
         )
@@ -463,8 +474,8 @@ export default defineWebSocketHandler({
           // Notify other users
           broadcastToRoom(
             payload.roomId,
-            createMessage('user-left', { 
-              user: { id: connectedPeer.userId, username: connectedPeer.username } 
+            createMessage('user-left', {
+              user: { id: connectedPeer.userId, username: connectedPeer.username }
             }, connectedPeer.userId)
           )
 
