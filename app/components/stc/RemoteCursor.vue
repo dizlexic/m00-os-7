@@ -28,17 +28,26 @@ const cursorPaths: Record<CursorStyle, string> = {
 }
 
 /** Computed cursor style */
-const cursorStyle = computed(() => ({
-  left: `${props.user.position.x}px`,
-  top: `${props.user.position.y}px`,
-  '--cursor-color': props.user.cursor.color
-}))
+const cursorStyle = computed(() => {
+  if (!props.user || !props.user.position) {
+    return { display: 'none' }
+  }
+  return {
+    left: `${props.user.position.x}px`,
+    top: `${props.user.position.y}px`,
+    '--cursor-color': props.user.cursor?.color || 'black'
+  }
+})
 
 /** Get the SVG path for the cursor style */
-const cursorPath = computed(() => cursorPaths[props.user.cursor.style] || cursorPaths.arrow)
+const cursorPath = computed(() => {
+  if (!props.user || !props.user.cursor) return cursorPaths.arrow
+  return cursorPaths[props.user.cursor.style] || cursorPaths.arrow
+})
 
 /** Check if user is active (activity within last 30 seconds) */
 const isActive = computed(() => {
+  if (!props.user || typeof props.user.lastActivity !== 'number') return false
   const thirtySecondsAgo = Date.now() - 30000
   return props.user.lastActivity > thirtySecondsAgo
 })
@@ -68,7 +77,7 @@ const isActive = computed(() => {
       <!-- Main cursor -->
       <path
         :d="cursorPath"
-        :fill="user.cursor.color"
+        :fill="user.cursor?.color || 'black'"
         stroke="white"
         stroke-width="1"
       />
@@ -78,7 +87,7 @@ const isActive = computed(() => {
     <div
       v-if="showLabel"
       class="remote-cursor__label"
-      :style="{ backgroundColor: user.cursor.color }"
+      :style="{ backgroundColor: user.cursor?.color || 'black' }"
     >
       {{ user.username }}
     </div>
