@@ -11,6 +11,8 @@ const {
   messages,
   friends,
   rooms,
+  blocked,
+  muted,
   allUsers,
   status,
   customStatus,
@@ -20,6 +22,15 @@ const {
   updateStatus,
   createRoom,
   joinRoom,
+  leaveRoom,
+  inviteToRoom,
+  removeFromRoom,
+  addFriend,
+  removeFriend,
+  blockUser,
+  unblockUser,
+  muteUser,
+  unmuteUser,
   refreshRooms,
   refreshUsers,
   sendFriendRequest
@@ -91,6 +102,61 @@ function handleSendFriendRequest() {
   friendRequestUsername.value = ''
 }
 
+function handleRoomContextMenu(event: MouseEvent, room: any) {
+  event.preventDefault()
+  const items: MenuItem[] = [
+    { id: 'leave-room', label: 'Leave Room', action: () => leaveRoom(room.id) },
+    { id: 'create-room', label: 'Create New Room...', action: () => { /* Logic to focus create room input */ } }
+  ]
+
+  if (room.id !== 'lobby') {
+    items.push({ id: 'room-info', label: 'Room Info', disabled: true })
+  }
+
+  showContextMenu({ x: event.clientX, y: event.clientY }, items)
+}
+
+function handleUserContextMenu(event: MouseEvent, userId: string, username: string) {
+  event.preventDefault()
+  const isMe = userId === String(authUser.value?.id)
+  if (isMe) return
+
+  const isFriend = !!friends.value.find(f => f.id === userId)
+
+  const items: MenuItem[] = [
+    { id: 'private-message', label: `Message ${username}`, action: () => { activeChatId.value = userId } },
+    { id: 'sep1', label: '', isSeparator: true },
+    isFriend
+      ? { id: 'remove-friend', label: 'Remove Friend', action: () => removeFriend(userId) }
+      : { id: 'add-friend', label: 'Add Friend', action: () => sendFriendRequest(username) },
+    { id: 'invite-private', label: 'Invite to Private Chat', action: () => {
+       const roomName = `Private: ${authUser.value?.username} & ${username}`
+       createRoom(roomName, true)
+    }},
+    { id: 'sep2', label: '', isSeparator: true },
+    {
+      id: 'block',
+      label: blocked.value.includes(userId) ? 'Unblock User' : 'Block User',
+      action: () => blocked.value.includes(userId) ? unblockUser(userId) : blockUser(userId)
+    },
+    {
+      id: 'mute',
+      label: muted.value.includes(userId) ? 'Unmute User' : 'Mute User',
+      action: () => muted.value.includes(userId) ? unmuteUser(userId) : muteUser(userId)
+    }
+  ]
+
+  // If in a private room and we are the owner, add "Remove from Private Chat"
+  // Note: ownerId should be added to ChatRoom type if not there
+  if (activeRoom.value && (activeRoom.value as any).isPrivate && (activeRoom.value as any).ownerId === String(authUser.value?.id)) {
+    if (activeRoom.value.members.includes(userId)) {
+      items.push({ id: 'remove-private', label: 'Remove from Private Chat', action: () => removeFromRoom(activeRoom.value!.id, userId) })
+    }
+  }
+
+  showContextMenu({ x: event.clientX, y: event.clientY }, items)
+}
+
 // Set lobby as default
 onMounted(() => {
   activeChatId.value = 'lobby'
@@ -107,6 +173,7 @@ onMounted(() => {
         @update:status="updateStatus"
         @update:customStatus="s => updateStatus(status, s)"
         @select-buddy="handleSelectBuddy"
+        @user-contextmenu="handleUserContextMenu"
       />
 
       <div class="messenger__friend-request">
@@ -123,6 +190,7 @@ onMounted(() => {
           class="messenger__room-item"
           :class="{ 'messenger__room-item--active': activeChatId === 'lobby' }"
           @click="handleSelectRoom('lobby')"
+          @contextmenu="handleRoomContextMenu($event, { id: 'lobby', name: 'System Lobby' })"
         >
           System Lobby
         </div>
@@ -132,6 +200,7 @@ onMounted(() => {
           class="messenger__room-item"
           :class="{ 'messenger__room-item--active': activeChatId === room.id }"
           @click="handleSelectRoom(room.id)"
+          @contextmenu="handleRoomContextMenu($event, room)"
         >
           {{ room.name }} {{ room.isPrivate ? '(P)' : '' }}
         </div>
@@ -157,6 +226,7 @@ onMounted(() => {
           :members="activeRoom?.members || []"
           :member-names="activeRoom?.memberNames || {}"
           @send-message="handleSendMessage"
+          @user-contextmenu="handleUserContextMenu"
         />
       </template>
       <div v-else class="messenger__no-chat">

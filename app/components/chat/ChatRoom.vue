@@ -17,6 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const emit = defineEmits<{
   'send-message': [text: string]
+  'user-contextmenu': [event: MouseEvent, userId: string, username: string]
 }>()
 
 const newMessage = ref('')
@@ -55,13 +56,23 @@ onMounted(() => {
           class="chat-room__message"
           :class="{ 'chat-room__message--own': msg.senderId === currentUserId }"
         >
-          <div class="chat-room__sender">{{ msg.senderId === currentUserId ? 'Me' : (msg.senderName || msg.senderId) }}:</div>
+          <div
+            class="chat-room__sender"
+            @contextmenu="emit('user-contextmenu', $event, msg.senderId, msg.senderName || msg.senderId)"
+          >
+            {{ msg.senderId === currentUserId ? 'Me' : (msg.senderName || msg.senderId) }}:
+          </div>
           <div class="chat-room__text">{{ msg.text }}</div>
         </div>
       </div>
       <div v-if="members.length > 0" class="chat-room__sidebar">
         <div class="chat-room__sidebar-title">Members ({{ members.length }})</div>
-        <div v-for="memberId in members" :key="memberId" class="chat-room__member">
+        <div
+          v-for="memberId in members"
+          :key="memberId"
+          class="chat-room__member"
+          @contextmenu="emit('user-contextmenu', $event, memberId, memberNames[memberId] || memberId)"
+        >
           {{ memberNames[memberId] || memberId }}
         </div>
       </div>

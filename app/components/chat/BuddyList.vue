@@ -15,6 +15,7 @@ const emit = defineEmits<{
   'select-buddy': [userId: string]
   'remove-friend': [userId: string]
   'block-user': [userId: string]
+  'user-contextmenu': [event: MouseEvent, userId: string, username: string]
 }>()
 
 const showStatusMenu = ref(false)
@@ -75,6 +76,7 @@ function handleCustomStatusBlur(e: Event) {
         :key="friend.id"
         class="buddy-list__friend"
         @dblclick="emit('select-buddy', friend.id)"
+        @contextmenu="emit('user-contextmenu', $event, friend.id, friend.username)"
       >
         <div class="buddy-list__status-dot" :class="`buddy-list__status--${friend.status}`"></div>
         <span class="buddy-list__friend-name">{{ friend.username }}</span>
