@@ -183,6 +183,14 @@ export default defineWebSocketHandler({
           cursor: newPeer.cursor
         }, newPeer.userId))
 
+        // Notify everyone that a new user joined
+        broadcastToAll(createMessage('user-joined', {
+          user: {
+            id: newPeer.userId,
+            username: newPeer.username
+          }
+        }, newPeer.userId))
+
         console.log(`[STC] User connected: ${newPeer.username} (${newPeer.userId})`)
         break
       }
@@ -404,6 +412,15 @@ export default defineWebSocketHandler({
         }))
 
         sendToPeer(peer.id, createMessage('session-list', { sessions }))
+        break
+      }
+
+      case 'user-list': {
+        const users = Array.from(peers.values()).map(p => ({
+          id: p.userId,
+          username: p.username
+        }))
+        sendToPeer(peer.id, createMessage('user-list', { users }))
         break
       }
 
